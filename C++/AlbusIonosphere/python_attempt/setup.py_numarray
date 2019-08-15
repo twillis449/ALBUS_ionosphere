@@ -1,0 +1,63 @@
+# setup.py
+# a setup file to help compile a C/C++ code module for Python
+# 2006 ??? ??  James M Anderson  --JIVE  start
+# 2007 Jan 10  JMA  --revise to also use Numarray stuff
+from distutils.core import setup#, Extension
+import sys
+sys.path.append("/home/mevius/albus/lib/python")
+#from numarray.numarrayext import NumarrayExtension
+import numpy
+from numpy.distutils.extension import Extension
+
+if not hasattr(sys, 'version_info') or sys.version_info < (2,2,0,'alpha',0): raise SystemError("Upgrade your Python")
+
+
+user_inp = raw_input('Give me the ALBUS_PATH MAJ MIN:   ')
+user_inp = user_inp.split()
+ALBUS_PATH = user_inp[0]
+maj_ver = user_inp[1]
+min_ver = user_inp[2]
+module1 = Extension('AlbusIonosphere',
+                    define_macros = [('MAJOR_VERSION', maj_ver),
+                                     ('MINOR_VERSION', min_ver)],
+# python 2.7 and Suse Linux
+#                    include_dirs = [ALBUS_PATH+'/include',numpy.get_include(),'/usr/lib/python2.7/dist-packages/numpy/numarray/include/numpy','/usr/lib64/python2.7/site-packages/numpy/numarray/include/numpy/'],
+
+# python 2.7 and Ububtu linux 12.04 or 14.04
+# the header files in the numpy subdirectory here come from /usr/lib/python2.7/dist-packages/numpy/numarray/include/numpy (numpy 1.1.8.2 in Ubuntu terminology)
+                     include_dirs = [ALBUS_PATH+'/include',numpy.get_include(),'./numpy'],
+
+# python 2.6 and Ububtu linux 10.04
+#                   include_dirs = [ALBUS_PATH+'/include',numpy.get_include(),'/usr/lib/python2.6/dist-packages/numpy/core/include/numpy'],
+
+# python 2.6 and Scientific Linux v6
+#                   include_dirs = [ALBUS_PATH+'/include',numpy.get_include(),'/usr/lib64/python2.6/site-packages/numpy/numarray/numpy'],
+
+
+                    libraries = ['mim',
+                                 'jmavex',
+                                 'iri',
+                                 'pim',
+                                 'sofa',
+                                 'vexplus',
+                                 'vex',
+                                 'fl',
+                                 'gfortran',
+                                 'lapacke',
+                                 'm'],
+                    library_dirs = [ALBUS_PATH+'/lib'],
+                    runtime_library_dirs = [ALBUS_PATH+'/lib'],
+                    sources = ['AlbusIonosphere.cxx'])
+
+setup (name = 'AlbusIonosphere',
+       version = maj_ver+'.'+min_ver,
+       description = 'ALBUS Ionospheric Calibration package for AIPS',
+       author = 'James M Anderson',
+       author_email = 'anderson@mpifr-bonn.mpg.de',
+       url = 'http://www.radionet-eu.org/rnwiki/ALBUSWikiPage',
+       long_description = '''
+ALBUS Ionospheric Calibration package for AIPS
+Currently in a development stage.
+''',
+       ext_modules = [module1])
+

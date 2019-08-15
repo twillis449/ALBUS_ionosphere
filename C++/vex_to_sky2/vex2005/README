@@ -1,0 +1,110 @@
+Describing /jccs/util/vex2005
+=============================
+
+2005-05-27: Harro got and compiled new VEX parser (from FS FS9.7.7)
+            and put the include files on jaw0
+            at the following location: /jccs/util/vex2005-orig 
+
+2005-05-27: As jive_cc:
+            Friso copied the lot to /jccs/util/vex2005
+            Friso copied vex++.h from vex2001-gnu2.95.3 (the operational system
+            Friso copied Makefile from vex2004 (Harro's adaption of vex2001-gnu2.95.3)
+            Friso removed unused source files vex_put.c, vexf.c, vexf_put.c and vexf.f.new 
+            cd /jccs/util/vex2005
+            gmake libvex.a libvex.sl
+bison -d -y vex.y
+mv -f y.tab.c vex.c
+/local/gcc-3.2/bin/gcc -fPIC   -c -o vex.o vex.c
+flex  -t vex.yy.l > vex.yy.c
+/local/gcc-3.2/bin/gcc -fPIC   -c -o vex.yy.o vex.yy.c
+/local/gcc-3.2/bin/gcc -fPIC   -c -o vex_util.o vex_util.c
+/local/gcc-3.2/bin/gcc -fPIC   -c -o print_vex.o print_vex.c
+/local/gcc-3.2/bin/gcc -fPIC   -c -o vex_get.o vex_get.c
+vex_get.c: In function `get_all_lowl':
+vex_get.c:451: warning: deprecated use of label at end of compound statement
+touch libvex.a
+rm libvex.a
+ar -qc libvex.a vex.o vex.yy.o vex_util.o print_vex.o vex_get.o
+touch libvex.sl
+rm libvex.sl
+gcc  -fPIC -shared -o libvex.sl vex.o vex.yy.o vex_util.o print_vex.o vex_get.o
+rm vex.c vex.yy.c
+
+
+Contents of this directory:
+==========================
+
+Sources:
+-------
+   1055 Nov 16  2004 Makefile   (copied from vex2004) -> libvex.a
+   9923 May 27 11:37 README     this file
+   6933 May 27 10:23 print_vex.c -> libvex.a 
+    147 Oct 22  2001 vex++.h    C++ wrapper around VEX library (copied from vex2001)
+  25297 May 27 10:23 vex.h      declarations/prototypes for VEX library
+  50768 May 27 10:23 vex.y      -> libvex.a (bison grammar file)
+  16180 May 27 10:23 vex.yy.l   -> libvex.a
+  23678 May 27 10:23 vex_get.c  -> libvex.a
+  49320 May 27 10:23 vex_util.c -> libvex.a
+
+   1024 May 27 10:24 test_parser/
+in test_parser/:
+     90 May 27 10:24 Makefile
+   4594 May 27 10:24 main.c
+  12261 May 27 10:24 t.f
+  91812 May 27 10:24 wh          VEX file for testing
+  91812 May 27 10:24 wh1         VEX file for testing
+
+differences with operational version jccs/util/vex2001-gnu2.95.3
+   6117 Oct 22  2001 vex2001-gnu2.95.3/print_vex.c  // block->vex_block (COPIED OVER)
+   6933 May 27 10:23 vex2005/print_vex.c            // printf->fprintf, added extern struct vex*
+  11673 Oct 22  2001 vex2001-gnu2.95.3/vex.h  // block->vex_block, remove *this (COPIED OVER)
+  25297 May 27 10:23 vex2005/vex.h            // + data_transfer and fu's create_* and get_*literal*
+  48542 Oct 22  2001 vex2001-gnu2.95.3/vex.y        // block->vex_block (COPIED OVER)
+  50768 May 27 10:23 vex2005/vex.y                  // + data_transfer, semicolons, new parms in SCHED, empty headstacknr in DAS,empty subpass name in TRACKS
+  16107 Oct 22  2001 vex2001-gnu2.95.3/vex.yy.l
+  16180 May 27 10:23 vex2005/vex.yy.l         // + CR is a field separator, data_transfer
+  18089 Oct 22  2001 vex2001-gnu2.95.3/vex_get.c    // block->vex_block (COPIED OVER)
+  23678 May 27 10:23 vex2005/vex_get.c              // + data_transfer and fu's create_* and get_*literal*
+  47570 Oct 22  2001 vex2001-gnu2.95.3/vex_util.c // block->vex_block (COPIED OVER)
+  49320 May 27 10:23 vex2005/vex_util.c           // + data_transfer, literals, comment
+
+
+Modifications (May 27 2005) -> vex2005-orig->vex2005:
+----------------------------------------------------
+"struct block" renamed to "struct vex_block"
+in: print_vex.c (2x), vex.h (2x), vex.y (1x), vex_get.c (16x), vex_util.c (2x)
+
+changed "external *this" into "external *"
+in: vex.h
+
+made declarations of *fp and *filename extern (to avoid reports of duplicate symbols filename and fp when building prep_job)
+in: vex.h
+
+Intermediates:
+-------------
+   5051 May 30 09:59 y.tab.h     <- bison -d -y vex.y
+                     vex.c       <- bison -d -y vex.y
+  80189 May 30 09:59 vex.o       <- gcc -c      vex.c
+                     vex.yy.c    <- flex -t     vex.yy.l
+  44514 May 30 09:59 vex.yy.o    <- gcc -c      vex.yy.c
+  10429 May 30 09:59 print_vex.o <- gcc -c      print_vex.c
+  23465 May 30 09:59 vex_get.o   <- gcc -c       vex_get.c
+  48149 May 30 09:59 vex_util.o  <- gcc -c       vex_util.c
+
+Products:
+--------
+ 215018 May 30 09:59 libvex.a    <- ar -qc libvex.a *.o
+ 238002 May 30 09:59 libvex.sl*  <- gcc -fPIC -shared -o libvex.sl *.o
+
+
+///////////////////////////////////////////////////////////////// move to jaw1
+2005-05-30: As jive_cc:
+            ftp-ed vex2005 to /jaw1_0/users/jive_cc/vex2005,
+            removed all intermediates and products,
+            gmake libvex.a libvex.sl;
+            emacs $CCC_ROOT/system_make/locations.jaw1.mak; // ->vex2005 
+            cd $CCC_ROOT/source/prep_job; gmake freshstart all install
+            As olnon:
+            cd /jaw1_0/users/olnon/twoheads/source/prep_job; gmake freshstart all install
+            emacs vexplus.C // in two places allow empty strings as return value
+            emacs vexcjd.C // make it Mark5A sensitive

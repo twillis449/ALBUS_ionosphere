@@ -1,0 +1,66 @@
+ "ursi88.dat                    " opened for input.
+ "ursi88da.dat                  " opened for output.
+ Processing month            1 , IREC=           0
+   sunspot 0 complete: IREC =          248
+   sunspot 100 complete: IREC =          496
+ Processing month            2 , IREC=         496
+   sunspot 0 complete: IREC =          744
+   sunspot 100 complete: IREC =          992
+ Processing month            3 , IREC=         992
+   sunspot 0 complete: IREC =         1240
+   sunspot 100 complete: IREC =         1488
+ Processing month            4 , IREC=        1488
+   sunspot 0 complete: IREC =         1736
+   sunspot 100 complete: IREC =         1984
+ Processing month            5 , IREC=        1984
+   sunspot 0 complete: IREC =         2232
+   sunspot 100 complete: IREC =         2480
+ Processing month            6 , IREC=        2480
+   sunspot 0 complete: IREC =         2728
+   sunspot 100 complete: IREC =         2976
+ Processing month            7 , IREC=        2976
+   sunspot 0 complete: IREC =         3224
+   sunspot 100 complete: IREC =         3472
+ Processing month            8 , IREC=        3472
+   sunspot 0 complete: IREC =         3720
+   sunspot 100 complete: IREC =         3968
+ Processing month            9 , IREC=        3968
+   sunspot 0 complete: IREC =         4216
+   sunspot 100 complete: IREC =         4464
+ Processing month           10 , IREC=        4464
+ IM,IREC,KF=          10        4465          11          35          53          63          67          69          71          73          75           6
+   sunspot 0 complete: IREC =         4712
+   sunspot 100 complete: IREC =         4960
+ Processing month           11 , IREC=        4960
+   sunspot 0 complete: IREC =         5208
+   sunspot 100 complete: IREC =         5456
+ Processing month           12 , IREC=        5456
+   sunspot 0 complete: IREC =         5704
+   sunspot 100 complete: IREC =         5952
+ foF2 coefficients complete.
+ M(3000): month            1 , IREC=        5952
+   final IREC =         6051
+ M(3000): month            2 , IREC=        6051
+   final IREC =         6150
+ M(3000): month            3 , IREC=        6150
+   final IREC =         6249
+ M(3000): month            4 , IREC=        6249
+   final IREC =         6348
+ M(3000): month            5 , IREC=        6348
+   final IREC =         6447
+ M(3000): month            6 , IREC=        6447
+   final IREC =         6546
+ M(3000): month            7 , IREC=        6546
+   final IREC =         6645
+ M(3000): month            8 , IREC=        6645
+   final IREC =         6744
+ M(3000): month            9 , IREC=        6744
+   final IREC =         6843
+ M(3000): month           10 , IREC=        6843
+   final IREC =         6942
+ M(3000): month           11 , IREC=        6942
+   final IREC =         7041
+ M(3000): month           12 , IREC=        7041
+   final IREC =         7140
+  sequential file closed
+  direct-access file closed

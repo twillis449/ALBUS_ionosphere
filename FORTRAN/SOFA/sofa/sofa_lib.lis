@@ -1,0 +1,249 @@
+sofa_lib.lis                                                2005 August 24
+
+                     ----------------------
+                     SOFA Astronomy Library
+                     ----------------------
+
+
+PREFACE
+
+The routines described here comprise the SOFA astronomy library.  Their
+general appearance and coding style conforms to conventions agreed by
+the SOFA Review Board, and their functions, names and algorithms have
+been ratified by the Board.  Procedures for soliciting and agreeing
+additions to the library are still evolving.
+
+At present the routines are all written in Fortran 77, complying
+with the ANSI standard (X3.9-1978) except in two respects:
+
+  (1) All routine names are prefixed with the string "iau_".  If
+      necessary, the string can be removed globally;  the result
+      is correctly functioning code.
+
+  (2) All routines include an IMPLICIT NONE statement.  This can
+      be removed without affecting the behaviour of the code.
+
+If the "iau_" string and/or the IMPLICIT NONE statements are removed
+globally, the resulting code is fully ANSI-compliant and is functionally
+unaffected.
+
+
+GENERAL PRINCIPLES
+
+The principal function of the SOFA Astronomy Library is to define
+algorithms.  A secondary function is to provide software suitable for
+direct use by writers of astronomical applications.
+
+The astronomy routines call on the SOFA vector/matrix library routines,
+which are separately listed.
+
+The routines are designed to exploit the full floating-point accuracy
+of the machines on which they run, and not to rely on compiler
+optimizations.  Within these constraints, the intention is that the code
+corresponds to the published formulation (if any).
+
+Epochs (or simply "dates") are always Julian Dates (except in calendar
+conversion routines) and are expressed as two double precision numbers
+which sum to the required value.
+
+A distinction is made between routines that implement IAU-approved
+models and those that use those models to create other results.  The
+former are referred to as "canonical models" in the preamble comments;
+the latter are described as "support routines".
+
+Using the library requires knowledge of positional astronomy and
+timescales.  These topics are covered in "Explanatory Supplement to the
+Astronomical Almanac", P. Kenneth Seidelmann (ed.), University Science
+Books, 1992.  Recent developments are documented in the journals, and
+references to the relevant papers are given in the SOFA code as
+required.  The IERS Conventions are also an important reference.
+
+
+ROUTINES
+
+  Calendars
+
+     CAL2JD    Gregorian Calendar to Julian Date
+     EPB       Julian Date to Besselian Epoch
+     EPB2JD    Besselian Epoch to Julian Date
+     EPJ       Julian Date to Julian Epoch
+     EPJ2JD    Julian Epoch to Julian Date
+     JD2CAL    Julian Date to Gregorian year, month, day, fraction
+     JDCALF    Julian Date to Gregorian date for formatted output
+
+  Time scales including Earth rotation
+
+     DAT       Delta(AT) (=TAI-UTC) for a given UTC date
+     DTDB      TDB-TT
+     EE00      equation of the equinoxes, IAU 2000, given nutation
+     EE00A     equation of the equinoxes, IAU 2000A
+     EE00B     equation of the equinoxes, IAU 2000B
+     EECT00    equation of the equinoxes complementary terms, IAU 2000
+     EQEQ94    equation of the equinoxes, IAU 1994
+     ERA00     Earth Rotation Angle, IAU 2000
+     GMST00    Greenwich Mean Sidereal Time, IAU-2000-compatible
+     GMST82    Greenwich Mean Sidereal Time, IAU 1982
+     GST00A    Greenwich Apparent Sidereal Time, IAU 2000A
+     GST00B    Greenwich Apparent Sidereal Time, IAU 2000B
+     GST94     Greenwich Apparent Sidereal Time, IAU 1994
+
+  Ephemerides (limited precision)
+
+     EPV00     Earth position and velocity
+     PLAN94    major-planet position and velocity
+
+  Precession, Nutation, Polar Motion
+
+     BI00      frame bias, ICRS to mean J2000, IAU 2000
+     BP00      frame bias and precession matrices, IAU 2000
+     BPN2XY    extract CIP X,Y from bias-precession-nutation matrix
+     C2I00A    celestial-to-intermediate matrix, IAU 2000A
+     C2I00B    celestial-to-intermediate matrix, IAU 2000B
+     C2IBPN    celestial-to-intermediate matrix given b-p-n
+     C2IXY     celestial-to-intermediate matrix given CIP
+     C2IXYS    celestial-to-intermediate matrix given CIP and s
+     C2T00A    celestial-to-terrestrial matrix, IAU 2000A
+     C2T00B    celestial-to-terrestrial matrix, IAU 2000B
+     C2TCEO    celestial-to-terrestrial matrix, CEO-based
+     C2TEQX    celestial-to-terrestrial matrix, classical
+     C2TPE     celestial-to-terrestrial matrix given nutation
+     C2TXY     celestial-to-terrestrial matrix given CIP
+     NUM00A    nutation matrix, IAU 2000A
+     NUM00B    nutation matrix, IAU 2000B
+     NUMAT     nutation matrix, generic
+     NUT00A    nutation, IAU 2000A
+     NUT00B    nutation, IAU 2000B
+     NUT80     nutation, IAU 1980
+     OBL80     mean obliquity, IAU 1980
+     NUTM80    nutation matrix, IAU 1980
+     PMAT00    precession matrix (including frame bias), IAU 2000
+     PMAT76    precession matrix, IAU 1976
+     PN00      b,p,n matrices, IAU 2000, given nutation
+     PN00A     b,p,n matrices, IAU 2000A
+     PN00B     b,p,n matrices, IAU 2000B
+     PNM00A    celestial-to-true (b-p-n) matrix, IAU 2000A
+     PNM00B    celestial-to-true (b-p-n) matrix, IAU 2000B
+     PNM80     precession/nutation matrix, IAU 1976/1980
+     POM00     polar-motion matrix, IAU 2000
+     PR00      adjustments to IAU 1976 precession, IAU 2000
+     PREC76    precession, IAU 1976
+     S00       the quantity s, IAU 2000, given CIP
+     S00A      the quantity s, IAU 2000A
+     S00B      the quantity s, IAU 2000B
+     SP00      the quantity s', IERS 2003
+     XYS00A    CIP and s, IAU 2000A
+     XYS00B    CIP and s, IAU 2000B
+
+  Star space motion
+
+     PVSTAR    star position+velocity vector to catalog coordinates
+     STARPV    star catalog coordinates to position+velocity vector
+
+  Star catalog conversions
+
+     FK52H     transform FK5 star data into the Hipparcos frame
+     FK5HIP    FK5 orientation and spin with respect to Hipparcos
+     FK5HZ     FK5 to Hipparcos assuming zero Hipparcos proper motion
+     H2FK5     transform Hipparcos star data into the FK5 frame
+     HFK5Z     Hipparcos to FK5 assuming zero Hipparcos proper motion
+     STARPM    proper motion between two epochs
+
+
+CALLS
+
+   SUBROUTINE        iau_BI00   ( DPSIBI, DEPSBI, DRA )
+   SUBROUTINE        iau_BP00   ( DATE1, DATE2, RB, RP, RBP )
+   SUBROUTINE        iau_BPN2XY ( RBPN, X, Y )
+   SUBROUTINE        iau_C2I00A ( DATE1, DATE2, RC2I )
+   SUBROUTINE        iau_C2I00B ( DATE1, DATE2, RC2I )
+   SUBROUTINE        iau_C2IBPN ( DATE1, DATE2, RBPN, RC2I )
+   SUBROUTINE        iau_C2IXY  ( DATE1, DATE2, X, Y, RC2I )
+   SUBROUTINE        iau_C2IXYS ( X, Y, S, RC2I )
+   SUBROUTINE        iau_C2T00A ( TTA, TTB, UTA, UTB, XP, YP, RC2T )
+   SUBROUTINE        iau_C2T00B ( TTA, TTB, UTA, UTB, XP, YP, RC2T )
+   SUBROUTINE        iau_C2TCEO ( RC2I, ERA, RPOM, RC2T )
+   SUBROUTINE        iau_C2TEQX ( RBPN, GST, RPOM, RC2T )
+   SUBROUTINE        iau_C2TPE  ( TTA, TTB, UTA, UTB, DPSI, DEPS,
+                                  XP, YP, RC2T )
+   SUBROUTINE        iau_C2TXY  ( TTA, TTB, UTA, UTB, X, Y, XP, YP, RC2T )
+   SUBROUTINE        iau_CAL2JD ( IY, IM, ID, DJM0, DJM, J )
+   SUBROUTINE        iau_DAT    ( IY, IM, ID, FD, DELTAT, J )
+   DOUBLE PRECISION FUNCTION
+                     iau_DTDB   ( EPOCH1, EPOCH2, UT, ELONG, U, V )
+   DOUBLE PRECISION FUNCTION
+                     iau_EE00   ( DATE1, DATE2, EPSA, DPSI )
+   DOUBLE PRECISION FUNCTION
+                     iau_EE00A  ( DATE1, DATE2 )
+   DOUBLE PRECISION FUNCTION
+                     iau_EE00B  ( DATE1, DATE2 )
+   DOUBLE PRECISION FUNCTION
+                     iau_EECT00 ( DATE1, DATE2 )
+   DOUBLE PRECISION FUNCTION
+                     iau_EPB    ( DJ1, DJ2 )
+   SUBROUTINE        iau_EPB2JD ( EPB, DJM0, DJM )
+   DOUBLE PRECISION FUNCTION
+                     iau_EPJ    ( DJ1, DJ2 )
+   SUBROUTINE        iau_EPJ2JD ( EPJ, DJM0, DJM )
+   SUBROUTINE        iau_EPV00  ( DJ1, DJ2, PVH, PVB, J )
+   DOUBLE PRECISION FUNCTION
+                     iau_EQEQ94 ( EPOCH1, EPOCH2 )
+   DOUBLE PRECISION FUNCTION
+                     iau_ERA00  ( DJ1, DJ2 )
+   SUBROUTINE        iau_FK52H  ( R5, D5, DR5, DD5, PX5, RV5,
+                                  RH, DH, DRH, DDH, PXH, RVH )
+   SUBROUTINE        iau_FK5HIP ( R5H, S5H )
+   SUBROUTINE        iau_FK5HZ  ( R5, D5, EPOCH1, EPOCH2, RH, DH)
+   DOUBLE PRECISION FUNCTION
+                     iau_GMST00 ( UTA, UTB, TTA, TTB )
+   DOUBLE PRECISION FUNCTION
+                     iau_GMST82 ( UTA, UTB )
+   DOUBLE PRECISION FUNCTION
+                     iau_GST00A ( UTA, UTB, TTA, TTB )
+   DOUBLE PRECISION FUNCTION
+                     iau_GST00B ( UTA, UTB )
+   DOUBLE PRECISION FUNCTION
+                     iau_GST94 ( UTA, UTB )
+   SUBROUTINE        iau_H2FK5  ( RH, DH, DRH, DDH, PXH, RVH,
+                                  R5, D5, DR5, DD5, PX5, RV5 )
+   SUBROUTINE        iau_HFK5Z  ( RH, DH, EPOCH1, EPOCH2, R5, D5, DR5, DD5 )
+   SUBROUTINE        iau_JD2CAL ( DJ1, DJ2, IY, IM, ID, FD, J )
+   SUBROUTINE        iau_JDCALF ( NDP, DJ1, DJ2, IYMDF, J )
+   SUBROUTINE        iau_NUM00A ( DATE1, DATE2, RMATN )
+   SUBROUTINE        iau_NUM00B ( DATE1, DATE2, RMATN )
+   SUBROUTINE        iau_NUMAT  ( EPSA, DPSI, DEPS, RMATN )
+   SUBROUTINE        iau_NUT00A ( DATE1, DATE2, DPSI, DEPS )
+   SUBROUTINE        iau_NUT00B ( DATE1, DATE2, DPSI, DEPS )
+   SUBROUTINE        iau_NUT80  ( EPOCH1, EPOCH2, DPSI, DEPS )
+   SUBROUTINE        iau_NUTM80 ( EPOCH1, EPOCH2, RMATN )
+   DOUBLE PRECISION FUNCTION
+                     iau_OBL80  ( EPOCH1, EPOCH2 )
+   SUBROUTINE        iau_PLAN94 ( EPOCH1, EPOCH2, NP, PV, J )
+   SUBROUTINE        iau_PMAT00 ( DATE1, DATE2, RBP )
+   SUBROUTINE        iau_PMAT76 ( DJ1, DJ2, RMATP )
+   SUBROUTINE        iau_PN00   ( DATE1, DATE2, DPSI, DEPS,
+                                  EPSA, RB, RP, RBP, RN, RBPN )
+   SUBROUTINE        iau_PN00A  ( DATE1, DATE2, DPSI, DEPS, EPSA,
+                                  RB, RP, RBP, RN, RBPN )
+   SUBROUTINE        iau_PN00B  ( DATE1, DATE2, DPSI, DEPS, EPSA,
+                                  RB, RP, RBP, RN, RBPN )
+   SUBROUTINE        iau_PNM00A ( DATE1, DATE2, RBPN )
+   SUBROUTINE        iau_PNM00B ( DATE1, DATE2, RBPN )
+   SUBROUTINE        iau_PNM80  ( EPOCH1, EPOCH2, RMATPN )
+   SUBROUTINE        iau_POM00  ( XP, YP, SP, RPOM )
+   SUBROUTINE        iau_PR00   ( DATE1, DATE2, DPSIPR, DEPSPR )
+   SUBROUTINE        iau_PREC76 ( EP01, EP02, EP11, EP12, ZETA, Z, THETA )
+   SUBROUTINE        iau_PVSTAR ( PV, RA, DEC, PMR, PMD, PX, RV, J )
+   DOUBLE PRECISION FUNCTION
+                     iau_S00    ( DATE1, DATE2, X, Y )
+   DOUBLE PRECISION FUNCTION
+                     iau_S00A   ( DATE1, DATE2 )
+   DOUBLE PRECISION FUNCTION
+                     iau_S00B   ( DATE1, DATE2 )
+   DOUBLE PRECISION FUNCTION
+                     iau_SP00   ( DATE1, DATE2 )
+   SUBROUTINE        iau_STARPM ( RA1, DEC1, PMR1, PMD1, PX1, RV1,
+                                  EP1A, EP1B, EP2A, EP2B,
+                                  RA2, DEC2, PMR2, PMD2, PX2, RV2, J )
+   SUBROUTINE        iau_STARPV ( RA, DEC, PMR, PMD, PX, RV, PV, J )
+   SUBROUTINE        iau_XYS00A ( DATE1, DATE2, X, Y, S )
+   SUBROUTINE        iau_XYS00B ( DATE1, DATE2, X, Y, S )

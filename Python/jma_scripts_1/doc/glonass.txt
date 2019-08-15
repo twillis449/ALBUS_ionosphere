@@ -1,0 +1,434 @@
+          Extensions for GLONASS and Mixed GPS/GLONASS RINEX Files
+          --------------------------------------------------------
+
+
+                              Werner Gurtner
+                          Astronomical Institute
+                            University of Bern
+
+                                April 1997
+
+
+This text contains all changes and extensions for RINEX Version 2 needed to
+include GLONASS observations and navigation messages into RINEX files.
+It is a result of discussions with people engaged in GPS/GLONASS hardware and
+software developments performed in March 1997.
+
+The following modifications to the original GLONASS proposal were performed:
+
+Observation Files:
+  * Introduction of an optional LEAP SECOND header line
+  * Format of EPOCH / PRN continuation lines (if more than 12 prns per epoch)
+  * Satellite system indicators for GLONASS satellites are always required
+    (blank defaults to GPS only!)
+
+GLONASS Navigation Files:
+  * Sign of satellite clock and frequency offsets changed to be compatible with
+    the corresponding GPS values
+  * Message frame time now in the PRN / EPOCH / SV CLK line of the GLONASS
+    navigation message block
+
+
+1. RINEX Observation Files
+**************************
+
+The RINEX Version 2 observation files have been defined in view of a possible
+inclusion of GLONASS pseudorange and phase observations. GLONASS observables
+are very similar to the GPS ones: There are also phase observations L1,L2 on
+the two carriers as well as a C/A code (C1) and two P-code (P1,P2)
+pseudoranges, and, for special cases, Doppler frequency observations.
+
+1.1 Time System Identifier
+==========================
+
+RINEX Version 2 needs one major supplement, the explicit definition of the time
+system:
+
+GLONASS is basically running on UTC (or, more precisely, GLONASS system time
+linked to UTC(SU)), i.e. the time tags are given in UTC and not GPS time.
+In order to remove possible misunderstandings and ambiguities, the header
+records "TIME OF FIRST OBS" and (if present) "TIME OF LAST OBS" in GLONASS and
+GPS observation files _can_, in mixed GLONASS/GPS observation files _must_
+contain a time system identifier defining the system that all time tags in the
+file are referring to. Pure GPS files default to GPS and pure GLONASS files
+default to GLO (=UTC time system):
+
+Example:
+
+  1994     3    24     0     0    0.000000      GPS         TIME OF FIRST OBS
+  1994     3    24    23    59   30.000000      GPS         TIME OF LAST  OBS
+
+or
+
+  1994     3    24     0     0   21.000000      GLO         TIME OF FIRST OBS
+  1994     3    24    23    59   51.000000      GLO         TIME OF LAST  OBS
+
+Format:
+
+ +--------------------+------------------------------------------+------------+
+ |TIME OF FIRST OBS   | - Time of first observation record       | 5I6,F12.6, |
+ |                    |   (4-digit-year, month,day,hour,min,sec) |            |
+ |                    | - Time system: GPS (=GPS time system)    |   6X,A3    |
+ |                    |                GLO (=UTC time system)    |            |
+ |                    |   compulsory in mixed GPS/GLONASS files  |            |
+ |                    |   Defaults: GPS for pure GPS files       |            |
+ |                    |             GLO for pure GLONASS files   |            |
+ +--------------------+------------------------------------------+------------+
+*|TIME OF LAST OBS    | - Time of last  observation record       | 5I6,F12.6, |*
+ |                    |   (4-digit-year, month,day,hour,min,sec) |            |
+ |                    | - Time system: GPS (=GPS time system)    |   6X,A3    |
+ |                    |                GLO (=UTC time system)    |            |
+ |                    |   compulsory in mixed GPS/GLONASS files  |            |
+ |                    |   Defaults: GPS for pure GPS files       |            |
+ |                    |             GLO for pure GLONASS files   |            |
+ +--------------------+------------------------------------------+------------+
+*|LEAP SECONDS        | Number of leap seconds since 6-Jan-1980  |     I6     |*
+ +--------------------+------------------------------------------+------------+
+
+                        Records marked with * are optional
+
+          (Modification of Table A1 in the RINEX Version 2 document)
+
+Hence, the two possible time tags differ by the current number of leap seconds.
+
+In order to have the current number of leap seconds available we recommend
+to include a LEAP SECOND line into the RINEX header.
+
+If there are known non-integer biases between the "GPS receiver clock"
+and "GLONASS receiver clock" in the same receiver, they should be applied.
+In this case the respective code and phase observations have to be corrected,
+too (c * bias if expressed in meters).
+
+Unknown such biases will have to be solved for during the post processing
+
+The small differences (modulo 1 second) between GLONASS system time, UTC(SU),
+UTC(USNO) and GPS system time have to be dealt with during the post-processing
+and not before the RINEX conversion. It may also be necessary to solve for
+remaining differences during the post-processing.
+
+1.2 Pseudorange Definition
+==========================
+
+The pseudorange (code) measurement is defined to be equivalent to the
+difference of the time of reception (expressed in the time frame of the
+receiver) and the time of transmission (expressed in the time frame of the
+satellite) of a distinct satellite signal.
+
+If a mixed-mode GPS/GLONASS receiver refers all pseudorange observations to
+one receiver clock only,
+
+- the raw GLONASS pseudoranges will show the current number of leap seconds
+  between GPS time and GLONASS time if the receiver clock is running in the
+  GPS time frame
+
+- the raw GPS pseudoranges will show the negative number of leap seconds
+  between GPS time and GLONASS time if the receiver clock is running in the
+  GLONASS time frame
+
+In order to avoid misunderstandings and to keep the code observations within
+the format fields the pseudoranges must be corrected in this case as follows:
+
+  PR(GPS) := PR(GPS) + c * leap_seconds   if generated with a receiver clock
+                                          running in the GLONASS time frame
+
+  PR(GLO) := PR(GLO) - c * leap_seconds   if generated with a receiver clock
+                                          running in the GPS time frame
+
+to remove the contributions of the leap seconds from the pseudoranges.
+
+"leap_seconds" is the actual number of leap seconds between GPS and GLONASS
+(UTC) time, as broadcast in the GPS almanac and distributed in Circular T
+of BIPM.
+
+1.3 More than 12 satellites per epoch
+=====================================
+
+The format of the epoch / satellite line in the observation record part of
+the RINEX Observation Files has only been defined for up to 12 satellites
+per epoch. We explicitly define the continuation lines as follows:
+
+ +----------------------------------------------------------------------------+
+ |                                   TABLE A2                                 |
+ |               OBSERVATION DATA FILE - DATA RECORD DESCRIPTION              |
+ +-------------+-------------------------------------------------+------------+
+ | OBS. RECORD | DESCRIPTION                                     |   FORMAT   |
+ +-------------+-------------------------------------------------+------------+
+ | EPOCH/SAT   | - Epoch :                                       | 5I3,F11.7, |
+ |     or      |     year (2 digits), month,day,hour,min,sec     |            |
+ | EVENT FLAG  | - Epoch flag 0: OK                              |     I3,    |
+ |             |              1: power failure between           |            |
+ |             |                 previous and current epoch      |            |
+ |             |             >1: Event flag                      |            |
+ |             | - Number of satellites in current epoch         |     I3,    |
+ |             | - List of PRNs (sat.numbers) in current epoch   | 12(A1,I2), |
+ |             | - receiver clock offset (seconds, optional)     |    F12.9   |
+ |             |                                                 |            |
+ |             |   If more than 12 satellites in current epoch:  |            |
+ |             |   Use continuation lines with (32X,12(A1,I2)).  |            |
+ |             |                                                 |            |
+ +-------------+-------------------------------------------------+------------+
+
+          (Modification of Table A2 in the RINEX Version 2 document)
+
+
+1.4 Satellite Numbers in Observation Files
+==========================================
+
+Satellites of the different systems are distinguished by preceding the 2-digit
+satellite number with a system identifier:
+
+        snn                  s:    satellite system identifier
+                                   G or blank : GPS
+                                   R          : GLONASS
+                            nn:    PRN (GPS), almanac number (GLONASS)
+
+        Note: G is mandatory in mixed GPS/GLONASS files
+
+
+2. RINEX Navigation Files for GLONASS
+*************************************
+
+As the GLONASS navigation message differs in contents from the GPS message
+too much, a special GLONASS navigation message file format has been defined.
+
+The header section and the first data record (epoch, satellite clock
+information) is similar to the GPS navigation file. The following records
+contain the satellite position, velocity and acceleration, the clock and
+frequency biases as well as auxiliary information as health, satellite
+frequency (channel), age of the information.
+
+In order to use the same sign conventions for the time and frequency bias as
+in the GPS navigation files the broadcast GLONASS values are multiplied by -1.
+
+The time tags in the GLONASS navigation files are given in UTC (i.e. _not_
+Moscow time or GPS time).
+
+We recommend using the following naming convention for the GLONASS
+navigation message files:
+
+        ssssdddf.yyt      ssss:    4-character station or center name
+                                   designator
+                           ddd:    day of the year of first record
+                             f:    file sequence number within day
+                                   0: file contains all the collected
+                                      messages of the current day
+                            yy:    year
+                             t:    file type:
+                                   G: GLONASS navigation message file
+
+ +----------------------------------------------------------------------------+
+ |                                   TABLE A10                                |
+ |        GLONASS NAVIGATION MESSAGE FILE - HEADER SECTION DESCRIPTION        |
+ +--------------------+------------------------------------------+------------+
+ |    HEADER LABEL    |               DESCRIPTION                |   FORMAT   |
+ |  (Columns 61-80)   |                                          |            |
+ +--------------------+------------------------------------------+------------+
+ |RINEX VERSION / TYPE| - Format version (2)                     |   I6,14X,  |
+ |                    | - File type ('G' = GLONASS nav mess data)|   A1,39X   |
+ +--------------------+------------------------------------------+------------+
+ |PGM / RUN BY / DATE | - Name of program creating current file  |     A20,   |
+ |                    | - Name of agency  creating current file  |     A20,   |
+ |                    | - Date of file creation (dd-mmm-yy hh:mm)|     A20    |
+ +--------------------+------------------------------------------+------------+
+*|COMMENT             | Comment line(s)                          |     A60    |*
+ +--------------------+------------------------------------------+------------+
+*|CORR TO SYSTEM TIME | - Time of reference for system time corr |            |*
+ |                    |   (year, month, day)                     |     3I6,   |
+ |                    | - Correction to system time scale (sec)  |  3X,D19.12 |
+ |                    |   to correct GLONASS system time to      |            |
+ |                    |   UTC(SU)                                |            |
+ +--------------------+------------------------------------------+------------+
+*|LEAP SECONDS        | Number of leap seconds since 6-Jan-1980  |     I6     |*
+ +--------------------+------------------------------------------+------------+
+ |END OF HEADER       | Last record in the header section.       |    60X     |
+ +--------------------+------------------------------------------+------------+
+
+                        Records marked with * are optional
+
+
+ +----------------------------------------------------------------------------+
+ |                                  TABLE A11                                 |
+ |         GLONASS NAVIGATION MESSAGE FILE - DATA RECORD DESCRIPTION          |
+ +--------------------+------------------------------------------+------------+
+ |    OBS. RECORD     | DESCRIPTION                              |   FORMAT   |
+ +--------------------+------------------------------------------+------------+
+ |PRN / EPOCH / SV CLK| - Satellite almanac number               |     I2,    |
+ |                    | - Epoch of ephemerides             (UTC) |            |
+ |                    |          - year (2 digits)               |    5I3,    |
+ |                    |          - month                         |            |
+ |                    |          - day                           |            |
+ |                    |          - hour                          |            |
+ |                    |          - minute                        |            |
+ |                    |          - second                        |    F5.1,   |
+ |                    | - SV clock bias (sec)              (-tau)|   D19.12   |
+ |                    | - SV relative frequency bias     (-gamma)|   D19.12   |
+ |                    | - message frame time (sec of day UTC)    |   D19.12   |
+ +--------------------+------------------------------------------+------------+
+ | BROADCAST ORBIT - 1| - Satellite position X      (km)         | 3X,4D19.12 |
+ |                    | -           velocity X dot  (km/sec)     |            |
+ |                    | -           X acceleration  (km/sec2)    |            |
+ |                    | -           health (0=OK)            (Bn)|            |
+ +--------------------+------------------------------------------+------------+
+ | BROADCAST ORBIT - 2| - Satellite position Y      (km)         | 3X,4D19.12 |
+ |                    | -           velocity Y dot  (km/sec)     |            |
+ |                    | -           Y acceleration  (km/sec2)    |            |
+ |                    | -           frequency number (1-24)      |            |
+ +--------------------+------------------------------------------+------------+
+ | BROADCAST ORBIT - 3| - Satellite position Z      (km)         | 3X,4D19.12 |
+ |                    | -           velocity Z dot  (km/sec)     |            |
+ |                    | -           Z acceleration  (km/sec2)    |            |
+ |                    | - Age of oper. information  (days)   (E) |            |
+ +--------------------+------------------------------------------+------------+
+
+
+3. Examples
+***********
+
++------------------------------------------------------------------------------+
+|                                   TABLE A12                                  |
+|                  GLONASS NAVIGATION MESSAGE FILE - EXAMPLE                   |
++------------------------------------------------------------------------------+
+
+----|---1|0---|---2|0---|---3|0---|---4|0---|---5|0---|---6|0---|---7|0---|---8|
+
+     2              GLONASS NAVMESS DATA                    RINEX VERSION / TYPE
+XXRINEXN V1.3 VAX   University of Berne 30-AUG-93 17:57     PGM / RUN BY / DATE
+  1993     8     7    -0.141188502312D-04                   CORR TO SYSTEM TIME
+                                                            END OF HEADER
+ 1 93  8  7 15 15  0.0 0.161942094564D-03-0.181898940355D-11 0.542700000000D+05
+    0.129469794922D+05-0.130014419556D+01 0.186264514923D-08 0.000000000000D+00
+   -0.380712744141D+04 0.266516971588D+01 0.000000000000D+00 0.170000000000D+02
+    0.216525634766D+05 0.124328994751D+01-0.186264514923D-08 0.000000000000D+00
+17 93  8  7 15 15  0.0-0.717733055353D-04-0.272848410532D-11 0.542700000000D+05
+    0.305286718750D+04 0.311648464203D+01 0.000000000000D+00 0.000000000000D+00
+   -0.108431787109D+05-0.317855834961D+00 0.000000000000D+00 0.210000000000D+00
+    0.229024404297D+05-0.575817108154D+00-0.186264514923D-08 0.000000000000D+00
+ 7 93  8  7 15 15  0.0 0.902833417058D-04-0.181898940355D-11 0.542700000000D+05
+   -0.548300732422D+04-0.442504882813D+00-0.931322574615D-09 0.000000000000D+00
+    0.227251596680D+05 0.131087875366D+01-0.931322574615D-09 0.130000000000D+00
+    0.998504833984D+04-0.323978710175D+01-0.931322574615D-09 0.000000000000D+00
+ 2 93  8  7 15 15  0.0 0.975374132395D-04-0.181898940355D-11 0.542700000000D+05
+    0.138356103516D+05-0.716581344604D+00 0.279396772385D-08 0.000000000000D+00
+   -0.190140761719D+05 0.116566944122D+01 0.000000000000D+00 0.500000000000D+01
+    0.991978125000D+04 0.322995281219D+01 0.000000000000D+00 0.000000000000D+00
+ 8 93  8  7 15 15  0.0 0.292631797493D-03-0.363797880709D-11 0.542700000000D+05
+    0.419437841797D+04-0.111876964569D+01 0.000000000000D+00 0.000000000000D+00
+    0.141901040039D+05 0.262095737457D+01-0.931322574615D-09 0.200000000000D+01
+    0.207799843750D+05-0.155530166626D+01-0.186264514923D-08 0.000000000000D+00
+24 93  8  7 15 15  0.0-0.176711939275D-03-0.109139364213D-10 0.544500000000D+05
+    0.204199819336D+05 0.176556110382D+01 0.279396772385D-08 0.000000000000D+00
+   -0.796999316406D+04-0.311827659607D+00 0.000000000000D+00 0.100000000000D+01
+    0.130460561523D+05-0.295512390137D+01-0.931322574615D-09 0.000000000000D+00
+
+----|---1|0---|---2|0---|---3|0---|---4|0---|---5|0---|---6|0---|---7|0---|---8|
+
++------------------------------------------------------------------------------+
+|                                   TABLE A13                                  |
+|                      GLONASS OBSERVATION FILE - EXAMPLE                      |
++------------------------------------------------------------------------------+
+
+----|---1|0---|---2|0---|---3|0---|---4|0---|---5|0---|---6|0---|---7|0---|---8|
+
+     2              OBSERVATION DATA    R (GLONASS)         RINEX VERSION / TYPE
+XXRINEXO V1.1       AIUB                27-AUG-93 07:23     PGM / RUN BY / DATE
+TST1                                                        MARKER NAME
+VIEWEG              BRAUNSCHWEIG                            OBSERVER / AGENCY
+100                 XX-RECEIVER         1.0                 REC # / TYPE / VERS
+101                 XX-ANTENNA                              ANT # / TYPE
+  3844808.114    715426.767   5021804.854                   APPROX POSITION XYZ
+         .0000         .0000         .0000                  ANTENNA: DELTA H/E/N
+     1     1                                                WAVELENGTH FACT L1/2
+     2    C1    L1                                          # / TYPES OF OBSERV
+    10                                                      INTERVAL
+  1993     8    23    14    24   40.049000      GLO         TIME OF FIRST OBS
+                                                            END OF HEADER
+ 93  8 23 14 24 40.0490000  0  3  2  1 21
+  23986839.824       20520.565 5
+  23707804.625       19937.231 5
+  23834065.096       -9334.581 5
+ 93  8 23 14 24 50.0490000  0  3  2  1 21
+  23992341.033       49856.525 5
+  23713141.002       48479.290 5
+  23831189.435      -24821.796 5
+ 93  8 23 14 25   .0490000  0  3  2  1 21
+  23997824.854       79217.202 5
+  23718494.110       77092.992 5
+  23828329.946      -40219.918 5
+ 93  8 23 14 25 10.0490000  0  5  2  5 17  1 21
+  24003328.910      108602.422 5
+  24933965.449      -19202.780 5
+  22203326.578       -2987.327 5
+  23723851.686      105777.849 5
+  23825485.526      -55529.205 5
+ 93  8 23 14 25 20.0490010  0  5  2  5 17  1 21
+  24008828.023      138012.178 5
+  24927995.616      -51188.500 5
+  22202547.907       -7213.298 5
+  23729236.758      134533.636 5
+  23822662.277      -70749.590 5
+ 93  8 23 14 25 30.0490000  0  5  2  5 17  1 21
+  24014330.779      167446.477 5
+  24922041.288      -83151.666 5
+  22201767.457      -11388.909 5
+  23734633.024      163360.131 5
+  23819848.894      -85881.102 5
+
+----|---1|0---|---2|0---|---3|0---|---4|0---|---5|0---|---6|0---|---7|0---|---8|
+
++------------------------------------------------------------------------------+
+|                                   TABLE A14                                  |
+|                MIXED GPS/GLONASS OBSERVATION FILE - EXAMPLE                  |
++------------------------------------------------------------------------------+
+
+----|---1|0---|---2|0---|---3|0---|---4|0---|---5|0---|---6|0---|---7|0---|---8|
+
+     2              OBSERVATION DATA    M (MIXED)           RINEX VERSION / TYPE
+YYRINEXO V2.8.1 VM  AIUB                19-FEB-97 13:59     PGM / RUN BY / DATE
+TST2                                                        MARKER NAME
+001-02-A                                                    MARKER NUMBER
+JIM                 Y-COMPANY                               OBSERVER / AGENCY
+1                   YY-RECEIVER         2.0.1               REC # / TYPE / VERS
+1                   GEODETIC L1                             ANT # / TYPE
+  3851178.1849   -80151.4072  5066671.1013                  APPROX POSITION XYZ
+        1.2340        0.0000        0.0000                  ANTENNA: DELTA H/E/N
+     1     0                                                WAVELENGTH FACT L1/2
+     2    C1    L1                                          # / TYPES OF OBSERV
+    10                                                      INTERVAL
+    11                                                      LEAP SECONDS
+  1997     2     6    11    53    0.000000      GPS         TIME OF FIRST OBS
+                                                            END OF HEADER
+ 97  2  6 11 53  0.0000000  0 14G23G07G02G05G26G09G21R20R19R12R02R11
+                                R10R03
+  22576523.586   -11256947.60212
+  22360162.704   -16225110.75413
+  24484865.974    14662682.882 2
+  21950524.331   -13784707.24912
+  22507304.252     9846064.848 2
+  20148742.213   -20988953.712 4
+  22800149.591   -16650822.70012
+  19811403.273   -25116169.741 3
+  23046997.513    -3264701.688 2
+  22778170.622  -821857836.745 1
+  22221283.991  -988088156.884 2
+  19300913.475   -83282658.19013
+  20309075.579  -672668843.84713
+  23397403.484  -285457101.34211
+ 97  2  6 11 53 10.0000000  0 14G23G07G02G05G26G09G21R20R19R12R02R11
+                                R10R03
+  22578985.016   -11244012.910 2
+  22359738.890   -16227337.841 2
+  24490324.818    14691368.710 2
+  21944376.706   -13817012.849 2
+  22512598.731     9873887.580 2
+  20147322.111   -20996416.338 4
+  22798942.949   -16657163.594 2
+  19812513.509   -25110234.795 3
+  23053885.702    -3227854.397 2
+  22770607.029  -821898566.774 1
+  22222967.297  -988079145.989 2
+  19297913.736   -83298710.38413
+  20313087.618  -672647337.04113
+  23392352.454  -285484291.40311
+
+----|---1|0---|---2|0---|---3|0---|---4|0---|---5|0---|---6|0---|---7|0---|---8|
+

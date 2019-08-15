@@ -1,0 +1,318 @@
+// vex_time.cxx
+// stuff for dealing with time in a VEX file
+//_HIST  DATE NAME PLACE INFO
+//	2005 Sep 20  James M Anderson  --JIVE  start
+
+
+
+#define VEX_TIME_CONSTANTS_H_FILE 1
+
+
+// INCLUDES
+#include "JMA_math.h"
+#include <stdlib.h>
+#include <time.h>
+#include <stdio.h>
+
+
+
+#include "vex_time.h"
+#include "sofa.h"
+#ifdef min
+#  undef min
+#endif
+
+
+
+
+// set up a namespace area for stuff.
+namespace JMA_VEX_AREA {
+
+
+
+
+// GLOBALS
+
+
+// FUNCTIONS
+
+
+    // Constructors
+VEX_Time::VEX_Time(Sint32 year_in, Sint32 yday_in,
+                   Sint32 hour_in, Sint32 min_in, Real64 sec_in,
+                   const VEX_UT1_Interp* const UT1)
+        : year(year_in), yday(yday_in), hour(hour_in),
+          min(min_in), sec(sec_in)
+{
+    fill_mm_dd_from_yday();
+    fill_day_fraction();
+    fill_JDs_from_ymd();
+    // Fill in the UT1 stuff
+    fill_UT1_information(UT1);
+    return;
+}
+
+VEX_Time::VEX_Time(Sint32 year_in, Sint32 month_in, Sint32 day_in,
+                   Sint32 hour_in, Sint32 min_in, Real64 sec_in,
+                   const VEX_UT1_Interp* const UT1)
+        : year(year_in), month(month_in), day(day_in), hour(hour_in),
+          min(min_in), sec(sec_in)
+{
+    fill_yday_from_mm_dd();
+    fill_day_fraction();
+    fill_JDs_from_ymd();
+    // Fill in the UT1 stuff
+    fill_UT1_information(UT1);
+    return;
+}
+VEX_Time::VEX_Time(const struct tm& time_in,
+                   const VEX_UT1_Interp* const UT1)
+        : year(time_in.tm_year+1900), month(time_in.tm_mon+1),
+          day(time_in.tm_mday), hour(time_in.tm_hour),
+          min(time_in.tm_min), sec(time_in.tm_sec)
+{
+    fill_yday_from_mm_dd();
+    fill_day_fraction();
+    fill_JDs_from_ymd();
+    // Fill in the UT1 stuff
+    fill_UT1_information(UT1);
+    return;
+}
+VEX_Time::VEX_Time(Real64 jd0_c_in, Real64 jd1_c_in,
+                   const VEX_UT1_Interp* const UT1)
+        : jd0_c(jd0_c_in), jd1_c(jd1_c_in),
+          jd0_1(jd0_c_in), jd1_1(jd1_c_in)
+{
+    // figure out a day fraction
+    Real64 fraction1 = jd0_c - floor(jd0_c);
+    Real64 fraction2 = jd1_c - floor(jd1_c);
+    Real64 fraction = fraction1 + fraction2 - 0.5;
+    if(fraction < 0.0) fraction += 1.0;
+    day_fraction = fraction;
+    // fill in the extra stuff
+    fill_ymd_from_JDs();
+    // Fill in the UT1 stuff
+    fill_UT1_information(UT1);
+    return;
+}
+VEX_Time::VEX_Time(std::string& VEX_epoch,
+                   const VEX_UT1_Interp* const UT1)
+{
+    // We are given a string of the form  YYYYyDDDdHHhMMmSSs, such as
+    // 2005y152d00h00m00s which gives the time.  Get this in a more
+    // usable representation
+    Sint32 num_read = sscanf(VEX_epoch.c_str(), "%dy%dd%dh%dm%lfs",
+                             &year, &yday, &hour, &min, &sec);
+    if(num_read != 5) {
+        // Hey!
+        fprintf(stderr, "Error: cannot parse VEX Epoch '%s', only got %d values\n%s:%d:%s\n",
+                VEX_epoch.c_str(), num_read,
+                __FILE__, __LINE__, __func__);
+        exit(3);
+    }
+    // Now, do the rest of the stuff.
+    fill_mm_dd_from_yday();
+    fill_day_fraction();
+    fill_JDs_from_ymd();
+    // Fill in the UT1 stuff
+    fill_UT1_information(UT1);
+    
+    return;
+}
+
+
+
+
+void VEX_Time::fill_yday_from_mm_dd(void) throw()
+{
+    static const Sint8 SIZE = 12;
+    static const Uint16 day_zero_val[SIZE] =
+        {0,31,59,90,120,151,181,212,243,273,304,334};
+    yday = day;
+    // check that the month is a valid month
+    if((month > 0) && (month <= SIZE)) yday += day_zero_val[month-1];
+    // correct for leap years, if we are past February
+    if(month > 2) {
+        // If the year is evenly divisible by 4.  
+        if( (year & 0x3) == 0) {
+            // if the year is not a century year, except every 400 years
+            if ((year % 100 != 0) || (year % 400 == 0)) yday++;
+        }
+    }
+    return;
+}
+void VEX_Time::fill_mm_dd_from_yday(void) throw()
+{
+    static const Sint8 SIZE = 12;
+    static const Uint16 day_zero_val[SIZE] =
+        {0,31,59,90,120,151,181,212,243,273,304,334};
+    Sint32 yday_temp = yday;
+    if(yday_temp > 59) {
+        // If the year is evenly divisible by 4.  
+        if( (year & 0x3) == 0) {
+            // if the year is not a century year, except every 400 years
+            if ((year % 100 != 0) || (year % 400 == 0)) yday_temp--;
+        }
+    }
+    int i;
+    for(i=1; i < SIZE; i++) if(yday_temp <= day_zero_val[i]) break;
+    month = i;
+    day = yday_temp - day_zero_val[i-1];
+    if((yday_temp == 59) && (yday == 60)) day = 29;
+    return;
+}
+void VEX_Time::fill_day_fraction(void) throw()
+{
+    // how many seconds are there past midnight?
+    day_fraction = sec + 60.0 * (min + 60.0 * (hour));
+    // divide by the number of seconds per day = 24*60*60
+    day_fraction /= SECONDS_PER_DAY;
+    return;
+}
+
+void VEX_Time::fill_hms_from_fraction(void) throw()
+{
+    Real64 hours_temp = day_fraction * 24.0;
+    hour = Sint32(floor(hours_temp));
+    Real64 minutes_temp = (hours_temp - hour) * 60.0;
+    min = Sint32(floor(minutes_temp));
+    sec = (minutes_temp - min) * 60.0;
+    return;
+}
+
+void VEX_Time::fill_JDs_from_ymd(void)
+{
+    // in case I change the sizes of things later on,
+    // don't trust that the VEX_Time variables are FORTRAN sized
+    integer IY = year;
+    integer IM = month;
+    integer ID = day;
+    integer J;
+    doublereal DJM0 = 0.0;
+    doublereal DJM = 0.0;
+    FTN_NAME(iau_cal2jd) (&IY, &IM, &ID, &DJM0, &DJM, &J);
+#ifdef DEBUG
+    if(J < 0) {
+        fprintf(stderr, "Error: bad iau_cal2jd call, got %d from date %d/%d/%d\n%s:%d:%s\n",
+                int(J), year, month, day,
+                __FILE__, __LINE__, __func__);
+    }
+#endif
+    jd0_c = DJM0;
+    jd1_c = DJM + day_fraction;
+
+    // that's all
+    return;
+}
+void VEX_Time::fill_ymd_from_JDs(void)
+{
+    // in case I change the sizes of things later on,
+    // don't trust that the VEX_Time variables are FORTRAN sized
+    integer IY = 0;
+    integer IM = 1;
+    integer ID = 1;
+    integer J;
+    doublereal DJM0 = jd0_c;
+    doublereal DJM = jd1_c;
+    doublereal fraction = 0.0;
+    FTN_NAME(iau_jd2cal) (&DJM0, &DJM, &IY, &IM, &ID, &fraction, &J);
+#ifdef DEBUG
+    if(J < 0) {
+        fprintf(stderr, "Error: bad iau_cal2jd call, got %d from date %f %f\n%s:%d:%s\n",
+                int(J), jd0_c, jd1_c,
+                __FILE__, __LINE__, __func__);
+    }
+#endif
+    year = IY;
+    month = IM;
+    day = ID;
+    day_fraction = fraction;
+    // fill in the extra stuff
+    fill_yday_from_mm_dd();
+    fill_hms_from_fraction();
+
+    return;
+}
+
+
+
+
+
+
+// Add some number of seconds to the UTC time.
+VEX_Time& VEX_Time::add_offset(const Real64 offset,
+                               const VEX_UT1_Interp* const UT1)
+{
+    // convert the offset to days
+    const Real64 offset_days = offset / SECONDS_PER_DAY;
+
+    // Now add the offset to the UTC Julian Date info
+    jd1_c += offset_days;
+
+    // update the rest of the time information
+    fill_ymd_from_JDs();
+
+    // update the UT1 information
+    fill_UT1_information(UT1);
+
+    return *this;
+}
+
+// Figure out the UT1 information for the Julian Dates
+void VEX_Time::fill_UT1_information(const VEX_UT1_Interp* const UT1)
+{
+    // First, get the UT1-UTC information, in seconds.
+    // Make sure the pointer is valid.  
+    if((UT1)) {
+        Real64 X_junk, Y_junk;
+        UT1->get_interpolation(jd1_c, &X_junk, &Y_junk,
+                               &ut1_utc);
+    }
+    else {
+        ut1_utc = 0.0;
+    }
+    // Now add this to the JD information
+    jd0_1 = jd0_c;
+    jd1_1 = jd1_c + ut1_utc / SECONDS_PER_DAY;
+
+    return;
+}
+
+
+
+struct tm VEX_Time::C_tm_time(void) const throw()
+{
+    struct tm tm_time;
+    tm_time.tm_sec = int(lround(sec));
+    tm_time.tm_min = min;
+    tm_time.tm_hour = hour;
+    tm_time.tm_mday = day;
+    tm_time.tm_mon = month-1;
+    tm_time.tm_year = year - 1900;
+    tm_time.tm_isdst = -1;
+    mktime(&tm_time);
+    return tm_time;
+}
+
+
+
+Real64 VEX_Time::Year_Fraction() const throw()
+{
+    Real64 days = yday + day_fraction;
+    Real64 total_days = 365.0;
+    // check for leap year
+    if((year & 0x3) == 0x0) {
+        if( (year%100 != 0) || (year%400 == 0) ) total_days += 1.0;
+    }
+    return (days / total_days);
+}
+
+
+        
+      
+
+    
+
+}  // end namespace
+
+

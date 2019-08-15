@@ -1,0 +1,184 @@
+      BLOCK DATA ITERATS
+C
+C  VERSION
+C     1.6   14-February-1997
+C
+C  MODIFICATIONS
+C     ----Person---- ----Date---- -----------------Description-----------------
+C     L. Brown       25-Sep-1995  1.3
+C                                 Removed references to INCLUDE file
+C                                 "cinit.inc" since it is no longer used.
+C                                 Removed initialization of variables ESCLLAT,
+C                                 FSCLLAT, USUE, USUF, and ONLYOP since they
+C                                 have been removed from common block INDIRECT.
+C     L. Brown       23-Jan-1996  1.3 ==> 1.4
+C                                 Variables MSAT, NSAT, SATLAT, and SATLON
+C                                 renamed to MPR, NPR, PRLAT, and PRLON in
+C                                 common block GRID.
+C                                 Variables RADLAT and RADLON renamed to OBSLAT
+C                                 and OBSLON in common block GRID.
+C     L. Brown       14-Feb-1997  1.4 ==> 1.6
+C                                 Added points to altitude grid stored in
+C                                 array ZOUT in common block GRID to include
+C                                 plasmaspheric altitudes.
+C     RM Campbell    1-Apr-1998   Removed DATA ZOUT since we reinitialize it
+C                                 it PIMVLBI2.
+C
+      INCLUDE 'aindex.inc'
+      INCLUDE 'grid.inc'
+      INCLUDE 'indirect.inc'
+C
+C     DATA statements for AINDEX.INC
+C
+      DATA ATR/24.4, 2.12/
+      DATA A/20.9, 1.7,13.4, 1.7,
+     6       20.9, 1.7,13.4, 1.7/
+C
+C     DATA statements for GRID.INC
+C
+      DATA GGLAT0,GGLON0,GGLATF,GGLONF,DLAT,DLON,NUMLAT,NUMLON,NALT/
+     1 -89.9,0.,89.9,360.,2.,10.,90,36,80/
+C
+      DATA NPR/1/
+      DATA PRLAT/MPR*0./
+      DATA PRLON/MPR*0./
+C
+      DATA OBSLAT/0./
+      DATA OBSLON/0./
+      DATA NAZ/1/
+      DATA SAZ/0./
+      DATA DAZ/1./
+      DATA NEL/1/
+      DATA SEL/0./
+      DATA DEL/1./
+C  The last element of ZOUT is R_{GPS}-R_{earth} to the closest km.  
+C    This aids the incorporation of ionosonde real-time data.  See notes
+C    in RTDAPPL  (tecvlbi4.f)
+C
+      DATA zoutorig /80., 95., 100., 105., 110., 115., 120., 125., 130.,
+     1  135., 140., 145., 150., 155., 160., 165., 170., 175., 180., 
+     2  190., 200., 210., 220., 230., 240., 250., 260., 270., 280.,
+     3  290., 300., 310., 320., 330., 340., 350., 360., 370., 380.,
+     4  390., 400., 420., 440., 460., 480., 500., 520., 540., 560.,
+     5  580., 600., 620., 640., 660., 680., 700., 720., 740., 770.,
+     6  800., 850., 900., 950., 1000., 1100., 1200., 1300., 1400., 
+     7  1500., 1600., 1700., 1800., 1900., 2000., 2100., 2200., 2300.,
+     8  2400., 2500., 3000., 3500., 4000., 4500., 5000., 5500., 6000.,
+     9  6500., 7000., 8000., 9000., 10000., 11000., 12000., 13000.,
+     a  14000., 16000., 18000., 20000., 22000., 25000. /
+c$$$      DATA zoutorig /90., 95., 100., 105., 110., 115., 120., 125., 130.,
+c$$$     1  135., 140., 145., 150., 155., 160., 165., 170., 175., 180., 
+c$$$     2  190., 200., 210., 220., 230., 240., 250., 260., 270., 280.,
+c$$$     3  290., 300., 310., 320., 330., 340., 350., 360., 370., 380.,
+c$$$     4  390., 400., 420., 440., 460., 480., 500., 520., 540., 560.,
+c$$$     5  580., 600., 620., 640., 660., 680., 700., 720., 740., 770.,
+c$$$     6  800., 850., 900., 950., 1000., 1100., 1200., 1300., 1400., 
+c$$$     7  1500., 1600., 1700., 1800., 1900., 2000., 2100., 2200., 2300.,
+c$$$     8  2400., 2500., 3000., 3500., 4000., 4500., 5000., 5500., 6000.,
+c$$$     9  6500., 7000., 7500., 8000., 8500., 9000., 10000., 11000.,
+c$$$     a  12000., 13000., 14000., 15000., 17500., 20182. /
+      DATA zout /90., 95., 100., 105., 110., 115., 120., 125., 130.,
+     1  135., 140., 145., 150., 155., 160., 165., 170., 175., 180., 
+     2  190., 200., 210., 220., 230., 240., 250., 260., 270., 280.,
+     3  290., 300., 310., 320., 330., 340., 350., 360., 370., 380.,
+     4  390., 400., 420., 440., 460., 480., 500., 520., 540., 560.,
+     5  580., 600., 620., 640., 660., 680., 700., 720., 740., 770.,
+     6  800., 850., 900., 950., 1000., 1100., 1200., 1300., 1400., 
+     7  1500., 1600., 1700., 1800., 1900., 2000., 2100., 2200., 2300.,
+     8  2400., 2500., 3000., 3500., 4000., 4500., 5000., 5500., 6000.,
+     9  6500., 7000., 7500., 8000., 8500., 9000., 10000., 11000.,
+     a  12000., 13000., 14000., 15000., 17500., 20182., 100*0./
+
+C
+C                    DATA statements for INDIRECT.INC
+C            1    2   3  4     5     6
+      DATA F10P7,EKP,BY,KP(0),KP(1),KP(2)/
+C       1     2    3    4    5    6
+     1  145., 2.0, 1.0, 1.9, 2.0, 2.1/
+C
+      END
+C
+      BLOCK DATA LOWF
+C
+C  VERSION
+C     1.2   27-April-1995
+C
+C  MODIFICATIONS
+C     ----Person---- ----Date---- -----------------Description-----------------
+C     L. Brown       27-Apr-1995  1.2
+C                                 Changed initialization of NF10P7L from 3
+C                                 to 2.
+C                                 Removed initialization of NKPL since NKPL has
+C                                 been removed from common block LOWER.
+C
+      INCLUDE 'lower.inc'
+      DATA F10P7L,NF10P7L/70.,130.,210.,2/
+      END
+      BLOCK DATA LOWE
+C
+C  VERSION
+C     1.2   27-April-1995
+C
+C  MODIFICATIONS
+C     ----Person---- ----Date---- -----------------Description-----------------
+C     L. Brown       27-Apr-1995  1.2
+C                                 Corrected initialization of KPLE(1) from 2.
+C                                 to 1.
+C                                 Changed initialization of NF10P7LE from 3
+C                                 to 2.
+C                                 Changed initialization of NKPLE from 3 to 2.
+C
+      INCLUDE 'low_e.inc'
+      DATA F10P7LE,KPLE,NF10P7LE,NKPLE/70.,130.,210.,1.,3.5,6.,2,2/
+      END
+      BLOCK DATA MIDF
+C
+C  VERSION
+C     1.2   27-April-1995
+C
+C  MODIFICATIONS
+C     ----Person---- ----Date---- -----------------Description-----------------
+C     L. Brown       27-Apr-1995  1.2
+C                                 Changed initialization of NF10P7M from 3
+C                                 to 2.
+C                                 Changed initialization of NKPM from 3 to 2.
+C
+      INCLUDE 'midlat.inc'
+      DATA F10P7M,KPM,NF10P7M,NKPM/70.,130.,210.,1.,3.5,6.,2,2/
+      END
+      BLOCK DATA HIGH
+C
+C  VERSION
+C     1.2   27-April-1995
+C
+C  MODIFICATIONS
+C     ----Person---- ----Date---- -----------------Description-----------------
+C     L. Brown       27-Apr-1995  1.2
+C                                 Changed initialization of NF10P7H from 3
+C                                 to 2.
+C                                 Changed initialization of NKPH from 3 to 2.
+C
+      INCLUDE 'usuarr.inc'
+      DATA F10P7H,KPH,NF10P7H,NKPH/70.,130.,210.,1.,3.5,6.,2,2/
+      END
+C
+      BLOCK DATA REGS
+      INCLUDE 'precip.inc'
+      INCLUDE 'region_b.inc'
+C
+C     DATA for PRECIP.INC
+C
+       DATA LAT,MLT,ERG,LAT0,MLT0,RAD0,A0,A1,B1,MLATR,MLTR,VALTR,
+     1 MLATR0,MLTR0,RADTR0/414*0.0/
+C
+C
+C
+C     DATA statments for REGION_B.INC
+C
+      DATA CTH,VTH/24.4,20.9,13.4,2.12,1.7,1.7/
+      DATA CAB,VAB/-10.5,2.7,0.8,0.0,.267,-.267/
+      DATA CB,PB/3.88,0.0,3.0,2.73,0.0,0.0/
+      DATA CBB,VBB/11.5,2.633333333,0.0,-0.08333333333/
+      DATA QBB,AB(0),BB(0)/0.0,0.00506666666,-10.5,11.5/
+C
+      END

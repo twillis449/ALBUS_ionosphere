@@ -1,0 +1,13 @@
+1                                                                               
+/home/twillis/ALBUS_maaijke/FORTRAN/PIM/PIM_1.7/cgmdb/              
+/home/twillis/ALBUS_maaijke/FORTRAN/PIM/PIM_1.7/usudb/unform/       
+/home/twillis/ALBUS_maaijke/FORTRAN/PIM/PIM_1.7/mlfdb/unform/       
+/home/twillis/ALBUS_maaijke/FORTRAN/PIM/PIM_1.7/llfdb/unform/       
+/home/twillis/ALBUS_maaijke/FORTRAN/PIM/PIM_1.7/lmedb/unform/       
+/home/twillis/ALBUS_maaijke/FORTRAN/PIM/PIM_1.7/unform/      
+/home/twillis/ALBUS_maaijke/libdata/PIM/noaa_dat/           
+/home/twillis/ALBUS_maaijke/FORTRAN/PIM/PIM_1.7/noaa_dat/IMF24.dat  
+/home/twillis/ALBUS_maaijke/FORTRAN/PIM/PIM_1.7/igrf/               
+src.cat                                                                         
+sta.cat                                                                         
+/home/twillis/ALBUS_maaijke/FORTRAN/PIM/PIM_1.7/rtd/                

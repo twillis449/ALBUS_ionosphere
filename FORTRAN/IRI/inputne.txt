@@ -1,0 +1,166 @@
+jmag(=0/1,geog/geom),lati/deg,long/deg
+0,0,0
+year(yyyy),mmdd(or -ddd),iut(=0/1,LT/UT),hour
+2000,715,0,12
+height/km
+(enter 0 for list of peak heights and densities)
+(enter -1 for plasma frequencies, B0, M3000, valley width and depth,)
+(    F1 probability, equ. vert. ion drift, and  storm/quiet ratio,)
+(    or 3 parameter of your choice)
+300
+upper height [km] for TEC integration (0 for no TEC)
+1500
+variable? (1/2/../8 for height/lat/long/year/month/day/day of year/hour)
+8
+begin, end, and stepsize for the selected variable
+0,20,4
+Options: t(rue) or f(alse)
+Standard: t,f,f,t,f,f,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t
+Enter 0 to use standard or 1 to enter your own
+0
+
+
+
+*** IRI parameters are being calculated ***
+Ne, foF2: URSI model is used.
+Ne, foF1: probability function used.
+Ne, D: Mechtley/Bilitza
+Ne, foF2: storm model included
+Ion Com.: Using Danilov et al. 1985/95.
+Te: Aeros/ISIS model
+*NE* HST IS NOT EVALUATED BY THE FUNCTION XE3
+     CORR.: LIN. APP. BETWEEN HZ=202.2 AND HEF=161.5
+*NE* HST IS NOT EVALUATED BY THE FUNCTION XE3
+     CORR.: LIN. APP. BETWEEN HZ=191.1 AND HEF=156.3
+*NE* HST IS NOT EVALUATED BY THE FUNCTION XE3
+     CORR.: LIN. APP. BETWEEN HZ=203.3 AND HEF=155.3
+Enter 0 to exit or 1 to generate another profile?
+1
+jmag(=0/1,geog/geom),lati/deg,long/deg
+1,0,0
+year(yyyy),mmdd(or -ddd),iut(=0/1,LT/UT),hour
+1980,-186,1,0
+height/km
+(enter 0 for list of peak heights and densities)
+(enter -1 for plasma frequencies, B0, M3000, valley width and depth,)
+(    F1 probability, equ. vert. ion drift, and  storm/quiet ratio,)
+(    or 3 parameter of your choice)
+-1
+upper height [km] for TEC integration (0 for no TEC)
+1000
+variable? (1/2/../8 for height/lat/long/year/month/day/day of year/hour)
+2
+begin, end, and stepsize for the selected variable
+-50,50,10
+Options: t(rue) or f(alse)
+Standard: t,f,f,t,f,f,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t
+Enter 0 to use standard or 1 to enter your own
+0
+Three additional output parameters (number:1-45)
+NmF2  hmF2  NmF1  hmF1  NmE   hmE   NmD   hmD   h05   B0    NVmin hVtop Tpeak
+hTpek T300  T400  T600  T1400 T3000 T120  Ti450 hTeTi sza   sndec dip   dipla
+modip dela  Srise Sset  seasn nseas Rz12  cov   B1    M3000 TEC   TECtp IG12
+F1_pb F107d C1    daynr vdrft foF2r
+or 0,0,0 for default (F1 probability, equ. vert. ion drift, storm/quiet ratio)
+23,29,30
+
+
+
+*NE* HST IS NOT EVALUATED BY THE FUNCTION XE3
+     CORR.: LIN. APP. BETWEEN HZ=206.0 AND HEF=171.8
+*NE* HST IS NOT EVALUATED BY THE FUNCTION XE3
+     CORR.: LIN. APP. BETWEEN HZ=199.3 AND HEF=167.2
+*NE* HST IS NOT EVALUATED BY THE FUNCTION XE3
+     CORR.: LIN. APP. BETWEEN HZ=196.3 AND HEF=160.1
+*NE* HST IS NOT EVALUATED BY THE FUNCTION XE3
+     CORR.: LIN. APP. BETWEEN HZ=206.7 AND HEF=155.6
+*NE* HST IS NOT EVALUATED BY THE FUNCTION XE3
+     CORR.: LIN. APP. BETWEEN HZ=201.3 AND HEF=153.6
+*NE* HST IS NOT EVALUATED BY THE FUNCTION XE3
+     CORR.: LIN. APP. BETWEEN HZ=194.7 AND HEF=149.4
+Enter 0 to exit or 1 to generate another profile?
+1
+jmag(=0/1,geog/geom),lati/deg,long/deg
+1,0,180
+year(yyyy),mmdd(or -ddd),iut(=0/1,LT/UT),hour
+1985,715,0,12
+height/km
+(enter 0 for list of peak heights and densities)
+(enter -1 for plasma frequencies, B0, M3000, valley width and depth,)
+(    F1 probability, equ. vert. ion drift, and  storm/quiet ratio,)
+(    or 3 parameter of your choice)
+0
+upper height [km] for TEC integration (0 for no TEC)
+0
+variable? (1/2/../8 for height/lat/long/year/month/day/day of year/hour)
+2
+begin, end, and stepsize for the selected variable
+-50,50,50
+Options: t(rue) or f(alse)
+Standard: t,f,f,t,f,f,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t
+Enter 0 to use standard or 1 to enter your own
+1
+Compute Ne, T, Ni? (enter: t,t,t  if you want all)
+t,f,f
+LAY version: t=standard ver., f=LAY version. {t}
+t
+Ne Topside mod.: t=standard, f=IRI-79 topside {t}
+t
+foF2 model: t=CCIR, f=URSI-88 {standard:f}
+f
+F2 peak density or foF2: t=model, f=user input.
+f
+F2 peak height or M3000F2: t=model, f=user input.
+f
+foF2: t=with storm model, f=without
+f
+Bottomside thickness B0: t=Table-option, f=Gulyaeva {t}.
+t
+F1 peak density or foF1: t=model, f=user input.
+t
+F1: t=with probability model, f=without   {t}
+t
+F1: t=standard probability, f=with L condition {t}
+t
+E peak density or foE: t=model, f=user input.
+t
+E peak height: t=model, f=user input.
+t
+D: t=old model, f=new options
+t
+Equat. Vert. Ion Drift: t=not included, f=included
+t
+Sunspot index: t=from file, f=user input.  {t}
+t
+Ionospheric index: t=from file, f=user input. {t}
+t
+Solar Index: t: F107D=COV, f: F107D user input
+t
+UT/LT computation: t=no date change, f=ut_lt subroutine.
+t
+Message output unit: t=(UNIT=6), f=(UNIT=12). {t}
+t
+
+
+
+foF2/Mhz or NmF2/m-3 for  LATI=  -50.00000
+1.e11
+hmF2/km or M3000F2 for  LATI=  -50.00000
+300
+foF2/Mhz or NmF2/m-3 for  LATI=  0.0000000E+00
+1.e12
+hmF2/km or M3000F2 for  LATI=  0.0000000E+00
+400
+foF2/Mhz or NmF2/m-3 for  LATI=   50.00000
+1.1e11
+hmF2/km or M3000F2 for  LATI=   50.00000
+310
+*NE* HST IS NOT EVALUATED BY THE FUNCTION XE3
+     CORR.: LIN. APP. BETWEEN HZ=170.4 AND HEF=127.2
+*NE* HMF1 IS NOT EVALUATED BY THE FUNCTION XE2
+CORR.: NO F1 REGION, B1=3, C1=0.0
+*NE* HST IS NOT EVALUATED BY THE FUNCTION XE3
+     CORR.: LIN. APP. BETWEEN HZ=172.9 AND HEF=127.2
+Enter 0 to exit or 1 to generate another profile?
+0
+

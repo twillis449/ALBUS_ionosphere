@@ -1,0 +1,119 @@
+URSI maps are used for the F2 peak density (NmF2)
+CCIR maps are used for the F2 peak height (hmF2)
+B0-Table option is used for the bottomside thickness parameter B0
+The foF2 STORM model is turned on 
+Scotto-97 no L   option is used for the F1 occurrence probability
+IRI-95    option is used for the electron temperature
+Danilov-95 option is used for the ion composition
+
+Solar and magnetic parameter for the 1st profile point:
+Solar Zenith Angle/degree                             158.8
+Dip (Magnetic Inclination)/degree                    -22.70
+Modip (Modified Dip)/degree                          -21.61
+Solar Sunspot Number (12-months running mean) Rz12    119.8
+Ionospheric-Effective Solar Index IG12                142.6
+
+TEC [1.E16 m-2] is obtained by numerical integration in 1km steps
+  from 50 to 1500.0 km.  t is the percentage of TEC above the F peak.
+
+-
+  HOUR ELECTRON DENSITY   TEMPERATURES         ION PERCENTAGES/%     1E16m-2
+  L.T. Ne/cm-3 Ne/NmF2 Tn/K  Ti/K  Te/K  O+  N+  H+ He+ O2+ NO+ Clust TEC t/%
+   0.0 1050951  0.959   949   949   949 100   0   0   0   0   1   0  -1.0  -1
+   4.0  340038  1.003   898   903   903 100   0   0   0   0   1   0  -1.0  -1
+   8.0 1952624  0.999   951   951  2223 100   0   0   0   0   0   0  -1.0  -1
+  12.0  754098  0.415  1140  1140  1814 100   0   0   0   0   0   0  -1.0  -1
+  16.0  874643  0.378  1224  1224  1315 100   0   0   0   0   0   0  -1.0  -1
+  20.0 1634197  0.814  1055  1055  1056 100   0   0   0   0   1   0  -1.0  -1
+URSI maps are used for the F2 peak density (NmF2)
+CCIR maps are used for the F2 peak height (hmF2)
+B0-Table option is used for the bottomside thickness parameter B0
+The foF2 STORM model is turned on 
+Scotto-97 no L   option is used for the F1 occurrence probability
+IRI-95    option is used for the electron temperature
+Danilov-95 option is used for the ion composition
+
+Solar and magnetic parameter for the 1st profile point:
+Solar Zenith Angle/degree                              34.0
+Dip (Magnetic Inclination)/degree                      5.47
+Modip (Modified Dip)/degree                            5.51
+Solar Sunspot Number (12-months running mean) Rz12    153.4
+Ionospheric-Effective Solar Index IG12                155.3
+
+TEC [1.E16 m-2] is obtained by numerical integration in 1km steps
+  from 50 to  800.0 km.  t is the percentage of TEC above the F peak.
+
+v-vert: equatorial vertical F-region drift.
+
+F1-prob/L-cond incl: F1-layer occurrence probability without/with L-condition cases.
+
+-
+   LONG               E-VALLEY   PLAS FREQ/ MHz  F1_pb    vdrft    foF2r 
+   GEOM M3000 B0/km  W/km Depth  foF2 foF1  foE            m/s         
+    0.0  2.26 220.6   4.4 0.972 10.62 0.00 3.94 1.00E+00 1.84E+01 1.00E+00
+   60.0  2.65 102.1   8.2 0.951 12.61 0.00 4.02 1.00E+00 1.61E+01 1.00E+00
+  120.0  2.38 200.2   4.3 0.985 11.52 5.89 4.13 1.00E+00 1.39E+01 1.00E+00
+  180.0  2.11 233.5   4.3 0.986 10.94 5.90 4.15 1.00E+00 1.48E+01 1.00E+00
+  240.0  2.18 238.0   4.3 0.985 11.93 5.86 4.13 1.00E+00 1.76E+01 1.00E+00
+  300.0  2.30 211.1   4.4 0.973 10.35 0.00 4.02 1.00E+00 2.05E+01 1.00E+00
+URSI maps are used for the F2 peak density (NmF2)
+CCIR maps are used for the F2 peak height (hmF2)
+B0-Table option is used for the bottomside thickness parameter B0
+The foF2 STORM model is turned on 
+Scotto-97 no L   option is used for the F1 occurrence probability
+IRI-95    option is used for the electron temperature
+Danilov-95 option is used for the ion composition
+Peak Densities/cm-3: NmF2= 612565.6   NmF1= 239504.1   NmE= 129668.6
+Peak Heights/km:     hmF2=   248.94   hmF1=   193.80   hmE=   110.00
+
+Solar Zenith Angle/degree                              41.1
+Dip (Magnetic Inclination)/degree                     47.93
+Modip (Modified Dip)/degree                           40.79
+Solar Sunspot Number (12-months running mean) Rz12     20.5
+Ionospheric-Effective Solar Index IG12                 14.7
+
+v-vert: equatorial vertical F-region drift.
+
+F1-prob/L-cond incl: F1-layer occurrence probability without/with L-condition cases.
+
+-
+   H   ELECTRON DENSITY   TEMPERATURES         ION PERCENTAGES/%     1E16m-2
+   km  Ne/cm-3 Ne/NmF2 Tn/K  Ti/K  Te/K  O+  N+  H+ He+ O2+ NO+ Clust TEC t/%
+  50.0      -1 -1.000    -1    -1    -1  -1  -1  -1  -1  -1  -1  -1  -1.0  -1
+ 150.0  152199  0.248   609   609   810  16   0   0   0  37  47   0  -1.0  -1
+ 250.0  612574  1.000   787   840  2124  94   0   0   0   2   4   0  -1.0  -1
+ 350.0  390675  0.638   798  1015  2349  99   1   0   0   0   0   0  -1.0  -1
+ 450.0  166025  0.271   799  1217  2227  94   6   0   0   0   0   0  -1.0  -1
+ 550.0   80041  0.131   799  1513  2391  92   7   0   0   0   0   0  -1.0  -1
+ 650.0   50412  0.082   799  1810  2537  88   8   2   2   0   0   0  -1.0  -1
+ 750.0   39113  0.064   799  2108  2667  81   9   6   4   0   0   0  -1.0  -1
+ 850.0   34356  0.056   799  2405  2795  68   7  16   9   0   0   0  -1.0  -1
+ 950.0   32233  0.053   799  2703  2924  47   4  35  13   0   0   0  -1.0  -1
+1050.0   31256  0.051   799  3000  3052  26   1  60  13   0   0   0  -1.0  -1
+CCIR maps are used for the F2 peak height (hmF2)
+B0-Table option is used for the bottomside thickness parameter B0
+The foF2 STORM model is turned off
+Scotto-97 with L option is used for the F1 occurrence probability
+NmF2/m-3  provided by user:
+ 1.000E+11 1.000E+12 1.100E+11
+
+Solar and magnetic parameter for the 1st profile point:
+Solar Zenith Angle/degree                              71.1
+Dip (Magnetic Inclination)/degree                    -61.19
+Modip (Modified Dip)/degree                          -53.10
+Solar Sunspot Number (12-months running mean) Rz12    119.8
+Ionospheric-Effective Solar Index IG12                142.6
+
+TEC [1.E16 m-2] is obtained by numerical integration in 1km steps
+  from 50 to  800.0 km.  t is the percentage of TEC above the F peak.
+
+v-vert: equatorial vertical F-region drift.
+
+F1-prob/L-cond incl: F1-layer occurrence probability without/with L-condition cases.
+
+-
+   LATI      PEAK ALTITUDES IN KM        PEAK DENSITIES IN cm-3  TEC top/%
+   GEOD    hmF2  hmF1   hmE   hmD      NmF2   NmF1    NmE    NmD  1E16m-2
+  -50.0  -278.4   0.0 110.0  81.2    100000      0 104978    400   0.76 100
+    0.0   372.5 288.8 110.0  81.0   1000000 386640 193562   1471  29.33  63
+   50.0  1731.7   0.0 110.0  81.0    110000      0 171975   1438   3.89   0

@@ -1,0 +1,98 @@
+RI_G01
+GPS_collection get_single_receiver_average_STEC
+//_DESC  full description of program
+//      This function uses the nearest GPS receiver to the location of the
+//      telescope to find the STEC value of the direction specified by
+//      using all of the GPS satellite on the sky (within the specified limits).
+
+RI_G03
+        )
+// GPS_collection_return GPS_collection::get_multiple_receiver_3D_MIM_fit
+//                                O  The STEC value, in m^{-2}
+//                                   A value of GPS_BAD_DATA_VALUE indicates
+//                                   no valid data available.
+
+//_USER  any user input?
+
+//_VARS  TYPE           VARIABLE I/O DESCRIPTION
+//       put globals used here
+
+//_DESC  full description of program
+//      This function uses nearby (hopefully many more than one) GPS receivers
+//      to calculate a 3-D MIM fit to the ionosphere.  It then calculates
+//      the model prediction for the telescope line of sight to the target.
+
+//      The 3-D MIM model currently has 2 options.  The multilayer model
+//      assumes that the latitude and longitude variation across the ionosphere
+//      is relatively the same at all heights above the Earth.  Multiple
+//      layers are used to model the ionosphere with multiple pierce points
+//      through a simple 2-D structure.
+
+//      The manylayer model, in contrast, assumes that each height layer
+//      can have a different latitude and longitude dependence.  This allows
+//      for greater variation, but more parameters are needed to describe the
+//      variation at the different heights.
+
+//      At the time of 2007 Jan 04, these two different models seem to produce
+//      roughly equivalent results for about the same number of parameters.
+//      It is not clear that either way is better than the other at the moment.
+...
+       printf("in linfit:  calculate_multilayer_2D_linear_polynomials\n");
+//_DESC  full description of program
+//      This function will compute the value of a set of polynomials for
+//      a 2D surface fit (fitting z as a function of x and y).  It is intended
+//      for fitting ionospheric data to latitude and longitude positions.
+
+//      This function generates a simple, straightforward set of polynomials,
+//      starting with the lowest order polynomial values in x and y, and working
+//      up to get NUM_PARAM values.  As I expect the ionosphere to vary more with
+//      latitude, this will go up in y order slightly faster than in x.
+
+
+RI_G09
+//_TITLE  fit_manylayer_spherical_h_model_2_grad --fit spherical harmonics
+//_DESC  full description of program
+//      This function handles the fitting of a multilayer spherical harmonics
+//      model to
+//      the observation data.  Only observations with use_flag[i]==true will
+//      be used for the fit.  The actual fitting is done by a linear least
+//      squares technique using singular value decomposition.
+
+
+//      This function will generate it own set of height and pierce point
+//      information, based on the number of heights requested.  This routine
+//      assumes that the main ionospheric height is around 350 km, with
+//      the ionospheric electron density decreasing above and below.  For
+//      each observation, the pierce points are calculated for the various
+//      heights.  These pierce point lattitude and longitudes are used to
+//      generate the spherical harmonics terms
+......
+void calculate_manylayer_2D_spherical_h_polynomials(
+//_DESC  full description of program
+//      This function will compute the value of a set of spherical harmonic
+//      terms.  It is intended
+//      for fitting ionospheric data to latitude and longitude positions.
+
+//      See Arfkin 1985, \S~12.6 for a description of using spherical harmonics
+//      to model real values systems.  Note that this breaks up the
+//      standard spherical harmonics into terms which have
+//      Y_{m \ell}^e = P_\ell^m(x=\cos\theta)\cos(m\phi)     and
+//      Y_{m \ell}^0 = P_\ell^m(x=\cos\theta)\sin(m\phi)    .
+//      Because we are fitting data to these "harmonic" terms, I leave
+//      off the normalization constants (as does Arfkin).  The representation is
+//      then
+//      \Sum_{\elll=0}^L \Sum_{m=0}^\ell \left\{ C_{\ell m} Y_{m \ell}^e
+//                                             + S_{\ell m} Y_{m \ell}^0 \right\}
+//      where the C_{\ell m} and S_{\ell m} terms are the fit parameters for
+//      the cosine and sine terms.
+
+//      In the calculation of \cos(m\phi) and \sin(m\phi) I use the
+//      basic trigonometry that e^{i(m+1)\phi} = e^{i\phi} e^{i m\phi},
+//      and use this recurrance relation to calculate subsequent  values of
+//      \cos(m\phi) and \sin(m\phi) rather than calling cos and sin directly.
+//      From my tests on 2007Mar07, using my desktop Intel pc, this results
+//      in residual levels which grow approximately as
+//      |resid| \lesssim 6\times 10^{-17} m
+//      which should be small enough for any reasonable value of m here.
+
+

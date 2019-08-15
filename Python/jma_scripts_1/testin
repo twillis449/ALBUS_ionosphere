@@ -1,0 +1,3 @@
+# Lines starting with a # are comment lines and are ignored
+# Name   Class  Disk  Sequence    RA_2000        Dec_2000
+MY_Src   clss   1     2           12h04m45.6s     -01:34:21.5

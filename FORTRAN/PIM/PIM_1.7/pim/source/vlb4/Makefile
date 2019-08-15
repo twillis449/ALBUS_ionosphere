@@ -1,0 +1,189 @@
+#
+# JMA_code.rules
+#
+# Example Makefile for JMA coding
+# 2004 Feb 13  James M Anderson  --NRAO  reorganize from various places
+# 2008 Feb 15  JMA  --MPIfR updates for generalizing build
+
+
+
+
+HEADERS = \
+	pim_asub_c.h
+
+SRCS = \
+	adj_fnh.f \
+	cgm_util.f \
+	environ.f \
+	f2ursi.f \
+	gen.F \
+	geophys_util.F \
+	hlim.f \
+	iau_time.f \
+	init.F \
+	io_util.f \
+	jma_igrf10.f \
+	looklib.F \
+	low_para.f \
+	math_uti.F \
+	mid_para.f \
+	param.F \
+	pim_asub.f \
+	pim_asub_c.c \
+	pim_blok.f \
+	precip.f \
+	read_dba.f \
+	read_geophys.F \
+	read_vlbi.f \
+	rtd.f \
+	setupvlbi.f \
+	strnglib.f \
+	teccalc.F \
+	tecvlbi4.f \
+	tijdsub.f \
+	timelib.f \
+	usumodel.f 
+
+
+
+OBJS = \
+	adj_fnh.o \
+	cgm_util.o \
+	environ.o \
+	f2ursi.o \
+	gen.o \
+	geophys_util.o \
+	hlim.o \
+	iau_time.o \
+	init.o \
+	io_util.o \
+	jma_igrf10.o \
+	looklib.o \
+	low_para.o \
+	math_uti.o \
+	mid_para.o \
+	param.o \
+	pim_asub.o \
+	pim_asub_c.o \
+	pim_blok.o \
+	precip.o \
+	read_dba.o \
+	read_geophys.o \
+	read_vlbi.o \
+	rtd.o \
+	setupvlbi.o \
+	strnglib.o \
+	teccalc.o \
+	tecvlbi4.o \
+	tijdsub.o \
+	timelib.o \
+	usumodel.o 
+
+PROG = \
+	pim_asub \
+	pim_asub2
+
+LIBS = \
+	libpim.$(EXT)
+
+
+LIBRARIES = \
+	../../../../../../FORTRAN/SOFA/sofa/libsofa.so
+	#-lsofa
+
+
+
+
+all: $(PROG) $(LIBS)
+.PHONY : all
+
+
+pim_asub: $(OBJS) testmain.o
+	$(F77) $(FFLAGS) -o $@ testmain.o $(OBJS) $(LIBRARIES)
+
+pim_asub2: $(OBJS) testmain2.o
+	$(CC) $(CFLAGS) -o $@ testmain2.o $(OBJS) $(LIBRARIES) -l$(F77_COMPILER_LIB) -lm
+
+libpim.so: $(OBJS)
+	$(RM) $@.$(VER_MAJOR).$(VER_MINOR).$(VER_SUBSUB) $@.$(VER_MAJOR) $@ 
+	gcc -shared -Wl,-soname,$@.$(VER_MAJOR) -o $@.$(VER_MAJOR).$(VER_MINOR).$(VER_SUBSUB) $(OBJS) -l$(F77_COMPILER_LIB) -lm
+	ln -s $@.$(VER_MAJOR).$(VER_MINOR).$(VER_SUBSUB) $@.$(VER_MAJOR)
+	ln -s $@.$(VER_MAJOR) $@ 
+
+
+libpim.a: $(OBJS)
+	$(RM) $@
+	ar rcs $@ $(OBJS)
+
+install: libpim.so
+	$(CP) libpim.* $(INSTALLDIR)/lib
+	$(CP) $(HEADERS) $(INSTALLDIR)/include
+
+
+
+
+
+
+
+
+
+# This will probably work best with C and C++ code.  Modify
+# If you want to do this for FORTRAN too.
+depend:
+	$(RM) $(MAKEDEPENDREAL)
+	$(foreach i,$(SRCS), $(MAKEDEPEND) $(CFLAGS) $i;cat $(MAKEDEPENDTEMP) >> $(MAKEDEPENDREAL);)
+	$(RM) $(MAKEDEPENDTEMP)
+
+
+clean:
+	$(RM) $(OBJS) $(PROG) pim_asub.o pim_asub2.o testmain2.o testmain.o libpim.so*
+
+distclean: clean
+	$(RM) $(OBJS) $(PROG)
+	$(RM) *~
+
+
+
+
+# make sure we can compile C++ stuff
+.SUFFIXES:
+.SUFFIXES: .cxx $(SUFFIXES)
+
+
+
+
+
+
+
+
+
+# declare our own default compilation rules
+.cxx.o:
+	$(CC) $(CFLAGS) -c $<
+
+.F.o:
+	$(F77) $(FFLAGS) -c $<
+
+.f.o:
+	$(F77) $(FFLAGS) -c $<
+
+
+
+
+
+
+
+
+
+
+
+
+# If you are going to use MAKEDEPEND with GCC, uncomment the following
+#include .dependencies.mk
+
+
+
+# The following stuff is for automatic generation of dependencies
+# Some MAKEDEPEND programs need it.  I tend to use gcc to make
+# it's own dependencies file.
+# DO NOT DELETE THIS LINE -- make depend depends on it.

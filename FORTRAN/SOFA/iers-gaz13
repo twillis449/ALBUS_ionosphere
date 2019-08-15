@@ -1,0 +1,331 @@
+
+***************************************************************************
+        Gazette IERS Gazette IERS Gazette IERS Gazette IERS Gazette
+                                      _____________________________________
+        No 13, 30 January 1997       /
+____________________________________/              Contact: iers@obspm.fr
+                                       ftp: hpvlbi.obspm.fr (145.238.100.7)
+                      WWW: ftp://hpvlbi.obspm.fr/iers/ierscb.html
+***************************************************************************
+
+	Title:   INTERPOLATING IERS EARTH ORIENTATION DATA
+	Authors: Dennis McCarthy, Daniel Gambis
+
+
+INTRODUCTION
+
+     IERS Earth Orientation Parameters (EOP) are produced at regular intervals
+(daily or longer) with the effects of semidiurnal and diurnal variations 
+removed. Users who require high accuracy information may want to interpolate
+the published data and include the semidiurnal/diurnal variations.
+ 
+     This gazette provides a recommended procedure to follow in order to
+determine the most accurate Earth orientation for a given instant.
+
+     Currently all analysis centers contributing to the IERS employ a 
+procedure using a priori values of the EOP which are then corrected through 
+the analysis of observations.  These a priori values are best estimates based 
+on the standard knowledge of the Earth's orientation, usually the interpolated 
+tabular values plus a diurnal/semidiurnal model plus lower frequency tides 
+(if appropriate). The corrections to the a priori estimates are determined 
+from the analyses of data taken over some period of time, ranging from minutes 
+to days. Thus, they represent the mean of the unmodelled variations over the 
+length of the analyzed period of time. When the reported estimates (a priori 
++ mean estimated correction) are based on distinct time intervals, they may 
+be referred to as normal points.
+ 
+     The IERS provides to users polar motion and UT1 based on the combination 
+of the analysis centers data, using either smoothed estimates in order to 
+reduce observational errors (Bulletins A and B, EOP 97 C 04, see Explanatory 
+Supplement to IERS Bulletins A and B), or normal points (EOP 97 C 01, 02, 03, 
+see IERS 1995 Annual Report, part II.4). These results are provided without the 
+effects of the diurnal/semidiurnal tides. The IERS Conventions (McCarthy 1996) 
+for transformations between terrestrial and celestial frames, however, imply 
+that IERS EOP data are exact estimates at the instant in time reported.
+
+SEMIDIURNAL/DIURNAL VARIATIONS
+
+     The existence of diurnal and semidiurnal variations caused by ocean tides 
+is well known (Eubanks 1993; Sovers et al. 1993; Herring & Dong 1994; Ray et 
+al. 1994).  In recent years, through continuous, high-precision VLBI 
+experiments (e.g. ERDE, EPOCH92, CONT93, etc.), analytical models have been 
+derived for the prominent diurnal and semidiurnal tides (Herring and Dong 1991;
+Brosche et al. 1991; Herring 1993; Herring and Dong 1994; Gipson 1996).  
+This in turn has prompted a refinement in the theoretical models (Brosche et 
+al. 1989; Seiler 1991; Dickman 1989, 1990, 1991, 1993; Gross 1993; Ray et al. 
+1994; Ray 1995; Seiler and Wunsch 1995).
+
+     As the observational data have improved in accuracy, the models (both 
+empirical and theoretical) have quickly converged. Although there are 
+differences between recent models (e.g. Ray et al. 1994; Ray 1995; Seiler 
+and Wunsch 1995; Gipson 1996), these differences are less than 10%. The 
+effects of these tides are on the order of 0.1 milliarcseconds (mas) in the 
+polar motion coordinates x and y and 10**-6 s in UT1.  The inclusion of any 
+of these models in high-precision, Earth orientation analysis software clearly 
+improves the solution.
+
+     If the data do not correctly model the diurnal/semidiurnal tide, the 
+errors can reach up to +/-0.1 milliarcseconds (mas). Systematic errors of this 
+magnitude may be unacceptable to high-accuracy users.  Possible ambiguities 
+caused by unclear procedures concerning subdiurnal EOPs and the epoch of 
+observation can be eliminated.  Although the problems are only on the fringes 
+of detectability, they may cause significant systematic errors. It is expected 
+that eventually subdiurnal observations of EOPs will be possible routinely from 
+a reduction standpoint.
+
+RECOMMENDATION
+
+     The following software is recommended to interpolate the IERS polar motion 
+and Universal Time products and account for the semidiurnal/diurnal variations 
+in the Earths orientation. This procedure makes use of a Lagrangian 
+interpolation scheme and applies the Ray model of the semidiurnal/diurnal 
+variations in the Earth's orientation as recommended in the IERS Conventions
+(McCarthy, 1996). Any equivalent interpolation scheme could, of course, be 
+substituted.  
+
+This software can be obtained in machine readable form by anonymous ftp to 
+
+   maia.usno.navy.mil, cd to dist, and get interp.f.
+or
+   hpvlbi.obspm.fr; cd iers/model; get interp.f (interp.note is the above text)
+------------
+      SUBROUTINE INTERP (RJD,X,Y,T,N,RJDINT,XINT,YINT,TINT)
+C
+C     THIS SUBROUTINE TAKES A SERIES OF X, Y, AND UT1-UTC VALUES
+C     AND INTERPOLATES THEM TO AN EPOCH OF CHOICE.  THIS ROUTINE
+C     ASSUMES THAT THE VALUES OF X AND Y ARE IN SECONDS OF
+C     ARC AND THAT UT1-UTC IS IN SECONDS OF TIME.  AT LEAST
+C     ONE POINT BEFORE AND ONE POINT AFTER THE EPOCH OF THE
+C     INTERPOLATION POINT ARE NECESSARY IN ORDER FOR THE
+C     INTERPOLATION SCHEME TO WORK.
+C
+C     PARAMETERS ARE :
+C     RJD   - ARRAY OF THE EPOCHS OF DATA (GIVEN IN MJD)
+C     X     - ARRAY OF X POLAR MOTION (ARCSEC)
+C     Y     - ARRAY OF Y POLAR MOTION (ARCSEC)
+C     T     - ARRAY OF UT1-UTC (SEC)
+C     N     - NUMBER OF POINTS IN ARRAYS
+C     RJDINT- EPOCH FOR THE INTERPOLATED VALUE
+C     XINT  - INTERPOLATED VALUE OF X
+C     YINT  - INTERPOLATED VALUE OF Y
+C     TINT  - INTERPOLATED VALUE OF UT1-UTC
+C
+      DOUBLE PRECISION RJD(N), X(N), Y(N), T(N),
+     . RJDINT, XINT, YINT, TINT, CORX, CORY, CORT
+      CALL LAGINT (RJD,X,N,RJDINT,XINT)
+      CALL LAGINT (RJD,Y,N,RJDINT,YINT)
+      CALL LAGINT (RJD,T,N,RJDINT,TINT)
+      CALL RAY (RJDINT,CORX,CORY,CORT)
+      XINT = XINT + CORX
+      YINT = YINT + CORY
+      TINT = TINT + CORT
+      RETURN
+      END
+C
+C----------------------------------------------------------------
+C
+      SUBROUTINE LAGINT (X,Y,N,XINT,YOUT)
+C 
+C     THIS SUBROUTINE PERFORMS LAGRANGIAN INTERPOLATION
+C     WITHIN A SET OF (X,Y) PAIRS TO GIVE THE Y
+C     VALUE CORRESPONDING TO XINT.  THIS PROGRAM USES A
+C     WINDOW OF 4 DATA POINTS TO PERFORM THE INTERPOLATION.
+C     IF THE WINDOW SIZE NEEDS TO BE CHANGED, THIS CAN BE
+C     DONE BY CHANGING THE INDICES IN THE DO LOOPS FOR
+C     VARIABLES M AND J.
+C
+C     PARAMETERS ARE :
+C     X     - ARRAY OF VALUES OF THE INDEPENDENT VARIABLE
+C     Y     - ARRAY OF FUNCTION VALUES CORRESPONDING TO X
+C     N     - NUMBER OF POINTS
+C     XINT  - THE X-VALUE FOR WHICH ESTIMATE OF Y IS DESIRED
+C     YOUT  - THE Y VALUE RETURNED TO CALLER
+C
+      REAL*8 X(N),Y(N),XINT,YOUT,TERM
+      INTEGER N,I,J
+C
+      YOUT = 0.0D0
+      DO 5 I = 1,N-1
+        IF ( XINT .GE. X(I) .AND. XINT .LT. X(I+1) ) K = I
+    5 CONTINUE
+      IF ( K .LT. 2 ) K = 2
+      IF ( K .GT. N-2 ) K = N-2
+      DO 20 M = K-1,K+2
+        TERM = Y(M)
+        DO 10 J = K-1,K+2
+          IF ( M .NE. J ) THEN
+            TERM = TERM * (XINT - X(J))/(X(M) - X(J))
+          END IF
+   10   CONTINUE
+        YOUT = YOUT + TERM
+   20 CONTINUE
+      RETURN
+      END
+
+C
+C----------------------------------------------------------------
+C
+      SUBROUTINE RAY (RJD,CORX,CORY,CORT)
+C
+C   THIS SUBROUTINE IMPLEMENTS THE RAY MODEL FOR
+C   DIURNAL/SUBDIURNAL TIDES.  IT USES THE SIMON ET AL.
+C   FUNDAMENTAL ARGUMENTS.  THE CORRECTIONS IN X AND Y ARE IN
+C   UNITS OF SEC. OF ARC AND UT1-UTC IN SEC. OF TIME.  THESE
+C   CORRECTIONS SHOULD BE ADDED TO "AVERAGE" EOP VALUES TO GET
+C   ESTIMATES OF THE INSTANTANEOUS VALUES.
+C
+C     PARAMETERS ARE :
+C     RJD   - EPOCH OF INTEREST GIVEN IN MJD
+C     CORX  - TIDAL CORRECTION IN X (SEC. OF ARC)
+C     CORY  - TIDAL CORRECTION IN Y (SEC. OF ARC)
+C     CORT  - TIDAL CORRECTION IN UT1-UTC (SEC. OF TIME)
+C
+      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
+      DOUBLE PRECISION
+     .   L,        LPRIME
+      HALFPI = 1.5707963267948966d0
+      T = (RJD - 51544.5D0)/36525.0D0
+      L = -0.00024470d0*T**4 + 0.051635d0*T**3 + 31.8792d0*T**2
+     .  + 1717915923.2178d0*T + 485868.249036d0
+      L = DMOD(L,1296000d0)
+      LPRIME = -0.00001149d0*T**4 - 0.000136d0*T**3
+     .  -  0.5532d0*T**2
+     .  + 129596581.0481d0*T + 1287104.79305d0
+      LPRIME = DMOD(LPRIME,1296000d0)
+      CAPF = 0.00000417d0*T**4 - 0.001037d0*T**3 - 12.7512d0*T**2
+     .  + 1739527262.8478d0*T + 335779.526232d0
+      CAPF = DMOD(CAPF,1296000d0)
+      CAPD = -0.00003169d0*T**4 + 0.006593d0*T**3 - 6.3706d0*T**2
+     .  + 1602961601.2090d0*T + 1072260.70369d0
+      CAPD = DMOD(CAPD,1296000d0)
+      OMEGA = -0.00005939d0*T**4 + 0.007702d0*T**3
+     .  + 7.4722d0*T**2
+     .  - 6962890.2665d0*T + 450160.398036d0
+      OMEGA = DMOD(OMEGA,1296000d0)
+      THETA = (67310.54841d0 +
+     .        (876600d0*3600d0 + 8640184.812866d0)*T +
+     .         0.093104d0*T**2 -
+     .         6.2d-6*T**3)*15.0d0 + 648000.0d0
+      ARG7 = DMOD((-L - 2.0D0*CAPF - 2.0D0*OMEGA + THETA)
+     .     * 3.14159265D0/648000.0D0,6.28318530718D0) - HALFPI
+      ARG1 = DMOD((-2.0d0*CAPF - 2.0d0*OMEGA + THETA)
+     .     * 3.14159265D0/648000.0D0,6.28318530718D0) - HALFPI
+      ARG2 = DMOD((-2.0d0*CAPF + 2.0d0*CAPD - 2.0d0*OMEGA
+     .       + THETA)
+     .     * 3.14159265D0/648000.0D0,6.28318530718D0) - HALFPI
+      ARG3 = DMOD(THETA *
+     .        3.14159265D0/648000.0D0,6.28318530718D0)
+     .     + HALFPI
+      ARG4 = DMOD((-L - 2.0d0*CAPF - 2.0D0*OMEGA + 2.0d0*THETA)
+     .     * 3.14159265D0/648000.0D0,6.28318530718D0)
+      ARG5 = DMOD((-2.0D0*CAPF - 2.0D0*OMEGA + 2.0d0*THETA)
+     .     * 3.14159265D0/648000.0D0,6.28318530718D0)
+      ARG6 = DMOD((-2.0d0*CAPF + 2.0d0*CAPD - 2.0d0*OMEGA
+     .     + 2.0d0*THETA)
+     .     * 3.14159265D0/648000.0D0,6.28318530718D0)
+      ARG8 = DMOD((2.0d0*THETA)
+     .     * 3.14159265D0/648000.0D0,6.28318530718D0)
+      CORX = - 0.026D0*DSIN(ARG7) + 0.006D0*DCOS(ARG7)
+     .       - 0.133D0*DSIN(ARG1) + 0.049D0*DCOS(ARG1)
+     .       - 0.050D0*DSIN(ARG2) + 0.025D0*DCOS(ARG2)
+     .       - 0.152D0*DSIN(ARG3) + 0.078D0*DCOS(ARG3)
+     .       - 0.057D0*DSIN(ARG4) - 0.013D0*DCOS(ARG4)
+     .       - 0.330D0*DSIN(ARG5) - 0.028D0*DCOS(ARG5)
+     .       - 0.145D0*DSIN(ARG6) + 0.064D0*DCOS(ARG6)
+     .       - 0.036D0*DSIN(ARG8) + 0.017D0*DCOS(ARG8)
+      CORY = - 0.006D0*DSIN(ARG7) - 0.026D0*DCOS(ARG7)
+     .       - 0.049D0*DSIN(ARG1) - 0.133D0*DCOS(ARG1)
+     .       - 0.025D0*DSIN(ARG2) - 0.050D0*DCOS(ARG2)
+     .       - 0.078D0*DSIN(ARG3) - 0.152D0*DCOS(ARG3)
+     .       + 0.011D0*DSIN(ARG4) + 0.033D0*DCOS(ARG4)
+     .       + 0.037D0*DSIN(ARG5) + 0.196D0*DCOS(ARG5)
+     .       + 0.059D0*DSIN(ARG6) + 0.087D0*DCOS(ARG6)
+     .       + 0.018D0*DSIN(ARG8) + 0.022D0*DCOS(ARG8)
+      CORT = + 0.0245D0*DSIN(ARG7) + 0.0503D0*DCOS(ARG7)
+     .       + 0.1210D0*DSIN(ARG1) + 0.1605D0*DCOS(ARG1)
+     .       + 0.0286D0*DSIN(ARG2) + 0.0516D0*DCOS(ARG2)
+     .       + 0.0864D0*DSIN(ARG3) + 0.1771D0*DCOS(ARG3)
+     .       - 0.0380D0*DSIN(ARG4) - 0.0154D0*DCOS(ARG4)
+     .       - 0.1617D0*DSIN(ARG5) - 0.0720D0*DCOS(ARG5)
+     .       - 0.0759D0*DSIN(ARG6) - 0.0004D0*DCOS(ARG6)
+     .       - 0.0196D0*DSIN(ARG8) - 0.0038D0*DCOS(ARG8)
+      CORX = CORX * 1.0d-3
+      CORY = CORY * 1.0d-3
+      CORT = CORT * 0.1d-3
+      RETURN
+      END
+----------------
+REFERENCES
+
+Brosche, P., Seiler, U., Sundermann, J., and Wunsch, J., 1989,
+     "Periodic Changes in Earth's Rotation due to Oceanic Tides,"
+     Astron. Astrophys., 220, pp. 318-320.
+
+Brosche, P., Wunsch, J., Campbell, J., and Schuh, H., 1991,
+     "Ocean Tide Effects in Universal Time detected by VLBI,"
+     Astron. Astrophys., 245, pp. 676-682.
+
+Dickman, S. R., 1989, "A Complete Spherical Harmonic Approach to
+     Luni-Solar Tides," Geophys. J., 99, pp. 457-468.
+
+Dickman, S. R., 1990, "Experiments in Tidal Mass Conservation,"
+     (research note), Geophys. J., 102, pp. 257-262.
+
+Dickman, S. R., 1991, "Ocean Tides for Satellite Geodesy," Mar.
+     Geod., 14, pp. 21-56.
+
+Dickman, S. R., 1993, "Dynamic ocean-tide effect on Earth's
+     rotation," Geophys. J. Int., 112, pp. 448-470.
+
+Eubanks, T. M., 1993, "Variations in the Orientation of the
+     Earth," in Contributions of Space Geodesy to Geodynamics:
+     Earth Dynamics Geodynamics, American Geophysical Union,
+     Washington, DC, 24, pp. 1-54.
+
+Gipson, J., 1996, "VLBI Determination of Neglected Tidal Terms in
+     High-Frequency Earth Orientation Variation," submitted to J.
+     Geophys. Res.
+
+Gross, R. S., 1993, "The Effect of Ocean Tides on he Earth's
+     Rotation as Predicted by the Results of an Ocean Tide
+     Model," Geophys. Res. Lett., 20, pp. 293-296.
+
+Herring, T. A., 1993, "Diurnal and semi-diurnal variations in
+     Earth rotation," in The Orientation of the Planet Earth as
+     Observed by Modern Space Techniques, M. Feissel (ed.),
+     Pergamon Press, in press.
+
+Herring, T. A. and Dong, D., 1991, "Current and future accuracy
+     of Earth rotation measurements," in Proceedings of the
+     Chapman conference on Geodetic VLBI: Monitoring Global
+     Change, NOAA Technical Report NOS 137 NGS 49, pp. 306-324.
+
+Herring, T. A. and Dong, D., 1994, "Measurement of Diurnal and
+     Semidiurnal Rotational Variations and Tidal Parameters of
+     Earth," J. Geophys. Res., 99, pp. 18051-18071.
+
+IERS Annual Report, Available from the Central Bureau of the
+     IERS, Paris Observatory, Paris.
+
+McCarthy, D. D., 1996, IERS Conventions, IERS Technical Note, 21.
+
+Ray, R., Steinberg, D. J., Chao, B. F., and Cartwright, D. E.,
+     1994, " Diurnal and Semidiurnal Variations in the Earth's
+     Rotation Rate Induced by Oceanic Tides," Science, 264, pp.
+     830-832.
+
+Ray, R., 1995, Personal Communication.
+
+Seiler, U., 1991, "Periodic Changes of the Angular Momentum
+     Budget due to the Tides of the World Ocean," J. Geophys.
+     Res., 96, pp. 10287-10300.
+
+Seiler, U. and Wunsch, J. 1995, "A refined model for the
+     influence of ocean tides on UT1 and polar motion," Astron.
+     Nachr., 316, pp. 419-423.
+
+Sovers, O. J., Jacobs, C. S., and Gross, R. S., 1993, "Measuring
+     rapid ocean tidal Earth orientation variations with VLBI, J.
+     Geophys. Res., 98, 19959-19971.
+
+

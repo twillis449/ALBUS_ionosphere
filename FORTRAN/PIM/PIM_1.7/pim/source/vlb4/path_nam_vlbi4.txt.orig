@@ -1,0 +1,13 @@
+1                                                                               :Type of record-length for direct-access files  {INTEGER[1=bytes,2=longwords]}
+/jop30_0/anderson/astro/ionosphere/prog/FORTRAN/PIM/PIM_1.7/cgmdb/              :Location of CGM coordinate conversion database  {CHAR*80}
+/jop30_0/anderson/astro/ionosphere/prog/FORTRAN/PIM/PIM_1.7/usudb/unform/       :Location of parameterized USU model database  {CHAR*80}
+/jop30_0/anderson/astro/ionosphere/prog/FORTRAN/PIM/PIM_1.7/mlfdb/unform/       :Location of parameterized MLF model database  {CHAR*80}
+/jop30_0/anderson/astro/ionosphere/prog/FORTRAN/PIM/PIM_1.7/llfdb/unform/       :Location of parameterized LLF model database  {CHAR*80}
+/jop30_0/anderson/astro/ionosphere/prog/FORTRAN/PIM/PIM_1.7/lmedb/unform/       :Location of parameterized LME model database  {CHAR*80}
+/jop30_0/anderson/astro/ionosphere/prog/FORTRAN/PIM/PIM_1.7/ursidb/unform/      :Location of URSI coefficients database        {CHAR*80}
+/jop30_0/anderson/astro/ionosphere/prog/FORTRAN/PIM/PIM_1.7/noaa_dat/           :Location of F10.7 & Kp datafile downloaded from NOAA  {CHAR*80}
+/jop30_0/anderson/astro/ionosphere/prog/FORTRAN/PIM/PIM_1.7/noaa_dat/IMF24.dat  :Filename of IMF By & Bz datafile downloaded from GSFC {CHAR*80}
+/jop30_0/anderson/astro/ionosphere/prog/FORTRAN/PIM/PIM_1.7/igrf/               :Location of IGRF terr. magnetic-field Sper.Harm.Coeff. databases  {CHAR*80}
+src.cat                                                                         :Filename of Source catalogue  (currently = working directory)    {CHAR*80}
+sta.cat                                                                         :Filename of Station catalogue  (currently = working directory)   {CHAR*80}
+/jop30_0/anderson/astro/ionosphere/prog/FORTRAN/PIM/PIM_1.7/rtd/                :Location of GPS a/o ISS real-time data  {CHAR*80}

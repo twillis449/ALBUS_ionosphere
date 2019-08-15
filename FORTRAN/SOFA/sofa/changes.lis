@@ -1,0 +1,25 @@
+SOFA changes implemented for the issue 2005-09-01
+
+The following changes have been implemented for the issue 2005-09-01.
+
+Changes
+
+1) An error in the routine iau_SEPP (angle between two vectors) was
+   corrected. For the unique case where two vectors are precise opposites, 
+   the previous version returned zero instead of pi.
+
+2) In the star-space-motion routines iau_PVSTAR and iau_STARPV, the 
+   DR2AS constant was truncated rather than rounded. The correction, a 
+   change by 1 in the 25th decimal digit, will have had no practical 
+   consequences
+
+3) The routine iau_DAT was updated to include the UTC leap second at 
+   the end of 2005.
+
+4) A small efficiency improvement was made to iau_C2IXYS. The results
+   should be unaffected.
+
+5) Improvements to text and layout.
+
+IAU SOFA Center
+2005-08-23

@@ -1,0 +1,4 @@
+The Modified Julian Day (MJD) is defined as MJD = JD - 2400000.5 , where JD is the Julian Day. 
+Start of the JD count is from 0 at 12 noon 1 JAN -4712 (4713 BC).
+
+Dublin Julian Date, or DJD= MJD - 15019.5

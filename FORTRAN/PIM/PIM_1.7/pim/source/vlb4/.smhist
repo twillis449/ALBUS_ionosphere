@@ -1,0 +1,79 @@
+print {i z y}
+set z = 1.25E-4*i*i + 0.0002*i + 4.48
+set y = exp(z)
+print {i z y}
+set z = 1.3E-4*i*i + 0.0002*i + 4.48
+set y = exp(z)
+print {i z y}
+set z = 1.3E-4*i*i + 0.002*i + 4.48
+set y = exp(z)
+print {i z y}
+set z = 1.3E-4*i*i + 0.0025*i + 4.48
+set y = exp(z)
+print {i z y}
+data out.7.2
+read {el 4 d1 5}
+set el=el*180/PI
+set d1[0]=0
+erase limits el d1 box connect el d1
+data out.6.2
+read {el 4 d1 5}
+set el=el*180/PI
+set d1[0]=0
+ctype red connect el d1 ctype black
+data out.7.2
+read {el 4 d1 5}
+set el=el*180/PI
+set d1[0]=0
+ctype blue connect el d1 ctype black
+data out.7.2
+read {el 4 d1 5}
+set el=el*180/PI
+set d1[0]=0
+erase limits el d1 box connect el d1
+data out.6.2
+read {el 4 d1 5}
+set el=el*180/PI
+ctype red connect el d1 ctype black
+data out.7.2
+read {el 4 d1 5}
+set el=el*180/PI
+set d1[0]=0
+erase limits el d1 box connect el d1
+data out.6.2
+read {el 4 d1 5}
+set el=el*180/PI
+ctype red connect el d1 ctype black
+data out.8.2
+read {el 4 d1 5}
+set el=el*180/PI
+ctype blue connect el d1 ctype black
+data out.7.2
+read {el 4 d1 5}
+set el=el*180/PI
+set d1[0]=0
+erase limits el d1 box connect el d1
+data out.6.2
+ read {el 4 d1 5}
+set el=el*180/PI
+ctype red connect el d1 ctype black
+data out.8.2
+read {el 4 d1 5}
+set el=el*180/PI
+ctype blue connect el d1 ctype black
+erase limits el d1 box connect el d1
+data out.7.2
+ read {el 4 d1 5}
+set el=el*180/PI
+set d1[0]=0
+erase limits el d1 box connect el d1
+data out.8.2
+read {el 4 d1 5}
+set el=el*180/PI
+ctype blue connect el d1 ctype black
+data out.8.2
+read { el 4 d1 5 d2 6 }
+set el = el * 180/PI
+erase limits el d1 box connect el d1
+erase limits el -1 0 box connect el d1
+erase limits el -0.4 0 box connect el d1 if(d1 < 0)

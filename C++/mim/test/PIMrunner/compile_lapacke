@@ -1,0 +1,1 @@
+gcc -o dummy lapacke_dgesdd_row.c -llapacke

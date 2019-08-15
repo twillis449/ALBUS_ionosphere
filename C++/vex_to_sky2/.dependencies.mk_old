@@ -1,0 +1,43 @@
+ellipsoidal_coord.o: ellipsoidal_coord.cxx \
+  /.aux_mnt/pc20021a/albus/ALBUS/include/JMA_math.h \
+  /.aux_mnt/pc20021a/albus/ALBUS/include/JMA_code.h \
+  ellipsoidal_coord.h
+ellipsoidal_coord.o: ellipsoidal_coord.cxx \
+  /.aux_mnt/pc20021a/albus/ALBUS/include/JMA_math.h \
+  /.aux_mnt/pc20021a/albus/ALBUS/include/JMA_code.h \
+  ellipsoidal_coord.h
+vex_iono_processor.o: vex_iono_processor.cxx \
+  /.aux_mnt/pc20021a/albus/ALBUS/include/JMA_math.h \
+  /.aux_mnt/pc20021a/albus/ALBUS/include/JMA_code.h \
+  /.aux_mnt/pc20021a/albus/ALBUS/include/vexplus.h \
+  /.aux_mnt/pc20021a/albus/ALBUS/include/vex++.h \
+  /.aux_mnt/pc20021a/albus/ALBUS/include/vex.h \
+  /.aux_mnt/pc20021a/albus/ALBUS/include/y.tab.h vex_time.h \
+  vex_ut1_interp.h vex_source.h \
+  /.aux_mnt/pc20021a/albus/ALBUS/C++/mim/test/PIMrunner/space_vector.h \
+  /.aux_mnt/pc20021a/albus/ALBUS/include/JMA_math.h \
+  /.aux_mnt/pc20021a/albus/ALBUS/C++/mim/test/PIMrunner/space_unit_vector.h \
+  /.aux_mnt/pc20021a/albus/ALBUS/C++/mim/test/PIMrunner/space_vector.h \
+  /.aux_mnt/pc20021a/albus/ALBUS/C++/mim/test/PIMrunner/MC_direction.h \
+  /.aux_mnt/pc20021a/albus/ALBUS/C++/mim/test/PIMrunner/MC_random.h \
+  /.aux_mnt/pc20021a/albus/ALBUS/C++/mim/test/PIMrunner/latlon_cart.h \
+  /.aux_mnt/pc20021a/albus/ALBUS/C++/mim/test/PIMrunner/space_rotation_matrix.h \
+  /.aux_mnt/pc20021a/albus/ALBUS/C++/mim/test/PIMrunner/station_reference.h \
+  /.aux_mnt/pc20021a/albus/ALBUS/C++/mim/test/PIMrunner/latlon_cart.h \
+  /.aux_mnt/pc20021a/albus/ALBUS/C++/mim/test/PIMrunner/station_latlon.h \
+  /.aux_mnt/pc20021a/albus/ALBUS/C++/mim/test/PIMrunner/space_unit_vector.h \
+  /.aux_mnt/pc20021a/albus/ALBUS/C++/mim/test/PIMrunner/space_rotation_matrix.h \
+  /.aux_mnt/pc20021a/albus/ALBUS/include/sofa.h \
+  /.aux_mnt/pc20021a/albus/ALBUS/include/f2c.h
+vex_time.o: vex_time.cxx \
+  /.aux_mnt/pc20021a/albus/ALBUS/include/JMA_math.h \
+  /.aux_mnt/pc20021a/albus/ALBUS/include/JMA_code.h vex_time.h \
+  vex_ut1_interp.h /.aux_mnt/pc20021a/albus/ALBUS/include/sofa.h \
+  /.aux_mnt/pc20021a/albus/ALBUS/include/f2c.h
+vex_ut1_interp.o: vex_ut1_interp.cxx \
+  /.aux_mnt/pc20021a/albus/ALBUS/include/JMA_math.h \
+  /.aux_mnt/pc20021a/albus/ALBUS/include/JMA_code.h vex_time.h \
+  vex_ut1_interp.h ut1_interp.h \
+  /.aux_mnt/pc20021a/albus/ALBUS/include/f2c.h \
+  /.aux_mnt/pc20021a/albus/ALBUS/include/JMA_code.h
+

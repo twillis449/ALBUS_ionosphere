@@ -1,0 +1,17 @@
+The PIM model ionosphere nominally needs some space weather data, which should be stored in
+in the files kpf107.dat and IMF24.dat 
+The kpf107.dat and IMF24.dat files that need to be updated are stored in the directory
+FORTRAN/PIM/PIM_1.7/noaa_dat. After updating the files, push them out to the install 
+directories with a 'make install' command from THIS top-level directory
+
+To get kpf107.dat updates enter : 
+ftp://ftp.gfz-potsdam.de/pub/home/obs/kp-ap/wdc in your browser and get whatever
+you need. The data are in the form kpxxxx.wdc, where xxxx is the year. The data are usually a couple of weeks behind the current date. Append the new data to the end of the stored kpf107.dat after deleting any repetitive dates. 
+
+http://omniweb.gsfc.nasa.gov/form/dx1.html is the current (2013) site to get IMF24 data. 
+See the png image IMF24_request.png in this directory for an example of the fields to be selected.
+
+It looks like satellite orbit data can be provided quickly from:
+ftp igscb.jpl.nasa.gov
+cd pub/product/GPS_week ...
+

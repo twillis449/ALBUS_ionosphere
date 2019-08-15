@@ -1,0 +1,614 @@
+
+
+      The National Geodetic Survey Standard GPS Format SP3
+
+
+                     Paul R. Spofford
+                 National Geodetic Survey
+               National Ocean Service, NOAA
+             Silver Spring, MD 20910-3282, USA
+
+                          and 
+
+                 Benjamin W. Remondi, PhD
+                      P.O. Box 37
+              Dickerson, Maryland 20842, USA
+
+
+
+                      INTRODUCTION
+
+     Why do we need standardized orbit formats?  Standard orbit
+formats provide many advantages, the most obvious being orbit
+exchange.  ASCII and binary formats both satisfy this function,
+but ASCII does it with greater generality because binary formats
+are computer operating system dependent.
+
+     The NGS standard GPS orbit format SP1 was introduced in
+Remondi (1985).  After a few years of use, it was realized that
+enhancements would eventually be required.  The "orbit type," the
+coordinate system, and the GPS week associated with the first
+epoch of the ephemeris file were added in a manner that did not
+impact the formats and existing software.
+
+     A more serious omission of the initial NGS orbit format was
+the satellite clock corrections.  This omission reflected an
+earlier belief that all geodetic applications could be
+accomplished in differential mode.  Today we realize that
+standard formats serve a wider community and include those who
+find it inconvenient to operate in a differential mode.  A user
+can operate in single-receiver or navigation mode based on the
+broadcast message.  However, the user can get more accurate
+(post-processed) results if the precise orbital data and the
+associated satellite clock corrections, which were determined
+simultaneously with those precise orbits, are available.  This
+becomes even more valuable when the broadcast orbit and clock
+information are intentionally degraded.
+
+     Thus, a new NGS orbit format was proposed in Remondi (1989),
+and modified and adopted in Remondi (1991).  This format is
+similar to the original NGS orbit format, but comprises
+positional and satellite clock correction data.  Furthermore,
+other changes were proposed which allow more flexibility with
+regard to enhancements.  This summary document combines the
+specifications and enhancements discussed in Remondi (1989) and
+Remondi (1991), with examples for the benefit of the user.
+
+
+
+SP3
+
+     In this document the NGS orbital format SP3 (Standard
+Product # 3) for Global Positioning System (GPS) satellites is
+discussed (see examples 1 and 2).  The major addition to earlier
+formats is the satellite clock correction information which is
+computed simultaneously with the orbits.  The basic format is a
+position and clock record; a second, optional, record contains
+velocities and clock rates-of-change.  The Position Record Flag,
+P, in line one indicates that no velocities are included.  The
+Velocity Record Flag, V, in line one indicates that at each
+epoch, and for each satellite, a satellite velocity and clock
+rate-of-change has been computed.  The SP3 format has been
+designed such that satellites other than GPS could be described
+as well.
+
+Note:  All times referred to in this document are GPS times, even
+when they are represented as Gregorian or Modified Julian Dates. 
+Thus, information for conversion of GPS time to Coordinated
+Universal Time (UTC) is not provided as part of the SP3 format.
+!     Standard Product #3 ASCII SP3 Format Version "a"
+     (refer to example given in figure 1)
+
+     SP3 First Line
+
+     Columns 1-2         Version Symbol   #a
+     Column  3           Pos or Vel Flag  P or V
+     Columns 4-7         Year Start       1994
+     Column  8           Unused           _
+     Columns 9-10        Month Start      12
+     Column  11          Unused           _
+     Columns 12-13       Day of Month St  17
+     Column  14          Unused           _
+     Columns 15-16       Hour Start       _0
+     Column  17          Unused           _
+     Columns 18-19       Minute Start     _0
+     Column  20          Unused           _
+     Columns 21-31       Second Start     _0.00000000
+     Column  32          Unused           _
+     Columns 33-39       Number of Epochs _____96
+     Column  40          Unused           _
+     Columns 41-45       Data Used        ____d
+     Column  46          Unused           _
+     Columns 47-51       Coordinate Sys   ITR92
+     Column  52          Unused           _
+     Columns 53-55       Orbit Type       FIT
+     Column  56          Unused           _
+     Columns 57-60       Agency           _NGS
+
+
+     SP3 Line Two
+
+     Columns 1-2         Symbols          ##
+     Column  3           Unused           _
+     Columns 4-7         GPS Week         _779
+     Column  8           Unused           _
+     Columns 9-23        Seconds of Week  518400.00000000
+     Column  24          Unused           _
+     Columns 25-38       Epoch Interval   __900.00000000
+     Column  39          Unused           _
+     Columns 40-44       Mod Jul Day St   49703
+     Column  45          Unused           _
+     Columns 46-60       Fractional Day   0.0000000000000
+
+
+     SP3 Line Three
+
+     Columns 1-2         Symbols          +_
+     Column  3-4         Unused           __
+     Columns 5-6         Number of Sats   25
+     Column  7-9         Unused           __
+     Columns 10-12       Sat #1 Id        __1
+     Column  13-15       Sat #2 Id        __2
+            *
+            *
+            *
+     Columns 58-60       Sat #17 Id      _22
+
+     SP3 Line Four
+
+     Columns 1-2         Symbols          +_
+     Columns 3-9         Unused           _______
+     Columns 10-12       Sat #18 Id       _23
+     Columns 13-15       Sat #19 Id       _24
+            *
+            *
+            *
+     Columns 58-60       Sat #34 Id       __0
+
+
+     SP3 Line Five
+
+     Columns 1-2         Symbols          +_
+     Columns 3-9         Unused           _______
+     Columns 10-12       Sat #35 Id       __0
+     Columns 13-15       Sat #36 Id       __0
+            *
+            *
+            *
+     Columns 58-60       Sat #51 Id       __0
+
+
+     SP3 Line Six
+
+     Columns 1-2         Symbols          +_
+     Columns 3-9         Unused           _______
+     Columns 10-12       Sat #52 Id       __0
+     Columns 13-15       Sat #53 Id       __0
+            *
+            *
+            *
+     Columns 58-60       Sat #68 Id      __0
+
+
+     SP3 Line Seven
+
+     Columns 1-2         Symbols          +_
+     Columns 3-9         Unused           _______
+     Columns 10-12       Sat #69 Id       __0
+     Columns 13-15       Sat #70 Id       __0
+            *
+            *
+            *
+     Columns 58-60       Sat #85 Id       __0
+
+
+     SP3 Line Eight
+
+     Columns 1-2         Symbols          ++
+     Columns 3-9         Unused           _______
+     Columns 10-12       Sat #1 Accuracy  __7
+     Columns 13-15       Sat #2 Accuracy  __6
+            *
+            *
+            *
+     Columns 58-60       Sat #17 Accuracy __5
+
+
+     SP3 Line Nine
+
+     Columns 1-2         Symbols          ++
+     Columns 3-9         Unused           _______
+     Columns 10-12       Sat #18 Accuracy __5
+     Columns 13-15       Sat #19 Accuracy __5
+            *
+            *
+            *
+     Columns 58-60       Sat #34 Accuracy __0
+
+
+     SP3 Line Ten
+
+     Columns 1-2         Symbols          ++
+     Columns 3-9         Unused           _______
+     Columns 10-12       Sat #35 Accuracy __0
+     Columns 13-15       Sat #36 Accuracy __0
+            *
+            *
+            *
+     Columns 58-60       Sat #51 Accuracy __0
+
+
+     SP3 Line Eleven
+
+     Columns 1-2         Symbols          ++
+     Columns 3-9         Unused           _______
+     Columns 10-12       Sat #52 Accuracy __0
+     Columns 13-15       Sat #53 Accuracy __0
+            *
+            *
+            *
+     Columns 58-60       Sat #68 Accuracy __0
+
+
+     SP3 Line Twelve
+
+     Columns 1-2         Symbols          ++
+     Columns 3-9         Unused           _______
+     Columns 10-12       Sat #69 Accuracy __0
+     Columns 13-15       Sat #70 Accuracy __0
+            *
+            *
+            *
+     Columns 58-60       Sat #85 Accuracy __0
+
+
+     SP3 Lines Thirteen and Fourteen
+
+     Columns 1-2         Symbols          %c
+     Column  3           Unused           _
+     Columns 4-5         2 characters     cc
+     Column  6           Unused           _
+     Columns 7-8         2 characters     cc
+     Column  9           Unused           _
+     Columns 10-12       3 characters     ccc
+     Column  13          Unused           _
+     Columns 14-16       3 characters     ccc
+     Column  17          Unused           _
+     Columns 18-21       4 characters     cccc
+     Column  22          Unused           _
+     Columns 23-26       4 characters     cccc
+     Column  27          Unused           _
+     Columns 28-31       4 characters     cccc
+     Column  32          Unused           _
+     Columns 33-36       4 characters     cccc
+     Column  37          Unused           _
+     Columns 38-42       5 characters     ccccc
+     Column  43          Unused           _
+     Columns 44-48       5 characters     ccccc
+     Column  49          Unused           _
+     Columns 50-54       5 characters     ccccc
+     Column  55          Unused           _
+     Columns 56-60       5 characters     ccccc
+
+
+     SP3 Lines Fifteen and Sixteen
+
+     Columns 1-2         Symbols          %f
+     Column  3           Unused           _
+     Columns 4-13        10-column float  _0.0000000
+     Column  14          Unused           _
+     Columns 15-26       12-column float  _0.000000000
+     Column  27          Unused           _
+     Columns 28-41       14-column float  _0.00000000000
+     Column  42          Unused           _
+     Columns 43-60       18-column float  _0.000000000000000
+
+
+     SP3 Lines Seventeen and Eighteen
+
+     Columns 1-2         Symbols          %i
+     Column  3           Unused           _
+     Columns 4-7         4-column int     ___0
+     Column  8           Unused           _
+     Columns 9-12        4-column int     ___0
+     Column  13          Unused           _
+     Columns 14-17       4-column int     ___0
+     Column  18          Unused           _
+     Columns 19-22       4-column int     ___0
+     Column  23          Unused           _
+     Columns 24-29       6-column int     _____0
+     Column  30          Unused           _
+     Columns 31-36       6-column int     _____0
+     Column  37          Unused           _
+     Columns 38-43       6-column int     _____0
+     Column  44          Unused           _
+     Columns 45-50       6-column int     _____0
+     Column  51          Unused           _
+     Columns 52-60       9-column int     ________0
+
+
+     SP3 Lines Nineteen to Twenty two
+
+     Columns 1-2         Symbols          /*
+     Column  3           Unused           _
+     Columns 4-60        Comment          CC...CC
+
+
+     SP3 Line Twenty three (The Epoch Header Record)
+
+     Columns 1-2         Symbols          *_
+     Column  3           Unused           _
+     Columns 4-7         Year Start       1994
+     Column  8           Unused           _
+     Columns 9-10        Month Start      12
+     Column  11          Unused           _
+     Columns 12-13       Day of Month St  17
+     Column  14          Unused           _
+     Columns 15-16       Hour Start       _0
+     Column  17          Unused           _
+     Columns 18-19       Minute Start     _0
+     Column  20          Unused           _
+     Columns 21-31       Second Start     _0.00000000
+
+
+     SP3 Line Twenty four (The Position and Clock Record)
+     (See example 1)
+
+     Column 1            Symbol           P
+     Columns 2-4         Vehicle Id.      __1
+     Columns 5-18        x-coordinate(km) __16258.524750
+     Columns 19-32       y-coordinate(km) __-3529.015750
+     Columns 33-46       z-coordinate(km) _-20611.427050
+     Columns 47-60       clock (microsec) ____-62.540600
+          *
+          *
+          *
+
+In addition, one could use the Velocity and Clock Rate-of-Change
+record, V, after the Position and Clock record.  The clock rate-
+of-change units are 10**-4 microseconds/second.
+
+     SP3 Line Twenty five
+     (See example 2)
+
+     Column 1            Symbol           V
+     Columns 2-4         Vehicle Id.      __1
+     Columns 5-18        x-velocity(dm/s) __16258.524750
+     Columns 19-32       y-velocity(dm/s) __-3529.015750
+     Columns 33-46       z-velocity(dm/s) _-20611.427050
+     Columns 47-60       clock rate-chg   ____-62.540600
+          *    
+          *
+          *
+
+
+     SP3 Line 22+NUMEPS*(NUMSATS+1)+1 (i.e., The Last Line)
+
+     Columns 1-3         Symbols          EOF
+
+!Discussion of the SP3 Format
+
+     On line one, character two is the format version
+identification character.  The first released version has been
+designated version 'a'.  Subsequent versions will use lower case
+letters in alphabetical order.  The first line comprises the
+Gregorian date and time of day of the first epoch of the orbit,
+the number of epochs in the ephemeris file (up to 10 million),
+the data used descriptor, the orbit type descriptor, and the
+agency descriptor.  The data used descriptor was included for
+ease in distinguishing between multiple orbital solutions from a
+single organization.  This will have primary use for the agency
+generating the orbit.  A possible convention is given below; this
+is not considered final and suggestions are welcome.
+
+     u   -- undifferenced carrier phase
+     du  -- change in u with time
+     s   -- 2-receiver/1-satellite carrier phase
+     ds  -- change on s with time
+     d   -- 2-receiver/2-satellite carrier phase
+     dd  -- change in d with time
+     U   -- undifferenced code phase
+     dU  -- change in U with time
+     S   -- 2-receiver/1-satellite code phase
+     dS  -- change in S with time
+     D   -- 2-receiver/2-satellite code phase
+     dD  -- change in D with time
+      +  -- type separator
+
+     Combinations such as "__u+U" seem reasonable.  If the
+measurements used were complex combinations of standard types,
+then one could use "mixed" where mixed could be explained on the
+comment lines.
+
+     Orbit type is described by a three character descriptor.  At
+this time only three have been defined: FIT (fitted), EXT
+(extrapolated or predicted), and BCT (broadcast).  Naturally,
+others are possible.  The computing agency descriptor allows four
+characters (e.g. _NGS).
+
+     The second line has:  the GPS week (which will exceed 1000
+in the year 1999); the seconds of the GPS Week elapsed at the
+start of the orbit (0.0 <= seconds of week < 604800.0); the epoch
+interval (0.0 < epoch interval < 100000.0) in seconds; the
+modified Julian Day Start (where 44244 represents GPS zero time -
+- January 6, 1980); and fractional part of the day (0.0 <=
+fractional < 1.0) at the start of the orbit.
+
+     The third line to the seventh lines indicate the number of
+satellites followed by their respective identifiers.  The
+identifiers must use consecutive slots and continue on lines 4-7,
+if required.  The value 0 should only appear after all the
+identifiers are listed.  Satellite identifiers may be listed in
+any order.  However, for ease in reviewing satellites included in
+the orbit file it is recommended that numerical order be used.
+
+     The eighth line to the twelfth lines have the orbit accuracy
+exponents.  The value 0 is interpreted as accuracy unknown.  A
+satellite's accuracy exponent appears in the same slot on lines
+8-12 as the identifier on lines 3-7.  The accuracy is computed
+from the exponent as in the following example.  If the accuracy
+exponent is 13, the accuracy is 2**13 mm or 8 m.  The quoted
+orbital error should represent one standard deviation and be
+based on the orbital error in the entire file for the respective
+satellite.  This may lead to some distortion when orbit files are
+joined together.
+
+     Lines 13-18 allow the SP3 ASCII file to be modified, since
+the SP3 format has been designed so that additional parameters
+may be added.
+
+     Lines 19-22 are free form comments.
+
+     Line 23 is the epoch header date and time.
+
+     Line 24 is the position and clock line, and the first
+character is 'P' indicating a position line.  The positional
+values are in kilometers and are precise to 1 mm.  A precision of
+0.5 mm can be accommodated if rounding is used, i.e., the value
+shown is never more than 0.5 mm from the computed value.  The
+clock values are in microseconds and are precise to 1 picosecond. 
+Bad or absent positional values are to be set to 0.000000.  Bad
+or absent clock values are to be set to _999999.9999__.  The six
+integer nines are required, whereas the fractional part nines are
+optional.  When the position/velocity mode flag is set to 'V' in
+line one, each position record for a given satellite is followed
+by a velocity record for the same satellite.  The first character
+of the velocity record is a "V".  The velocity components are
+given in decimeters/second and have a precision of 10**-4 mm/second. 
+The last column of a velocity record is the rate-of-change of
+clock correction given in units of 10**-4 microsecond/second.  The
+precision of this parameter is 10**-16 second/second.
+
+!Example 1
+
+#aP1994 12 17  0  0  0.00000000      96     d ITR92 FIT  NGS
+##  779 518400.00000000   900.00000000 49703 0.0000000000000
++   25     1  2  4  5  6  7  9 12 14 15 16 17 18 19 20 21 22
++         23 24 25 26 27 28 29 31  0  0  0  0  0  0  0  0  0
++          0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
++          0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
++          0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+++         7  6  5  5  5  5  5  5  5  6  5  5  5  5  6  5  5
+++         5  5  6  5  5  5  5  5  0  0  0  0  0  0  0  0  0
+++         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+++         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+++         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+%c cc cc ccc ccc cccc cccc cccc cccc ccccc ccccc ccccc ccccc
+%c cc cc ccc ccc cccc cccc cccc cccc ccccc ccccc ccccc ccccc
+%f  0.0000000  0.000000000  0.00000000000  0.000000000000000
+%f  0.0000000  0.000000000  0.00000000000  0.000000000000000
+%i    0    0    0    0      0      0      0      0         0
+%i    0    0    0    0      0      0      0      0         0
+/* CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+/* CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+/* CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+/* CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+*  1994 12 17  0  0  0.00000000
+P  1  16258.524750  -3529.015750 -20611.427050    -62.540600
+P  2 -21998.652100  -8922.093550 -12229.824050   -131.326200
+P  4 -26019.547600   4809.810900  -2508.578200      3.544600
+P  5   7014.950200  21130.960300 -14387.334650     79.692800
+   *
+   *
+   *
+P 28  13204.937750 -20485.533400  10794.787000     55.200800
+P 29  -1638.431050 -24391.479200  10455.312650      3.690300
+P 31   6265.255800 -25687.986950   -753.359000     70.830800
+*  1994 12 17  0 15  0.00000000
+P  1  15716.820135  -1169.850490 -21281.578766    -62.542746
+P  2 -22813.261065  -9927.616864  -9816.490189   -131.328686
+   *
+   *
+   *
+P 28  13416.746195 -22186.753441   6248.864499     55.385492
+P 29  -2745.269113 -22169.709690  14469.340453      3.718873
+P 31   5629.986510 -25241.323751  -5659.769347     71.118497
+*  1994 12 17 23 45  0.00000000
+P  1  16708.907949  -5150.972262 -19904.291167    -62.727331
+P  2 -21321.617042  -8048.187511 -13856.581227   -131.555527
+P  4 -26107.382526   5010.736034   -422.963345      3.672587
+P  5   7932.078481  21838.230749 -12767.671968     79.888744
+   *
+   *
+   *
+P 28  13308.321924 -21306.183480   8935.290694     55.387446
+P 29  -2059.774801 -23532.083663  12229.852140      3.719337
+P 31   6034.395625 -25605.621951  -2843.783172     71.121661
+EOF!Example 2
+
+#aV1994 12 17  0  0  0.00000000      96     d ITR92 FIT  NGS
+##  779 518400.00000000   900.00000000 49703 0.0000000000000
++   25     1  2  4  5  6  7  9 12 14 15 16 17 18 19 20 21 22
++         23 24 25 26 27 28 29 31  0  0  0  0  0  0  0  0  0
++          0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
++          0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
++          0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+++         7  6  5  5  5  5  5  5  5  6  5  5  5  5  6  5  5
+++         5  5  6  5  5  5  5  5  0  0  0  0  0  0  0  0  0
+++         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+++         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+++         0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+%c cc cc ccc ccc cccc cccc cccc cccc ccccc ccccc ccccc ccccc
+%c cc cc ccc ccc cccc cccc cccc cccc ccccc ccccc ccccc ccccc
+%f  0.0000000  0.000000000  0.00000000000  0.000000000000000
+%f  0.0000000  0.000000000  0.00000000000  0.000000000000000
+%i    0    0    0    0      0      0      0      0         0
+%i    0    0    0    0      0      0      0      0         0
+/* CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+/* CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+/* CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+/* CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+*  1994 12 17  0  0  0.00000000
+P  1  16258.524750  -3529.015750 -20611.427050    -62.540600
+V  1  -6560.373522  25605.954994  -9460.427179     -0.024236
+P  2 -21998.652100  -8922.093550 -12229.824050   -131.326200
+V  2  -9852.750736 -12435.176313  25738.634180     -0.029422
+P  4 -26019.547600   4809.810900  -2508.578200      3.544600
+V  4   2559.038002  -3340.527442 -31621.490838      0.016744
+   *
+   *
+   *
+P 29  -1638.431050 -24391.479200  10455.312650      3.690300
+V 29   5754.005457 -12065.761570 -27707.056273      0.003537
+P 31   6265.255800 -25687.986950   -753.359000     70.830800
+V 31   3053.344058    -63.091750  31910.454757      0.033749
+*  1994 12 17  0 15  0.00000000
+P  1  15716.820135  -1169.850490 -21281.578766    -62.542746
+V  1  -5439.955846  26738.341429  -5409.793390     -0.023226
+P  2 -22813.261065  -9927.616864  -9816.490189   -131.328686
+V  2  -8178.974330  -9924.329320  27813.754308     -0.025238
+   *
+   *
+   *
+P 31   5629.986510 -25241.323751  -5659.769347     71.118497
+V 31   5213.646243  -5585.922919  30831.379942      0.040199
+*  1994 12 17 23 45  0.00000000
+P  1  16708.907949  -5150.972262 -19904.291167    -62.727331
+V  1  -7218.304166  24494.550676 -12283.334526     -0.023824
+   *
+   *
+   *
+P 31   6034.395625 -25605.621951  -2843.783172     71.121661
+V 31   3831.346050  -2469.229615  31655.436179      0.028935
+EOF!                            REFERENCES
+
+
+1.  Remondi, B. W. 1985: Distribution of Global Positioning
+System Ephemerides by the National Geodetic Survey, Presented at
+the First Conference on Civil Applications of GPS - Institute of
+Navigation, September 12, 1985, 8 pp.
+
+2.  Remondi, B. W. 1989: Extending the National Geodetic Survey
+Geodetic Orbit Formats, NOAA Technical Report 133 NGS 46, 85 pp.
+
+3.  Remondi, B. W., 1991: NGS Second Generation ASCII and Binary
+Orbit Formats and Associated Interpolated Studies, Proceedings of
+the Twentieth General Assembly, International Union of Geodesy
+and Geophysics, Vienna, Austria, August 11-24, 1991, 28 pp.
+
+
+
+
+                      ORDERING INFORMATION
+
+
+Geodetic publications of NOAA and the National Geodetic Survey
+are sold in paper form by the Information Services Division,
+National Geodetic Survey, NOAA.  To obtain a price list or to
+place an order contact:
+
+                  NOAA, National Geodetic Survey
+                  SSMC3, N/CG112
+                  1315 East-West Highway
+                  Silver Spring, Maryland  20910-3282
+                  USA
+
+                  Telephone: 301-713-3242
+                  FAX:       301-713-4172.
+
+=====================================================================
+Paul R. Spofford                         Internet: pauls@ngs.noaa.gov
+NOAA, National Geodetic Survey                Telephone: 301-713-3205
+1315 East-West Highway, N/CG12                      FAX: 301-713-4322
+Silver Spring, Maryland 20910-3282, USA            Home: 301-831-6099
+=====================================================================

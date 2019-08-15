@@ -1,0 +1,190 @@
+# instructions for installing ALBUS Ionosphere program 
+# 2008 Mar 04  James M Anderson  --MPIfR  start
+# 2014 May 06  Anthony G Willis updated for use with CASA Measurement Sets
+# 2019 May 06  Anthony G Willis updated for work with python3 interface
+
+If you want to use the ALBUS software with CASA measurement sets you 
+must install the casacore package from https://code.google.com/p/casacore/ 
+and the pyrap package from https://code.google.com/p/pyrap/
+
+If you do not need/want to work with CASA measurement sets, then at a minimum 
+you need to have the Python numpy and PyEphem  (http://rhodesmill.org/pyephem/)
+packages installed.
+
+You should download and install the either the ftplib or PyCurl package 
+needed to get data from remote GPS sites.
+
+The ALBUS Ionosphere package should be able to install on most Linux
+systems.  This code probably requires something close to the GNU make
+to build, but you are welcome to test it with other systems,
+and report back any problems.  The code should be able to run on most
+"Unix"-like environments.
+
+First, you need to edit the top-level Makefile to set various parameters.
+
+Set the environment variable, INSTALLDIR to tell the system 
+where you want final libraries and data used by the package to be installed. 
+You can do this in the bash shell with e.g.
+
+setenv INSTALLDIR /home/twillis/albus 
+
+where you would replace /home/twillis/albus  with your own directory structure.
+You should create this directory before you issue the 'make' command to start
+the actual build.
+
+Do you want to use debug mode by default? Under Linux Ubuntu 10.04 there seemed
+to be some problems with gfortran and multiprocessing in optimised mode. Under 
+ubuntu 12.04 things seem to work OK
+
+export DEBUG=0
+
+Then define the compiler. The following works for Ubuntu 18.04
+
+export CC = gcc
+export F77 = gfortran -std=legacy
+export F77_COMPILER_LIB = gfortran
+export F77_RECL_UNIT = bytes
+export HAVE_G2C_H_FILE=0
+export C++ = g++
+
+export CPP = cpp -P
+
+That should do it for the Makefile.
+
+You may also need to edit the file
+
+./C++/AlbusIonosphere/python_attempt/setup.py
+
+to specify the location of the numpy include files as these locations seem 
+to vary from one Linux to another. Examples that are known to work are shown 
+in the setup.py file
+
+You will probably need to add $INSTALLDIR/lib to your 
+LD_LIBRARY_PATH, and  $INSTALLDIR/share/python:$INSTALLDIR/lib to your 
+PYTHONPATH environment variables. Add $INSTALLDIR/bin to ypur PATH environment
+variable. If things have been set up correctly then you should be able to copy 
+the getGPSIONO_3C138.py script from the examples subdirectory to 
+any directory on your computer and run it from there.
+
+You should update these environment variables before you start the build.
+
+You need to have shared libraries for the flex lexical analyzer installed. 
+This seems to happen if you install flex on an ubuntu linux system, but may not be the case by default for other linuxes.
+
+To build, just run 'make' followed by 'make install'. That should work.
+
+IMPORTANT: You will also need to install the conversion software programs 
+contained in the file RNXCMP_4.0.5_src.tar.gz.  See the file 
+RNXCMP_4.0.5_src/docs/RNXCMP.txt for instructions on compilation. Put the 
+compiled binarys in some directory (e.g. /usr/local/bin) which will be in 
+your search path for executable files.
+
+If you decide to rebuild the software for some reason first run 'make clean',
+followed by 'source remove_remainder'.
+
+To run the software, edit the script getGPSIONO.py. Examples of usage are 
+given at the end of the file, and also at the ends of other scripts, especially
+MS_Iono_agw_azel_par.py in the python_scripts or examples subdirectory. 
+The examples illustrate the various parameters that the system will accept. 
+The process_ionosphere function in the MS_Iono_functions.py script gives 
+definitions of all the parameters that you can set.
+
+The flag do_serial, if set equal to 0 does parallel processing to download GPS 
+station data sets. If do_serial is set to 1 the program will do the ftp 
+sequentially, which can be slow. BUT if all the GPS data sets have been 
+downloaded in a previous session it will just read the data from disk, 
+using the station names contained in the file 'albus_good_stations'. 
+Unfortunately if you use do_serial set to 0 to read in data that you have 
+already collected then some python shared-memory bug gets triggered. 
+This bug does not seem to have been fixed as of python 2.7
+
+num_processors tells the system how many python ftp sessions can be spawned 
+off in parallel. If you give a value <= 2 the system will check your CPU and
+assign the number of processors on the basis of what it finds. If you have
+set do_serial=1, this parameter will have no effect until the software reaches
+the prediction stage. 
+
+The processing will end up producing an ASCII file whose name begins with 
+albus_report.  The columns in the report give:
+
+column 0: sequence number
+column 1: a colon !
+column 2: will be 0, if the prediction calculation went OK, otherwise -1. 
+  You will certainly get a -1 if the field goes below the horizon.
+column 3: time, relative to the start time in seconds
+column 4: time width of a sample, usuallly 300 seconds
+column 5: elevation, in degrees
+column 6: azimuth, in degrees
+column 7; STEC, in TEC units
+column 8: rotation measure in radians/m^2
+column 9: factor by which to multiply STEC to get VTEC 
+
+See the file MS_Iono_agw_azel_par.py for documentation on the ionosphere 
+processing_options. The MO_PIM and MO_IRI models are only theoretical, and 
+sometimes do not come even close to what the actual GPS solutions give.
+# The types of fits that can be selected for processing GPS data sets
+# The valid RINEX groups are
+PROCESSING_OPTION_RINEX_GROUPS = ["RI_G00",  # Single station, nearest sat
+                                  "RI_G01",  # single station, all sats
+                                  "RI_G02",  # simple 2D
+                                  "RI_G03",  # 3D mult (same lat,lon for all h)
+                                  "RI_G04",  # 3D many (different lat,lon for h)
+                                  "RI_G05",  # 3D spherical harmonics
+                                  "RI_G06",  # 2D with time dependance
+                                  "RI_G07",  # 2D with gradient LSQ
+                                  "RI_G08",  # 2D with time, gradient
+                                  "RI_G09",  # 3D spherical, gradient
+                                  ]
+
+The GPS processing options you probably want to try are:
+RI_G03
+RI_G01
+in decreasing order of preference. Processing_option = 'RI_G05' may also
+give reasonable results.
+
+At present the function ionosphere_GPS_set_criteria in the file 
+MS_Iono_functions.py is not actually called - instead, to adjust any 
+parameters you need to edit MS_Iono_functions.py around line 495 or 
+thereabouts.
+
+NOTE: The MO_IRI option seems to produce zeros for STEC and RM, at least 
+on a ubuntu 14.04 machine. The gfortran compiler may be having problems 
+with the IRI Fortran code.  This needs further investigation. The code compiles
+and runs OK on a ubuntu 12.04 machine.
+
+-----------------------------------------------------------------
+
+# If you find that you have many GPS stations, you might increase
+# the number of fit parameters below from 25 to say 40.
+ionosphere_GPS_set_criteria(2.0*math.pi,
+                                       0.1745,     
+                                       600E3,     
+                                       2000E3,     
+                                       300E3,     
+                                       15.5,
+                                       25,         
+                                       3,  
+                                       1,
+                                       0,
+                                       0
+                                       )
+## The following will set things up to do a more careful analysis
+## of the GPS biases, and some extra functionality using an empirical 
+## ionosphere model.  But it will be SLOW.
+#ionosphere_GPS_set_criteria(2.0*math.pi,
+#                                       0.1745,     
+#                                       600E3,     
+#                                       2000E3,     
+#                                       300E3,     
+#                                       15.5,
+#                                       25,         
+#                                       3,  
+#                                       1,
+#                                       3,
+#                                       3
+#                                       )
+
+The python_scripts and examples subdirectories contains examples which you can
+modify for your own use. 
+
+
