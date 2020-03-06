@@ -36,5 +36,5 @@ taking into account modern understanding of ionospheric physics, and employs a
 model of the terrestrial magnetic field that accounts for change of intensity
 and direction with height.
 
-The software makes expensive use of python scripts and should work with both
+The software makes extensive use of python scripts and should work with both
 python2 and python3.
