@@ -1465,7 +1465,7 @@ def process_ionosphere(MSname="",MSdir=".", Ra=0, Dec=0, Az=180.0, El=-90.0, Lat
           print ('*** setting number of processors to',num_processors) 
       except:
         pass
-    num_processors = 1
+      
     if lat_set:
       Lat = math.degrees(Lat1)
       Long = math.degrees(Long1)
