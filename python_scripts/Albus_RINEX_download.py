@@ -4,28 +4,42 @@
 # stuff for < 2.5 seems to not work or was not implemented, so
 # I have made my own simple case
 # 2007 Jan 19  James M Anderson  --JIVE  start
+# 2020 Using pycurl with python3
 
 
 import sys
-HAS_PYCURL = False
-HAS_FTPLIB = False
-try:
-  import pycurl
-  HAS_PYCURL = True
-except:
-  pass
-
-try:
-  import ftplib
-  HAS_FTPLIB = True
-except:
-  pass
+import pycurl
 
 def main():
     print('in Albus_RINEX_download')
     if(len(sys.argv) != 4):
         print("Error: correct usage is %s inURL, outfilename timeout"%sys.argv[0])
         sys.exit(-2)
+    HAS_PYCURL = True
+    if HAS_PYCURL:  #  currently the system used for retrieving ftp data
+      print ('using PyCurl')
+      print ('system parameters ', sys.argv)
+      HAS_FTPLIB = False
+      try:
+        print("URL=",sys.argv[1]," File=",sys.argv[2])
+        try:
+          timeout = int(sys.argv[3])
+          with open(sys.argv[2], 'wb') as f:
+               c = pycurl.Curl()
+               c.setopt(c.URL, sys.argv[1])
+               c.setopt(pycurl.CONNECTTIMEOUT, 120)
+               c.setopt(pycurl.TIMEOUT, timeout)
+               c.setopt(c.WRITEDATA, f)
+               print('curl getting data at ',sys.argv[1])
+               c.perform()
+               print('curl closing for ', sys.argv[1])
+               c.close()
+        except:
+          print('PyCurl failed to get data for ', sys.argv[1], ' file probably not found!!')
+          sys.exit(-3)
+      except:
+        pass
+
     if HAS_FTPLIB:
       in_str = sys.argv[1]
       # we ignore the initial ftp:// characters
@@ -47,29 +61,6 @@ def main():
       HAS_PYCURL = False
       
    
-    if HAS_PYCURL:  #  currently the system used for retrieving ftp data
-      print ('using PyCurl')
-      print ('system parameters ', sys.argv)
-      try:
-        print("URL=",sys.argv[1]," File=",sys.argv[2])
-        try:
-          timeout = int(sys.argv[3])
-          with open(sys.argv[2], 'wb') as f:
-               c = pycurl.Curl()
-               c.setopt(c.URL, sys.argv[1])
-               c.setopt(pycurl.CONNECTTIMEOUT, 120)
-               c.setopt(pycurl.TIMEOUT, timeout)
-               c.setopt(c.WRITEDATA, f)
-               print('curl getting data at ',sys.argv[1])
-               c.perform()
-               print('curl closing for ', sys.argv[1])
-               c.close()
-        except:
-          print('PyCurl failed to get data for ', sys.argv[1], ' file probably not found!!')
-          sys.exit(-3)
-      except:
-        pass
-
     sys.exit(0)
 
 if __name__ == '__main__':
