@@ -26,6 +26,8 @@
  2013 Oct 07  AGW  --add in South Africa trignet stations
  2015 Apr 28  AGW  --add in additional Australian Geodesy stations
  2018 Jun 12  AGW  --add in further additional Australian Geodesy stations
+ 2020 Mar 10  AGW  --add in further additional New Zealand stations ~ 234 more stations
+ Column names are Mark, Name, Latitude, Longitude, Elevation
          10        20        30        40        50        60        70 
 012345678901234567890123456789012345678901234567890123456789012345678901234567
 -FILE/COMMENT
@@ -4263,5 +4265,234 @@
  ZIMJ  A 14001M006 P      Bern, Switzerland   7 27 54.4   46 52 37.7    954.3
  ZIMM  A 14001M004 P            Switzerland   7 27 55.0   46 52 37.6    956.3
  GASC                         WA, Australia 115 20 19.0  -24 37 57.4    182.5
+ SIMO  A 30307M001 P Simonstown, South Afri  18 26 22.5  -34 11 16.6     39.5  
+ 2406  A XXXXXXXXX P           C KAIAPO TLP 175 59 41.2  -38 41 30.7    442.788 
+ AHTI  A XXXXXXXXX P                Ahititi 178 02 45.6  -38 24 41.2    563.221 
+ AKTO  A XXXXXXXXX P         Akitio Station 176 27 40.4  -40 32 23.3    432.94 
+ ANAU  A XXXXXXXXX P             Anaura Bay 178 17 28.4  -38 16 05.6    229.304 
+ ARTA  A XXXXXXXXX P          Aratiatia Dam 176 08 11.1  -38 37 03.3    369.723 
+ ATIA  A XXXXXXXXX P          Aratiatia Dam 176 08 11.1  -38 37 03.3    369.0
+ AUCK  A XXXXXXXXX P      Whangaparaoa No 3 174 50 03.8  -36 36 10.2    132.6808 
+ AUKT  A XXXXXXXXX P    Auckland Tide Gauge 174 46 13.5  -36 50 37.5    040.1 
+ AVLN  A XXXXXXXXX P     Avalon Sound Stage 174 55 58.3  -41 11 47.2    039.552 
+ BHST  A XXXXXXXXX P     Black Hill Station 176 03 47.4  -39 29 21.1    882.479 
+ BIRF  A XXXXXXXXX P             Birch Farm 176 14 46.0  -40 40 47.2    308.983 
+ BLUF  A XXXXXXXXX P                  Bluff 168 17 31.5  -46 35 06.2    124.6401 
+ BM8A  A XXXXXXXXX P       8A Balmoral Lane 172 43 57.0  -43 33 26.5    037.65 
+ BNET  A XXXXXXXXX P           Burnett Rock 170 11 24.5  -43 51 45.0    757.772 
+ BTHL  A XXXXXXXXX P           Battery Hill 175 08 11.5  -41 20 25.8    078.839 
+ CAST  A XXXXXXXXX P    Castlepoint Station 176 12 05.6  -40 54 35.3    173.636 
+ CHAT  A XXXXXXXXX P         Chatham Island 184 33 57.0  -43 57 20.8    057.9738 
+ CHTI  A XXXXXXXXX P   Chatham Island North 184 37 01.6  -43 44 07.7    075.678 
+ CKID  A XXXXXXXXX P        Cape Kidnappers 177 04 34.9  -39 39 28.3    234.903 
+ CLIM  A XXXXXXXXX P             Mt. Climie 175 08 43.7  -41 08 40.8    830.724 
+ CLRR  A XXXXXXXXX P         Clarence River 173 48 55.4  -42 08 40.6    922.9363 
+ CLS3  A XXXXXXXXX P  92 Richmond Hill Road 172 45 25.2  -43 34 17.4    096.0
+ CLS4  A XXXXXXXXX P  80 Richmond Hill Road 172 45 28.1  -43 34 12.0    068.0
+ CLS5  A XXXXXXXXX P       8 Kinsey Terrace 172 45 07.6  -43 33 54.7    070.0
+ CLS6  A XXXXXXXXX P           Clifton Hill 172 45 11.8  -43 33 56.4    075.183 
+ CLSG  A XXXXXXXXX P Glendevere Terrace Red 172 43 57.0  -43 33 36.4    085.7 
+ CLSK  A XXXXXXXXX P  Kinsey Terrace Sumner 172 45 09.7  -43 33 56.9    089.1 
+ CMBL  A XXXXXXXXX P    Cape Campbell No. 2 174 12 49.7  -41 44 56.5    257.0051 
+ CNCL  A XXXXXXXXX P           Conical Hill 169 51 21.1  -43 39 58.4    1222.3078 
+ CNST  A XXXXXXXXX P        Carnagh Station 178 12 40.1  -38 29 16.7    242.6788 
+ CORM  A XXXXXXXXX P             Coromandel 175 44 58.4  -36 51 55.6    170.2417 
+ DNVK  A XXXXXXXXX P             Dannevirke 176 09 60.0  -40 17 55.9    457.6175 
+ DUND  A XXXXXXXXX P                Dunedin 170 35 49.8  -45 53 01.2    386.916 
+ DUNT  A XXXXXXXXX P     Dunedin Tide Gauge 170 37 45.9  -45 48 51.6    013.5 
+ DURV  A XXXXXXXXX P              D'Urville 173 55 17.7  -40 48 06.4    468.459 
+ FALE  A XXXXXXXXX P                Faleolo 189 59 58.3  -13 49 56.0    047.6006 
+ FOX1  A XXXXXXXXX P  Fox Glacier landslide 170 02 56.7  -43 31 06.0    1277.8185 
+ FRTN  A XXXXXXXXX P             Frasertown 177 24 35.5  -38 56 21.5    169.463 
+ GDS1  A XXXXXXXXX P Gladstone Station Temp 173 36 38.8  -41 55 56.3    930.8583 
+ GISB  A XXXXXXXXX P               Gisborne 177 53 09.7  -38 38 07.2    087.1767 
+ GLDB  A XXXXXXXXX P             Golden Bay 172 31 46.4  -40 49 35.7    302.604 
+ GLOK  A XXXXXXXXX P    Glen Orkney Station 173 49 18.7  -41 51 26.0    751.6266 
+ GNBK  A XXXXXXXXX P              Greenbank 175 14 17.3  -40 04 49.2    090.307 
+ GRAC  A XXXXXXXXX P             Gracefield 174 55 01.4  -41 14 06.4    026.2406 
+ GRNG  A XXXXXXXXX P            Grange Hill 175 27 33.4  -39 58 34.5    365.8342 
+ GUNR  A XXXXXXXXX P             Gunn Ridge 170 23 21.3  -43 23 31.5    1563.535 
+ HAAS  A XXXXXXXXX P                  Haast 168 47 08.0  -44 04 23.5    1053.549 
+ HAMT  A XXXXXXXXX P               Hamilton 175 06 33.1  -37 48 24.3    069.4004 
+ HANA  A XXXXXXXXX P               Hangaroa 177 34 09.7  -38 41 12.6    574.0468 
+ HANM  A XXXXXXXXX P           Hanmer Basin 172 47 34.0  -42 33 10.2    321.718 
+ HAST  A XXXXXXXXX P               Hastings 176 43 35.6  -39 37 01.3    152.3338 
+ HIKB  A XXXXXXXXX P              Hicks Bay 178 18 12.1  -37 33 39.7    107.2888 
+ HOKI  A XXXXXXXXX P               Hokitika 170 59 03.5  -42 42 46.5    053.6686 
+ HOLD  A XXXXXXXXX P     Holdsworth Station 175 30 54.7  -40 53 50.1    469.6892 
+ HORN  A XXXXXXXXX P          Hoophorn Spur 170 06 19.8  -43 46 38.4    960.366 
+ KAHU  A XXXXXXXXX P             Kahuranaki 176 52 34.6  -39 47 37.5    654.309 
+ KAIK  A XXXXXXXXX P               Kaikoura 173 32 01.2  -42 25 31.7    315.504 
+ KAPT  A XXXXXXXXX P                 Kapiti 174 54 35.2  -40 51 39.2    367.612 
+ KARA  A XXXXXXXXX P             Karangarua 169 46 30.6  -43 36 30.1    1403.2832 
+ KAWK  A XXXXXXXXX P          Kaweka Forest 176 25 22.0  -39 25 26.5    831.0
+ KERE  A XXXXXXXXX P                 Kereru 176 22 12.5  -39 38 35.4    520.891 
+ KOKO  A XXXXXXXXX P                 Kokohu 177 40 04.0  -39 00 58.0    301.825 
+ KORO  A XXXXXXXXX P                  Kooro 175 25 26.6  -40 24 33.6    051.554 
+ KTIA  A XXXXXXXXX P                Kaitaia 173 16 23.2  -35 04 08.2    127.4329 
+ KUTA  A XXXXXXXXX P                Te Kuta 177 04 11.1  -39 10 20.1    181.0
+ LDRZ  A XXXXXXXXX P    Lauder NIWA Station 169 41 02.8  -45 02 18.0    379.329 
+ LEVN  A XXXXXXXXX P           Moutere No.3 175 14 26.3  -40 35 19.6    096.127 
+ LEXA  A XXXXXXXXX P              Alexandra 169 18 29.7  -45 13 51.7    331.8521 
+ LEYL  A XXXXXXXXX P           Tangoio No 2 176 56 12.2  -39 19 56.4    114.0888 
+ LKTA  A XXXXXXXXX P            Lake Taylor 172 15 58.8  -42 47 00.1    712.9659 
+ LOK1  A XXXXXXXXX P Glen Orkney Station Te 173 49 06.1  -41 51 34.3    678.4554 
+ LOOK  A XXXXXXXXX P          Mount Lookout 173 28 56.8  -42 00 41.7    1609.0
+ LRR1  A XXXXXXXXX P Clarence River Tempora 173 48 55.1  -42 08 39.9    921.9091 
+ LYTT  A XXXXXXXXX P   Lyttelton Tide Gauge 172 43 20.0  -43 36 21.0    018.5 
+ MAHA  A XXXXXXXXX P        Mahakipawa Hill 173 47 37.7  -41 17 29.0    442.0
+ MAHI  A XXXXXXXXX P        Mahia Peninsula 177 54 25.2  -39 09 09.2    322.4398 
+ MAHO  A XXXXXXXXX P               Mahoenui 174 51 14.7  -38 30 46.8    302.4836 
+ MAKO  A XXXXXXXXX P               Makorori 178 07 44.8  -38 38 37.5    231.0
+ MANG  A XXXXXXXXX P     Mangatainoka River 175 34 29.5  -40 40 07.3    418.01 
+ MAST  A XXXXXXXXX P              Masterton 175 35 04.5  -41 03 43.2    207.197 
+ MATW  A XXXXXXXXX P                Matawai 177 31 34.3  -38 20 01.8    646.269 
+ MAVL  A XXXXXXXXX P           Mavora Lakes 168 07 05.6  -45 21 59.5    592.4608 
+ MCNL  A XXXXXXXXX P           McNeill Hill 176 41 47.6  -39 26 39.1    366.277 
+ METH  A XXXXXXXXX P                Methven 171 34 31.1  -43 35 28.9    452.6493 
+ MING  A XXXXXXXXX P               Minginui 176 44 59.0  -38 37 00.7    458.0
+ MKNO  A XXXXXXXXX P            Makino Road 176 01 43.8  -39 42 12.2    832.205 
+ MNHR  A XXXXXXXXX P          Manuhara Road 176 13 24.2  -40 28 07.1    295.633 
+ MQZG  A XXXXXXXXX P        McQueens Valley 172 39 16.9  -43 42 09.8    154.6377 
+ MRBL  A XXXXXXXXX P           Marble Point 172 46 30.7  -42 39 42.3    563.863 
+ MTBL  A XXXXXXXXX P    Mount Blewitt No. 2 175 32 10.1  -40 10 52.9    156.761 
+ MTJO  A XXXXXXXXX P    Mt John Observatory 170 27 53.8  -43 59 08.5    1043.6594 
+ MTPR  A XXXXXXXXX P               Mt Price 170 21 01.9  -43 20 11.1    1548.855 
+ MTQN  A XXXXXXXXX P              Mt. Quoin 175 14 28.9  -41 00 05.7    1207.295 
+ MUL1  A XXXXXXXXX P Muller Station Tempora 173 24 51.3  -42 03 37.7    1076.7841 
+ NETT  A XXXXXXXXX P        Annette Plateau 170 03 40.4  -43 45 22.1    2251.6797 
+ NIUC  A XXXXXXXXX P                   Niue 191 55 52.1  -19 03 44.5    056.488 
+ NIUM  A XXXXXXXXX P Niue Meteorological St 191 55 37.4  -19 04 35.6    090.121 
+ NLS1  A XXXXXXXXX P     Nelson Landslide 1 173 15 20.7  -41 16 41.8    066.573 
+ NLS2  A XXXXXXXXX P     Nelson Landslide 2 173 15 14.4  -41 16 41.3    035.0
+ NLSN  A XXXXXXXXX P                 Nelson 173 26 01.4  -41 11 00.6    302.1197 
+ NMAI  A XXXXXXXXX P                 Naumai 176 48 23.8  -39 05 49.4    857.565 
+ NPLY  A XXXXXXXXX P           New Plymouth 174 07 05.4  -39 10 57.2    416.9224 
+ NRRD  A XXXXXXXXX P       North Range Road 175 45 40.8  -40 23 07.6    500.701 
+ NRSW  A XXXXXXXXX P              Norsewood 176 12 00.1  -40 06 48.0    364.054 
+ OHIN  A XXXXXXXXX P              Ohingaiti 175 47 26.4  -39 55 05.8    530.658 
+ OKOH  A XXXXXXXXX P                  Okoha 174 03 37.0  -41 01 09.3    334.0
+ OPTK  A XXXXXXXXX P                Opotiki 177 18 27.3  -38 02 47.5    127.477 
+ OROA  A XXXXXXXXX P                 Oueroa 176 40 50.4  -40 06 15.7    279.0
+ OTAK  A XXXXXXXXX P              Tuapaka Z 175 10 13.5  -40 48 59.6    245.0853 
+ OUSD  A XXXXXXXXX P Otago University Surve 170 30 39.3  -45 52 10.2    026.1568 
+ PAEK  A XXXXXXXXX P       Paekakariki Hill 174 57 07.5  -41 01 18.4    443.238 
+ PAKI  A XXXXXXXXX P              Pakihiroa 178 04 57.4  -37 53 38.3    828.0
+ PALI  A XXXXXXXXX P          Cape Palliser 175 15 17.2  -41 34 09.2    624.147 
+ PARI  A XXXXXXXXX P            Paritu Road 177 52 59.8  -38 55 21.3    507.4359 
+ PARW  A XXXXXXXXX P                Paruwai 175 25 37.0  -41 22 53.6    556.899 
+ PAWA  A XXXXXXXXX P                Pawanui 176 51 50.0  -40 01 59.1    159.017 
+ PGKH  A XXXXXXXXX P              Kahui Hut 174 00 51.4  -39 17 39.7    904.572 
+ PGNE  A XXXXXXXXX P           North Egmont 174 05 43.6  -39 16 12.1    962.689 
+ PILK  A XXXXXXXXX P     Pilkington Glacier 169 55 17.5  -43 39 38.1    1753.313 
+ PKNO  A XXXXXXXXX P               Parikino 175 10 54.9  -39 48 17.2    328.308 
+ PNUI  A XXXXXXXXX P                Pukenui 176 12 01.7  -39 55 00.4    787.922 
+ PORA  A XXXXXXXXX P             Porangahau 176 38 06.8  -40 15 59.0    306.377 
+ PRTU  A XXXXXXXXX P               Paparatu 177 41 52.4  -38 48 51.1    634.663 
+ PTOI  A XXXXXXXXX P                Puketoi 175 59 57.4  -40 36 03.8    511.639 
+ PUKE  A XXXXXXXXX P               Puketiti 178 15 26.5  -38 04 17.1    468.075 
+ PYGR  A XXXXXXXXX P         Puysegur Point 166 40 50.6  -46 09 58.2    253.2365 
+ QUAR  A XXXXXXXXX P                 Quarry 169 48 56.9  -43 31 54.0    058.0333 
+ RAHI  A XXXXXXXXX P                  Arahi 177 05 09.8  -38 54 58.2    467.092 
+ RAKW  A XXXXXXXXX P                Raukawa 176 37 16.2  -39 44 49.9    334.823 
+ RAUL  A XXXXXXXXX P           Raoul Island 183 55 44.2  -29 14 40.8    092.304 
+ RAUM  A XXXXXXXXX P        Raukumara Range 177 40 39.1  -37 57 54.0    1140.976 
+ RAWI  A XXXXXXXXX P                 Rawiri 177 24 55.4  -38 29 44.0    932.0
+ RCHD  A XXXXXXXXX P         Richmond Range 173 18 40.0  -41 28 46.2    1497.0
+ RDLV  A XXXXXXXXX P                Ardelve 175 24 15.7  -41 11 12.9    110.6 
+ RGAR  A XXXXXXXXX P             Allen Road 176 20 34.9  -38 33 43.4    410.2951 
+ RGAW  A XXXXXXXXX P                Awakeri 176 53 46.2  -38 00 11.5    104.798 
+ RGCR  A XXXXXXXXX P           Cookson Road 176 22 40.7  -38 06 16.9    701.092 
+ RGHD  A XXXXXXXXX P      Hawthornden Drive 176 21 57.3  -38 05 37.2    515.484 
+ RGHL  A XXXXXXXXX P      Highlands Station 176 21 08.2  -38 15 07.0    691.093 
+ RGHR  A XXXXXXXXX P          Handcock Road 176 17 16.8  -38 23 08.9    644.0
+ RGKA  A XXXXXXXXX P                Kaharoa 176 14 38.6  -38 01 12.3    497.32 
+ RGKW  A XXXXXXXXX P                Kawerau 176 46 22.1  -38 03 09.1    101.086 
+ RGLI  A XXXXXXXXX P       Lichenstein Road 176 23 08.6  -38 00 11.8    386.968 
+ RGMK  A XXXXXXXXX P               Makatiti 176 28 01.6  -38 08 18.0    955.539 
+ RGMT  A XXXXXXXXX P                 Matata 176 43 29.0  -37 54 55.6    399.5855 
+ RGON  A XXXXXXXXX P               Ongahoro 176 13 56.1  -38 15 23.7    595.279 
+ RGOP  A XXXXXXXXX P             Ohinepanea 176 33 22.5  -37 50 45.2    259.108 
+ RGRE  A XXXXXXXXX P                Rotoehu 176 31 16.3  -38 03 26.3    552.0
+ RGRR  A XXXXXXXXX P        Republican Road 176 30 52.6  -38 20 20.0    552.71 
+ RGTA  A XXXXXXXXX P               Tarawera 176 30 22.0  -38 14 01.6    1063.3613 
+ RGUT  A XXXXXXXXX P                Utuhina 176 11 39.0  -38 10 35.9    560.127 
+ RGWC  A XXXXXXXXX P White Island Crater Fl 177 11 32.9  -37 31 27.6    036.764 
+ RGWI  A XXXXXXXXX P    White Island Summit 177 10 40.0  -37 31 05.1    292.351 
+ RGWV  A XXXXXXXXX P    Waikite Valley Road 176 12 39.1  -38 21 09.2    490.0
+ RIPA  A XXXXXXXXX P                  Ripia 176 29 33.0  -39 09 55.9    734.063 
+ SCTB  A XXXXXXXXX P             Scott Base 166 45 28.9  -77 50 56.3    -18.923 
+ SEDD  A XXXXXXXXX P                 Seddon 174 08 14.3  -41 39 49.8    107.6514 
+ SNST  A XXXXXXXXX P        Shannon Station 177 20 51.0  -38 46 46.7    597.0
+ SUTT  A XXXXXXXXX P                 Sutton 170 08 21.4  -45 38 03.0    411.0
+ TAKL  A XXXXXXXXX P    Auckland Tide Gauge 174 46 11.6  -36 50 37.0    050.0
+ TAKP  A XXXXXXXXX P          Takapari Road 175 57 46.5  -40 03 41.6    698.854 
+ TAUP  A XXXXXXXXX P          Taupo Airport 176 04 51.6  -38 44 33.8    427.0207 
+ TAUW  A XXXXXXXXX P          Tauwhareparae 178 00 21.2  -38 09 44.7    713.456 
+ TEMA  A XXXXXXXXX P               Te Maipa 175 53 25.7  -41 06 23.6    515.1993 
+ TEN2  A XXXXXXXXX P Lake Tennyson Temporar 172 47 24.8  -42 12 54.1    1833.0459 
+ TENN  A XXXXXXXXX P          Lake Tennyson 172 47 24.8  -42 12 53.9    1833.9471 
+ TGHO  A XXXXXXXXX P       Horomatangi Reef 175 59 46.8  -38 48 46.3    385.999 
+ TGHR  A XXXXXXXXX P          Hingarae Road 175 42 42.9  -38 40 41.2    570.302 
+ TGOH  A XXXXXXXXX P            Ouaha Hills 176 02 50.9  -38 50 45.0    661.094 
+ TGRA  A XXXXXXXXX P             Rangitukua 175 46 12.5  -38 51 48.1    570.062 
+ TGRI  A XXXXXXXXX P             Rihia Road 175 51 30.6  -38 58 37.7    520.659 
+ TGTK  A XXXXXXXXX P      Te Kawerauta 1836 175 48 39.0  -38 36 39.7    637.198 
+ TGWH  A XXXXXXXXX P               Whakaroa 175 56 20.5  -38 40 24.4    660.0
+ THAP  A XXXXXXXXX P                Taihape 175 47 08.2  -39 40 57.0    572.796 
+ TINT  A XXXXXXXXX P                Tintock 175 53 08.4  -40 46 33.7    538.547 
+ TKAR  A XXXXXXXXX P              Te Karaka 177 48 41.2  -38 26 14.9    287.0
+ TKHL  A XXXXXXXXX P            Takaka Hill 172 57 37.7  -41 02 01.3    450.227 
+ TORY  A XXXXXXXXX P          Arapawa No. 2 174 16 48.3  -41 11 29.7    499.118 
+ TRAV  A XXXXXXXXX P              Traveller 175 41 16.5  -41 23 52.8    365.601 
+ TRNG  A XXXXXXXXX P               Tauranga 176 15 39.2  -37 43 43.7    151.101 
+ TRWH  A XXXXXXXXX P              Terawhiti 174 37 39.5  -41 16 41.0    470.299 
+ TURI  A XXXXXXXXX P                 Te Uri 176 22 57.2  -40 15 53.9    538.166 
+ UTK1  A XXXXXXXXX P       Utiku Borehole 1 175 50 16.2  -39 45 00.5    340.005 
+ UTK2  A XXXXXXXXX P       Utiku Borehole 2 175 50 16.0  -39 44 46.9    365.874 
+ UTK3  A XXXXXXXXX P       Utiku Borehole 3 175 50 010.0  -39 44 54.1    367.494 
+ UTK4  A XXXXXXXXX P       Utiku Borehole 4 175 50 14.4  -39 44 57.2    352.416 
+ UTKU  A XXXXXXXXX P Utiku Reference Statio 175 49 52.9  -39 44 43.5    481.028 
+ V27B  A XXXXXXXXX P      27 Vernon Terrace 172 39 46.6  -43 33 57.0    028.299 
+ V47B  A XXXXXXXXX P      47 Vernon Terrace 172 39 46.2  -43 34 02.0    034.589 
+ VAVS  A XXXXXXXXX P                 Vava'u 187 58 59.3  -18 39 02.5    067.384 
+ VEXA  A XXXXXXXXX P               Vexation 169 53 35.6  -43 38 15.7    1494.695 
+ VGDR  A XXXXXXXXX P                   Dome 175 33 48.3  -39 16 31.0    2691.957 
+ VGET  A XXXXXXXXX P         East Tongariro 175 42 38.7  -39 08 08.5    1231.863 
+ VGFW  A XXXXXXXXX P               Far West 175 33 09.0  -39 15 18.0    2049.505 
+ VGKR  A XXXXXXXXX P             Karewarewa 175 38 28.7  -39 05 39.9    1210.537 
+ VGMO  A XXXXXXXXX P          Moawhango Dam 175 45 15.5  -39 24 26.7    899.61 
+ VGMT  A XXXXXXXXX P            Mangateitei 175 28 13.7  -39 23 04.5    836.5254 
+ VGNG  A XXXXXXXXX P              Ngauruhoe 175 36 04.1  -39 10 32.0    1453.644 
+ VGNT  A XXXXXXXXX P        North Tongariro 175 40 33.3  -39 05 55.2    1279.4 
+ VGOB  A XXXXXXXXX P    Chateau Observatory 175 32 32.1  -39 11 59.4    1161.26 
+ VGOT  A XXXXXXXXX P                Oturere 175 39 54.5  -39 09 47.0    1508.174 
+ VGPK  A XXXXXXXXX P                 Pokaka 175 20 47.1  -39 17 21.4    788.09 
+ VGT2  A XXXXXXXXX P             Te Maari 2 175 40 23.4  -39 06 31.0    1508.435 
+ VGT8  A XXXXXXXXX P            Tongariro 8 175 40 33.4  -39 05 55.3    1279.773 
+ VGTM  A XXXXXXXXX P               Te Maari 175 42 14.9  -39 06 56.2    1222.382 
+ VGTR  A XXXXXXXXX P                  Turoa 175 32 53.9  -39 17 54.3    2085.06 
+ VGTS  A XXXXXXXXX P       Tukino Ski Field 175 36 32.2  -39 16 38.1    1766.6 
+ VGWH  A XXXXXXXXX P          Whangaehu Hut 175 35 20.3  -39 16 56.7    2088.156 
+ VGWN  A XXXXXXXXX P               Wahianoa 175 35 52.3  -39 19 36.9    1564.718 
+ VGWT  A XXXXXXXXX P         West Tongariro 175 35 22.9  -39 06 54.5    1189.705 
+ WAHU  A XXXXXXXXX P                 Waihua 177 14 03.9  -39 04 38.0    219.0
+ WAIM  A XXXXXXXXX P                Waimate 170 55 13.1  -44 39 20.5    1044.8603 
+ WAKA  A XXXXXXXXX P              Waka Mara 169 53 07.1  -43 35 02.5    1416.1 
+ WANG  A XXXXXXXXX P               Wanganui 174 49 17.2  -39 47 12.8    289.6678 
+ WARK  A XXXXXXXXX P              Warkworth 174 39 46.0  -36 26 03.9    111.2731 
+ WEST  A XXXXXXXXX P               Westport 171 48 22.4  -41 44 41.1    665.3769 
+ WGTN  A XXXXXXXXX P     Wellington Airport 174 48 21.2  -41 19 24.4    026.0387 
+ WGTT  A XXXXXXXXX P  Wellington Tide Gauge 174 46 53.7  -41 17 25.6    042.9724 
+ WHKT  A XXXXXXXXX P              Whakatane 177 00 50.0  -37 58 54.1    231.8318 
+ WHNG  A XXXXXXXXX P              Whangarei 174 18 52.4  -35 48 13.6    172.7702 
+ WHVR  A XXXXXXXXX P  Whangaehu Valley Road 175 27 06.3  -39 43 48.4    690.052 
+ WITH  A XXXXXXXXX P           Wither Hills 173 59 03.3  -41 33 38.3    408.0
+ WMAT  A XXXXXXXXX P           Waiomatatini 178 24 31.3  -37 49 30.0    356.0
+ WPAW  A XXXXXXXXX P                Waipawa 176 32 34.8  -39 53 45.2    293.452 
+ WPUK  A XXXXXXXXX P             Waipukurau 176 26 26.2  -40 03 51.1    344.435 
+ WRA1  A XXXXXXXXX P Wairau Valley temporar 173 35 11.0  -41 35 43.7    529.5565 
+ WRAU  A XXXXXXXXX P          Wairau Valley 173 35 10.2  -41 35 42.0    536.3704 
+ WRPA  A XXXXXXXXX P              Wairarapa 175 34 59.6  -41 03 45.2    204.8078 
+ YALD  A XXXXXXXXX P              Yaldhurst 172 28 52.1  -43 29 26.8    064.653 
 -SITE/ID
- simo  A 30307M001 P Simonstown, South Afri  18 26 22.5  -34 11 16.6     39.5  
