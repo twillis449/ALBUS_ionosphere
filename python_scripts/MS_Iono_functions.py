@@ -14,7 +14,7 @@ import astropy.io.fits as astropyfits
 
 #from string import split, strip
 from multiprocessing import Process, Queue, current_process
-from queue import Empty
+#from Queue import Empty
 
 HAS_EPHEM = True
 try:
@@ -734,7 +734,7 @@ OUTPUTS: None
           else:
             print ('bad result_sum', result_sum, 'station is ', result[1][0])
             print ('get_GPS_data failed for station ', result[1])
-        except Empty:
+        except:
           print (' ')
           print ('****** TIMEOUT in Get_GPS_data queue !!!')
           print ('****** Assuming queue is empty or there is a hangup with some data retrieval')
@@ -873,12 +873,14 @@ def setup_AlbusIonosphere_for_ref_date(log, MSname="",MSdir=".",Lat=0, Long=0, H
           et = end_time * 86400.0 +  TIME_OFFSET
           num_seconds = et - st
         elif HAS_EPHEM:
+          print('EPHEM start and end times ', start_time, ' ', end_time)
           start_time = ephem.julian_date(ephem.Date(start_time)) - 2400000.5
           end_time = ephem.julian_date(ephem.Date(end_time)) - 2400000.5
           print ('ephem start and end time ', start_time, end_time)
           st = start_time * 86400.0 - TIME_OFFSET
           et = end_time * 86400.0 +  TIME_OFFSET
           num_seconds = et - st
+          print('number of seconds', num_seconds)
         else:
           print ('It appears that neither PyRap nor PyEphem is installed!')
           print ('Unable to extract start and end times. Exiting')
@@ -1465,7 +1467,7 @@ def process_ionosphere(MSname="",MSdir=".", Ra=0, Dec=0, Az=180.0, El=-90.0, Lat
           print ('*** setting number of processors to',num_processors) 
       except:
         pass
-      
+#   num_processors = 1
     if lat_set:
       Lat = math.degrees(Lat1)
       Long = math.degrees(Long1)

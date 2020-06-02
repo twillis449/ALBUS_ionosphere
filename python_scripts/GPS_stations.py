@@ -234,6 +234,7 @@ filename    I  The name of an SNX file to open and read to find new station
 OUTPUTS: GPS
 GPS         O  The filled dictionary
 """
+    print('input file is ', filename)
     fp = open(filename, "r")
     wide = True
     counter = 0
@@ -430,6 +431,19 @@ def fill_standard_stations():
     test_file = "./gps_pos_default.snx"
     if(os.path.isfile(test_file)):
         warnings.warn("Using GPS receiver positions only from user file '%s'"%test_file)
+        try:
+            print('*** filling GPS_dict')
+            print('using GPS data file ', test_file)
+            GPS_dict = fill_GPS_station_dict(GPS_dict, test_file)
+        except:
+            print('***** failed in read of GPS data from file ', test_file)
+            print('***** check for invalid data (maybe non-ascii character) in file')
+            pass
+        return GPS_dict
+    # then try 'standard'file
+    test_file = os.environ['HOME'] + "/albus/libdata/JMA/gps_pos_default.snx"
+    if(os.path.isfile(test_file)):
+        warnings.warn("Using GPS receiver positions from file '%s'"%test_file)
         try:
             print('*** filling GPS_dict')
             print('using GPS data file ', test_file)
@@ -729,6 +743,7 @@ A        O  List of 3 element arrays [station_name, station_position, dist],
     local_list = []
     global_list = [] 
     for s in stations:
+#       print s, stations[s]
         pos = stations[s]
         for XYZ in coord_list:
             delta = [pos[0]-XYZ[0], pos[1]-XYZ[1], pos[2]-XYZ[2]]

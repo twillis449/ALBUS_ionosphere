@@ -74,6 +74,8 @@ _RINEX_SITE_LIST_ZA = ["anth","beni","beth","bftn","biso","brit","brnk","bwes","
 
 #_RINEX_SITE_LIST_ZA = ["anth","beni","beth","bftn","biso","brit","brnk","bwes","calv","cpnt","ctwn","dear","drba","eldn","emlo","eras","gdal","geoa","geor","grey","grhm","grnt","heid","hnus","ixop","kley","kman","koks","krug","kstd","lgbn","lsmh","malm","mbrg","mfkg","mriv","nspt","newc","nyls","okny","pbwa","pelb","plet","pmbg","potg","pret","pska","ptbg","qtwn","sbok","scot","sprt","stbs","stng","sut1","tdou","temb","uldi","umta","upta","verg","welk","worc","bfta","harb","hrao","simo","suth","sutm","sutv"]
 
+_RINEX_SITE_LIST_NZ = ["2406","ahti","akto","anau","arta","atia","auck","aukt","avln","bhst","birf","bluf","bm8a","bnet","bthl","cast","chat","chti","ckid","clim","clrr","cls3","cls4","cls5","cls6","clsg","clsk","cmbl","cncl","cnst","corm","dnvk","dund","dunt","durv","fale","fox1","frtn","gds1","gisb","gldb","glok","gnbk","grac","grng","gunr","haas","hamt","hana","hanm","hast","hikb","hoki","hold","horn","kahu","kaik","kapt","kara","kawk","kere","koko","koro","ktia","kuta","ldrz","levn","lexa","leyl","lkta","lok1","look","lrr1","lytt","maha","mahi","maho","mako","mang","mast","matw","mavl","mcnl","meth","ming","mkno","mnhr","mqzg","mrbl","mtbl","mtjo","mtpr","mtqn","mul1","nett","niuc","nium","nls1","nls2","nlsn","nmai","nply","nrrd","nrsw","ohin","okoh","optk","oroa","otak","ousd","paek","paki","pali","pari","parw","pawa","pgkh","pgne","pilk","pkno","pnui","pora","prtu","ptoi","puke","pygr","quar","rahi","rakw","raul","raum","rawi","rchd","rdlv","rgar","rgaw","rgcr","rghd","rghl","rghr","rgka","rgkw","rgli","rgmk","rgmt","rgon","rgop","rgre","rgrr","rgta","rgut","rgwc","rgwi","rgwv","ripa","sctb","sedd","snst","sutt","takl","takp","taup","tauw","tema","ten2","tenn","tgho","tghr","tgoh","tgra","tgri","tgtk","tgwh","thap","tint","tkar","tkhl","tory","trav","trng","trwh","turi","utk1","utk2","utk3","utk4","utku","v27b","v47b","vavs","vexa","vgdr","vget","vgfw","vgkr","vgmo","vgmt","vgng","vgnt","vgob","vgot","vgpk","vgt2","vgt8","vgtm","vgtr","vgts","vgwh","vgwn","vgwt","wahu","waim","waka","wang","wark","west","wgtn","wgtt","whkt","whng","whvr","with","wmat","wpaw","wpuk","wra1","wrau","wrpa","yald"]
+
 ################################################################################
 # Need some exception classes to help with downloding files
 class No_RINEX_File_Error(IOError):
@@ -208,6 +210,7 @@ No returns.  If there is an error, raises a No_RINEX_File_Error or
 a Command_Timeout_Error
 """
     sys.stdout.write("Trying %s\n"%infile)
+    print(' in get_url to get ', infile, outfile)
     try:
         computer = infile.split('/')
         if(len(computer) < 2):
@@ -236,6 +239,7 @@ a Command_Timeout_Error
                                 [URL_GETTER, infile, outfile,
                                  "%d"%DEFAULT_TIMEOUT],
                                 DEFAULT_TIMEOUT)
+        print('get_url had success')
     except Command_Timeout_Error:
         # if there is a file there, it is corrupted
         if(os.path.isfile(outfile)):
@@ -283,7 +287,7 @@ obs_height   I  height of observer above mean Earth, in m
 def gunzip_some_file(compressed_file,
                      uncompressed_file,
                      delete_file = 1):
-    print ( 'uncompressing file 1 to file 2 ', compressed_file, uncompressed_file)
+    print ( '*** uncompressing file 1 to file 2 ', compressed_file, uncompressed_file)
 # if file is already uncompressed, do nothing
     if compressed_file == uncompressed_file:
       return
@@ -361,7 +365,7 @@ OUTPUTS:  None
     assert(FTP_site >= 0)
     our_file = output_directory + '/' + RINEX_filename
     # First, if we have run out of FTP sites, bail
-    if(FTP_site > 16):
+    if(FTP_site > 17):
         # Out of FTP sites.
         if(RINEX_filename[-1] != 'd'):
             GPS_stations.add_to_missing(RINEX_filename)
@@ -420,6 +424,8 @@ OUTPUTS:  None
          FTP_site = 13
      if(RINEX_filename[0:4].lower() in _RINEX_SITE_LIST_AOPR_0):
          FTP_site = 15
+     if(RINEX_filename[0:4].lower() in _RINEX_SITE_LIST_NZ):
+         FTP_site = 17
 #    if(RINEX_filename[0:4].lower() in _RINEX_SITE_LIST_BIGF_0):
 #        FTP_site = 14
     assert(year > 1979)
@@ -530,6 +536,17 @@ OUTPUTS:  None
             ftp_file_name = RINEX_filename[0:7].upper()+'Z.zip'
             site_str = "ftp://ftp.trignet.co.za/RefData.%2.2d/%3.3d/L1L2_30sec/%s"%(year-2000, doy, ftp_file_name)
             our_Z_file = output_directory + '/' + ftp_file_name
+        else:
+            pass # site_str = "" from above, which will generate an IOError
+    elif(FTP_site == 17):
+        # New Zealand GeoNet and LINZ servers
+        print ( '*********** accessing New Zealand FTP site!')
+        if(RINEX_filename[0:4] in _RINEX_SITE_LIST_NZ):
+            print('nz RINEX file name ', RINEX_filename)
+            if RINEX_filename[11] == 'o':
+              site_str = "ftp://ftp.geonet.org.nz/gnss/rinex/%4.4d/%3.3d/%s.gz"%(year, doy, RINEX_filename)
+            if RINEX_filename[11] == 'd':
+              site_str = "https://apps.linz.govt.nz/ftp/positionz/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
         else:
             pass # site_str = "" from above, which will generate an IOError
     else:
