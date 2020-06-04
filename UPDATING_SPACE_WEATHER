@@ -1,8 +1,9 @@
 The PIM model ionosphere nominally needs some space weather data, which should be stored in
 in the files kpf107.dat and IMF24.dat 
 The kpf107.dat and IMF24.dat files that need to be updated are stored in the directory
-FORTRAN/PIM/PIM_1.7/noaa_dat. After updating the files, push them out to the install 
-directories with a 'make install' command from THIS top-level directory
+FORTRAN/PIM/PIM_1.7/noaa_dat. After updating the files, remove any empty 'install' file, and
+then push the updated data out to the home 'albus' directories with a 'make install' 
+command from THIS (ALBUS_ionosphere) top level directory.
 
 To get kpf107.dat updates enter : 
 ftp://ftp.gfz-potsdam.de/pub/home/obs/kp-ap/wdc in your browser and get whatever
