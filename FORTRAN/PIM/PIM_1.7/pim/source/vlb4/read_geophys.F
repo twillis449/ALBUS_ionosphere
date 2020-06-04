@@ -36,6 +36,10 @@ C	2005 Aug 30  James M Anderson  --JIVE  80 characters for a path length
 C                                        is far too short for me.  Bump this up
 C                                        to 256
       CHARACTER pkpf*256, flin*256, dumm*1
+      INTEGER FIRST
+      DATA FIRST/1/
+      SAVE FIRST
+
 C---------------
 C
 C  MAXDAY - Dimension-size of number of days in data/simul duration 
@@ -136,10 +140,13 @@ C  Desired data is later than end of "final-processed" database,
 C    need to check "preliminary" file and/or "forecast" file
 C
  150  CONTINUE
+      IF(FIRST.EQ.1) THEN
       WRITE (LUSTDERR,'(/,a)') 
      &     '*** Requested dates past end of KPF107.DAT ***'
       WRITE (LUSTDERR,'(a)') 
      &   '    Preliminary and/or Forecast NOAA files should be checked'
+      FIRST=0
+      END IF
       CLOSE (LUKPF)
       irec1 = rec_count - 28 - ndays
       iyr1 = irec1/365 + 1981
@@ -246,6 +253,10 @@ C                                        to 256
       CHARACTER pimf*256, datstr*12, dumm*1
       DATA LAST_GOOD_DATE/2100000/
       SAVE LAST_GOOD_DATE
+      INTEGER FIRST
+      DATA FIRST/1/
+      SAVE FIRST
+
 C------------
 C
 C  YRDY0,YRDY1 - 1st & last days of data
@@ -341,11 +352,14 @@ C     IF here, then no data exists for this date
       ENDIF
       bzsig = 0.d0
       IMFNA = 1
+      IF (FIRST.EQ.1) THEN
       WRITE (LUSTDERR,'(/,a)') 
      &     '*** Requested dates past end of IMF24.DAT or bad data***'
       WRITE (LUSTDERR,450) irec
       WRITE (LUSTDERR,'(a)') 
      &   '    Using default values for bz field'
+      FIRST = 0
+      END IF
       GOTO 900
 
 
