@@ -7,11 +7,7 @@ import math
 import hampel
 from pylab import *
 
-# set following to True if you want to run data 
-# through a Hampel filter to remove outliers
-use_hampel = True
-
-def getdata( filename ):
+def getdata( filename, use_hampel ):
         text = open(filename, 'r').readlines()
         L = len(text)
         i = 0
@@ -53,7 +49,12 @@ def getdata( filename ):
 
 def main( argv ):
   print('processing ALBUS file ', argv[1])
-  x_data, y_data, y_err, latest  = getdata(argv[1])
+
+# set following to True if you want to run data 
+# through a Hampel filter to remove outliers
+  use_hampel = True
+
+  x_data, y_data, y_err, latest  = getdata(argv[1],use_hampel)
   xlim(0,latest)
   if y_err.shape[0] == 0:
     plot(x_data, y_data,'ro')
