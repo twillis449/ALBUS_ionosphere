@@ -2,10 +2,9 @@ import sys
 import numpy
 import math
 from pylab import *
-from string import split, strip
 
 def savitzky_golay(y, window_size, order, deriv=0, rate=1):
-    r"""Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
+    """Smooth (and optionally differentiate) data with a Savitzky-Golay filter.
     The Savitzky-Golay filter removes high frequency noise from data.
     It has the advantage of preserving the original shape and
     features of the signal better than other types of filtering
@@ -59,7 +58,8 @@ def savitzky_golay(y, window_size, order, deriv=0, rate=1):
     try:
         window_size = np.abs(np.int(window_size))
         order = np.abs(np.int(order))
-    except ValueError, msg:
+#   except ValueError, msg:
+    except:
         raise ValueError("window_size and order have to be of type int")
     if window_size % 2 != 1 or window_size < 1:
         raise TypeError("window_size size must be a positive odd number")
@@ -91,7 +91,7 @@ def getdata( filename ):
         # get actual data
         for i in range( start,len(text)):
           try:
-            info = split(strip(text[i]))
+            info = text[i].split()
             if int(info[2]) == 0:
               rel_time.append(float(info[3]))
               rm.append(float(info[8]))
@@ -119,6 +119,7 @@ def plot_data(albus_report, time, smoothed_rm):
 
 def main( argv ):
 # argv[1] = name of ALBUS report file
+  print('processing albus file', argv[1])
   rel_time, rm = getdata(argv[1])
   smoothed_rm = smooth_data(rm)
   plot_data(argv[1], rel_time, smoothed_rm)

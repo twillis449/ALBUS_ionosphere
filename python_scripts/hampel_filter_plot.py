@@ -7,8 +7,6 @@ import math
 from copy import deepcopy
 from pylab import *
 
-from string import split, strip
-
 
 # Hampel filter to find and replace outliers -  algorithm from Ronald Pearson
 def hampel(data,window,t):
@@ -24,9 +22,9 @@ def hampel(data,window,t):
   zeroes[window:window+length] = data
   data = zeroes
 # numpy.lib.pad(data,(window,window),'edge')
-  print 'window, t ', window,t
-  print 'shape ', data.shape[0]
-  print 'bounds ', window, data.shape[0]-window-1
+  print('window, t ', window,t)
+  print('shape ', data.shape[0])
+  print('bounds ', window, data.shape[0]-window-1)
   for i in range(window, data.shape[0]-window):
     upper_bound = i+1+window
     lower_bound = i-window
@@ -40,7 +38,7 @@ def hampel(data,window,t):
     difference = numpy.abs(data[i] - median_wk)
 #   print i, data[i], difference, median_wk
     if difference > diff: 
-      print  '*** outlier: i, data difference, diff', i-window, data[i], difference, diff
+      print('*** outlier: i, data difference, diff', i-window, data[i], difference, diff)
       filtered_data[i-window] = median_wk
   return filtered_data
 # return data
@@ -59,22 +57,20 @@ def getdata( filename ):
         # get actual data
         for i in range( start,len(text)):
           try:
-            info = split(strip(text[i]))
+            info = text[i].split()
             if int(info[2]) == 0:
               rel_time.append(float(info[3]) / 3600)
-#             stec.append(float(info[7]))
               stec.append(float(info[8]))
           except:
             pass
         stec_arr = numpy.array(stec)
         filtered_data= hampel(stec_arr, 5, 3)
         diff = filtered_data - stec_arr
-        print diff
         return rel_time, filtered_data
 #       return rel_time, stec_arr
 
 def main( argv ):
-  print 'processing ALBUS file ', argv[1]
+  print('processing ALBUS files ', argv[1], ' ', argv[2])
   x_data, y_data  = getdata(argv[1])
   x_data, y_data1  = getdata(argv[2])
   plot(x_data, y_data,'bo')

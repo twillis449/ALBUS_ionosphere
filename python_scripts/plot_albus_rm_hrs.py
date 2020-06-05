@@ -7,7 +7,9 @@ import math
 import hampel
 from pylab import *
 
-from string import split, strip
+# set following to True if you want to run data 
+# through a Hampel filter to remove outliers
+use_hampel = True
 
 def getdata( filename ):
         text = open(filename, 'r').readlines()
@@ -26,12 +28,11 @@ def getdata( filename ):
         # get actual data
         for i in range( start,len(text)):
           try:
-            info = split(strip(text[i]))
+            info = text[i].split()
             if int(info[2]) == 0:
               latest = float(info[3])/3600.0
               rel_time.append(latest)
               rm_val = float(info[8])
-#             rm.append(-1* rm_val)
               rm.append(rm_val)
               try:
                 rm_error =  rm_val * (float(info[10]) / float(info[7]))
@@ -42,16 +43,16 @@ def getdata( filename ):
             pass
         rm_arr = numpy.array(rm)
         rm_err = numpy.array(rm_err)
-        filtered_data= hampel.hampel(rm_arr, 5, 4)
-        filtered_data= hampel.hampel(filtered_data, 10, 1)
-#        diff = filtered_data - rm_arr
-#        print diff
-#       return rel_time, filtered_data,rm_err,latest
+        if use_hampel:
+          print('running hampel filter')
+          filtered_data= hampel.hampel(rm_arr, 5, 4)
+          filtered_data= hampel.hampel(filtered_data, 10, 1)
+          rm_arr = filtered_data
         return rel_time, rm_arr, rm_err, latest
 
 
 def main( argv ):
-  print 'processing ALBUS file ', argv[1]
+  print('processing ALBUS file ', argv[1])
   x_data, y_data, y_err, latest  = getdata(argv[1])
   xlim(0,latest)
   if y_err.shape[0] == 0:

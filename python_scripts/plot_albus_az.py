@@ -6,8 +6,6 @@ import numpy
 import math 
 from pylab import *
 
-from string import split, strip
-
 
 def getdata( filename ):
         text = open(filename, 'r').readlines()
@@ -23,10 +21,10 @@ def getdata( filename ):
         # get actual data
         for i in range( start,len(text)):
           try:
-            info = split(strip(text[i]))
+            info = text[i].split()
             if int(info[2]) == 0:
               rel_time.append(float(info[3]))
-              azimuth = 57.2957795 * float(info[6])
+              azimuth = float(info[6])
               if azimuth < 0.0:
                 azimuth = -1.0 * azimuth
               az.append(azimuth)
@@ -34,18 +32,14 @@ def getdata( filename ):
             pass
         return rel_time, az
 
-
-
-
 def main( argv ):
-  print 'processing ALBUS file ', argv[1]
+  print('processing ALBUS file ', argv[1])
   x_data, y_data  = getdata(argv[1])
 
   plot(x_data, y_data,'ro')
   xlabel('relative time (seconds)')
   ylabel('Azimuth (radians)')
-# title_string = argv[1] + ' : STEC as a function of time'
-  title_string = 'RI_G03: Azimuth as a function of time'
+  title_string = 'Azimuth as a function of time'
   title(title_string)
   grid(True)
 

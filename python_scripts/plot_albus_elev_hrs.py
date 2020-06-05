@@ -7,8 +7,6 @@ import math
 from copy import deepcopy
 from pylab import *
 
-from string import split, strip
-
 def getdata( filename ):
         text = open(filename, 'r').readlines()
         L = len(text)
@@ -23,21 +21,20 @@ def getdata( filename ):
         # get actual data
         for i in range( start,len(text)):
           try:
-            info = split(strip(text[i]))
+            info = text[i].split()
             if int(info[2]) == 0:
               latest = float(info[3]) / 3600
               rel_time.append(float(info[3]) / 3600)
-              elev.append(numpy.degrees(float(info[5])))
+              elev.append(float(info[5]))
           except:
             pass
         elev_arr = numpy.array(elev)
         return rel_time, elev_arr, latest
 
 def main( argv ):
-  print 'processing ALBUS file ', argv[1]
+  print('processing ALBUS file ', argv[1])
   x_data, y_data, latest  = getdata(argv[1])
   xlim(0,latest)
-# xlim(0,25)
   plot(x_data, y_data,'r')
   xlabel('relative time (hours)')
   ylabel('Elevation (degrees)')

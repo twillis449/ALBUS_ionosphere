@@ -7,7 +7,7 @@ import math
 import hampel
 from pylab import *
 
-from string import split, strip
+#from string import split, strip
 
 def getdata( filename ):
         text = open(filename, 'r').readlines()
@@ -24,7 +24,8 @@ def getdata( filename ):
         # get actual data
         for i in range( start,len(text)):
           try:
-            info = split(strip(text[i]))
+#           info = text[i].split().strip()
+            info = text[i].split()
             if int(info[2]) == 0:
               latest = float(info[3]) / 3600
               rel_time.append(latest)
@@ -41,25 +42,23 @@ def getdata( filename ):
         filtered = hampel.hampel(stec_arr, 5, 4)
         filtered_data= hampel.hampel(filtered, 10, 1)
         diff = filtered_data - stec_arr
-        print diff
 #       return rel_time, filtered_data, stec_err, latest
         return rel_time, stec_arr, stec_err, latest
 
 def main( argv ):
   STEC = True
-  print 'processing ALBUS file ', argv[1]
+  print('processing ALBUS file ', argv[1])
   x_data, y_data, y_err, latest  = getdata(argv[1])
-  print 'shapes ', x_data.shape, y_data.shape, y_err.shape
+  print('shapes ', x_data.shape, y_data.shape, y_err.shape)
 
   xlim(0,latest)
   if y_err.shape[0] == 0:
-    print 'calling plot'
+    print('calling plot')
     plot(x_data, y_data,'ro')
   else:
-    print 'calling errorbar'
+#   print('calling errorbar')
     plot(x_data, y_data,'ro')
 #   errorbar(x_data, y_data,yerr=y_err, fmt='ro')
-  xlabel('relative time (days)')
   xlabel('relative time (hours)')
   if STEC:
     ylabel('STEC (TEC Units)')
