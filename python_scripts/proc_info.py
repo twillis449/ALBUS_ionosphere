@@ -11,4 +11,4 @@ def get_processor_info():
     return ""
 
 result = get_processor_info()
-print result
+print(result)
