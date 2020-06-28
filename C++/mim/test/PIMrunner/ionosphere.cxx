@@ -27,8 +27,8 @@
 
 // External Functions
 // Get the IGRF magnetic field around the Earth
-extern "C" int jma_igrf11syn(
-    double date,  // I  time (years AD, in UT) valid 1900--2015                                 
+extern "C" int jma_igrf13syn(
+    double date,  // I  time (years AD, in UT) valid 1900--2025                                 
     double radius,// I  the position radius, in meters                    
     double clatit,// I  the cos(latitude, in radians)                    
     double slatit,// I  the sin(latitude, in radians)                    
@@ -1337,8 +1337,8 @@ Space_Vector Ionosphere_Base::Magnetic_Field(
 //	precise, or one which takes into account the effects of Solar
 //	wind, etc.
 
-//	This function calls the IGRF11-based magnetic field calculation function
-//	jma_igrf11syn, which is my C adaptation of the original FORTRAN
+//	This function calls the IGRF13-based magnetic field calculation function
+//	jma_igrf13syn, which is my C adaptation of the original FORTRAN
 //	function approved by the IGRF.  This is a self-contained function,
 //	meaning that all data is held internally, with no file access.
 //	The original FORTRAN has been modified to accept the sines and cosines
@@ -1354,9 +1354,9 @@ Space_Vector Ionosphere_Base::Magnetic_Field(
 //_FILE  files used and logical units used
 
 //_LIMS  design limitations
-//	The limitations of this routine are all attributable to the IGRF11
-//	software limitations.  The IGRF11 code is only valid for time in the
-//	range year 1900--2020.  But I will let the IGRF code deal with that.
+//	The limitations of this routine are all attributable to the IGRF13
+//	software limitations.  The IGRF13 code is only valid for time in the
+//	range year 1900--2025.  But I will let the IGRF code deal with that.
 //	Also, the coordinate system returned by the IGRF code is ill-defined
 //	along the Earth's polar axis.  That is, what is the magnetic field
 //	above the North pole?  The orientation of the IGRF x,y axes is
@@ -1382,8 +1382,11 @@ Space_Vector Ionosphere_Base::Magnetic_Field(
     // I need a place to store the magnetic field components
     Real64 x,y,z;
 
-//    fprintf(stdout, "In Ionosphere_Base::Magnetic_Field - calling jma_igrf11syn\n");
-    jma_igrf11syn(year_fraction,
+//    fprintf(stdout, "In Ionosphere_Base::Magnetic_Field - calling jma_igrf13syn\n");
+//    fprintf(stderr,"Using Position year=%.3f r=%14E Lat=%.3f Lon=%.3f\n",
+//              year_fraction, position.Radius(),
+//              position.Lat()*M_RAD2DEG,position.Lon()*M_RAD2DEG);
+    jma_igrf13syn(year_fraction,
                   position.Radius(),
                   position.cLat(),
                   position.sLat(),
@@ -1394,10 +1397,7 @@ Space_Vector Ionosphere_Base::Magnetic_Field(
                   &z
                   );
 
-//     printf("Using Position year=%.3f r=%14E Lat=%.3f Lon=%.3f\n",
-//            year_fraction, position.Radius(),
-//            position.Lat()*M_RAD2DEG,position.Lon()*M_RAD2DEG);
-//     printf("Got IGRF10 B field x=%14E y=%14E z=%14E\n",x,y,z);//exit(1);
+//   fprintf(stderr,"Got IGRF13 B field x=%14E y=%14E z=%14E\n",x,y,z);//exit(1);
 
     // Make a space vector out of the magnetic field.
     Space_Vector IGRF_mag_field(x,y,z);
