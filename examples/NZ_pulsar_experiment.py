@@ -18,6 +18,7 @@ if __name__ == "__main__":
   startime = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
   print("program start at %s" % startime)
 
+  use_elev = False
 
 # Warkworth telescope location
   LONG="174:40:01.0"
@@ -30,16 +31,27 @@ if __name__ == "__main__":
   RA = "11:41:07.02"  
   DEC = "-65:45:19.1"
 
-  OBJECT="PSR_J1141-6545_300km_300s"
-  START_TIME="2018/12/01 00:00:00"
-  END_TIME="2018/12/01 23:59:59"
-  DATA_DIR = '/home/twillis/PSR_J1145_data_2018'
+  START_TIME="2014/12/01 00:00:00"
+  END_TIME="2014/12/01 23:59:59"
+  DATA_DIR = '/home/twillis/PSR_J1145_data_2014'
   RED_TYPE = 'RI_G03'
   TIME_STEP = 300
   MAX_DIST = 300E3
   NUM_PROCESSORS = 8
   DO_SER = 0
-  iono.process_ionosphere(time_step=TIME_STEP,object=OBJECT,Ra=RA,Dec=DEC,Lat=LAT,Long=LONG,Height=HEIGHT,start_time=START_TIME,end_time=END_TIME,max_dist=MAX_DIST,processing_option=RED_TYPE,do_serial=DO_SER,num_processors=NUM_PROCESSORS, gps_data_directory=DATA_DIR);
+  DO_SER = 1
+
+
+# call the following function if you want to just track changes in the ionosphere at an elevation of 90 deg
+# i.e. direcly overhead
+  if use_elev:
+    OBJECT="PSR_J1141-6545_300km_300s_2014_90El"
+    iono.process_ionosphere(time_step=TIME_STEP,object=OBJECT,El=90.0,Lat=LAT,Long=LONG,Height=HEIGHT,start_time=START_TIME,end_time=END_TIME,max_dist=MAX_DIST,processing_option=RED_TYPE,do_serial=DO_SER,num_processors=NUM_PROCESSORS, gps_data_directory=DATA_DIR);
+
+#  use the following function if you want to track pulsar position
+  else:
+    OBJECT="PSR_J1141-6545_300km_300s_2014"
+    iono.process_ionosphere(time_step=TIME_STEP,object=OBJECT,Ra=RA,Dec=DEC,Lat=LAT,Long=LONG,Height=HEIGHT,start_time=START_TIME,end_time=END_TIME,max_dist=MAX_DIST,processing_option=RED_TYPE,do_serial=DO_SER,num_processors=NUM_PROCESSORS, gps_data_directory=DATA_DIR);
 
   os.system('date')
   endtime = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
