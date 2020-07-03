@@ -62,9 +62,11 @@ def main( argv ):
   if len(data_err) > 0:
     fig, axs = plt.subplots(5)
     axs[4].set(ylabel='data_err')
+    axs[4].set(xlabel=x_label)
     axs[4].plot(rel_time, data_err,'bo')
   else:
     fig, axs = plt.subplots(4)
+    axs[3].set(xlabel=x_label)
   fig.suptitle = 'Vertically stacked sublots'
   axs[0].set(ylabel='Elev (deg)')
   axs[1].set(ylabel='STEC (TEC U)')
