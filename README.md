@@ -38,3 +38,5 @@ and direction with height.
 
 The software makes extensive use of python scripts and should work with both
 python2 and python3.
+
+You need to install pycurl, astropy, pyephem or python casacore, numpy and matplotlib for the system to work.
