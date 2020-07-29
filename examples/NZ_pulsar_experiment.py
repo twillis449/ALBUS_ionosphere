@@ -18,8 +18,8 @@ if __name__ == "__main__":
   startime = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
   print("program start at %s" % startime)
 
-  use_elev = False
-
+  use_elev = True # to monitor variations of the ionosphere directly overhead
+                  # set to False to track a given RA/DEC
 # Warkworth telescope location
   LONG="174:40:01.0"
   LAT="-36:25:55.0"
@@ -30,7 +30,8 @@ if __name__ == "__main__":
 # PSR experiment
   RA = "11:41:07.02"  
   DEC = "-65:45:19.1"
-
+  # note: following date is near time of solar maximum
+  # try date in 2018 for time near solar minimum
   START_TIME="2014/12/01 00:00:00"
   END_TIME="2014/12/01 23:59:59"
   DATA_DIR = '/home/twillis/PSR_J1145_data_2014'
@@ -38,9 +39,8 @@ if __name__ == "__main__":
   TIME_STEP = 300
   MAX_DIST = 300E3
   NUM_PROCESSORS = 8
-  DO_SER = 0
   DO_SER = 1
-
+  DO_SER = 0
 
 # call the following function if you want to just track changes in the ionosphere at an elevation of 90 deg
 # i.e. direcly overhead
