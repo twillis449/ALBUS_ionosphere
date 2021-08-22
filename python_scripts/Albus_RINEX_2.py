@@ -13,8 +13,6 @@ from __future__ import (print_function)
 
 # satellite ephemeris files eph and sp3
 # by gps week
-# ftp://cddis.gsfc.nasa.gov/pub/gps/products/0656
-
 # ephemeris eph and sp3 files
 # http://igs.ifag.de/root_ftp/IGS/products/orbits/1383/
 
@@ -937,7 +935,8 @@ obs_data   O  The output data array, as
             raise Albus_RINEX.No_RINEX_File_Error("Error: sp3 file '%s' cannot be opened"%filename)
         line = fp.readline()    # Line 1
         version = line[1]
-        if((version == 'a') or (version == 'b') or (version == 'c')):
+        print('****rinex SP3 version', version)
+        if((version == 'a') or (version == 'b') or (version == 'c') or (version == 'd')):
             # things are ok
             pass
         else:
@@ -976,6 +975,8 @@ obs_data   O  The output data array, as
                 raise Albus_RINEX.RINEX_Data_Barf("Unsupported Time system in file '%s'"%filename)
         # read through line 22
         for i in range(14,23):
+            line = fp.readline()
+        if version == 'd':   # read an extra line
             line = fp.readline()
         # Now to the data
         MJD = np.zeros((Num_Data), dtype='Float64')

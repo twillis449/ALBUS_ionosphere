@@ -2,7 +2,7 @@
 # Python stuff for dealing with Ionosphere RINEX stuff
 # 2006 Jul 17  James M Anderson  --JIVE  start
 
-from __future__ import (print_function)
+#from __future__ import (print_function)
 
 ################################################################################
 # some import commands  The User should not need to change this.
@@ -19,6 +19,7 @@ import inspect
 import warnings
 import math
 import time as systime
+import subprocess
 
 ################################################################################
 # JMA's ionosphere stuff
@@ -26,6 +27,7 @@ import AlbusIonosphere
 import Albus_Coordinates
 import jma_tools
 import GPS_stations
+from Albus_rnx3_to_rnx2 import convert_rnx3_to_rnx2_file
 
 
 
@@ -286,8 +288,10 @@ obs_height   I  height of observer above mean Earth, in m
 ################################################################################
 def gunzip_some_file(compressed_file,
                      uncompressed_file,
-                     delete_file = 1):
-    print ( '*** uncompressing file 1 to file 2 ', compressed_file, uncompressed_file)
+                     delete_file = 1,
+                     RX3_flag=False):
+ 
+    print ( '*** uncompressing file 1 to file 2 ', compressed_file, uncompressed_file, RX3_flag)
 # if file is already uncompressed, do nothing
     if compressed_file == uncompressed_file:
       return
@@ -310,7 +314,7 @@ def gunzip_some_file(compressed_file,
             print ( "No .Z form of compressed file  trying .gz")
             new_compressed = compressed_file[:-1] + "gz"
             return gunzip_some_file(new_compressed, uncompressed_file,
-                                    delete_file)
+                                    delete_file,RX3_flag)
         raise RINEX_Data_Barf("No such file '%s' to uncompress"%compressed_file)
     if compressed_file[-3:] != 'zip' and compressed_file[-1] != 'Z':
         # file is most likely uncompressed ...
@@ -323,6 +327,10 @@ def gunzip_some_file(compressed_file,
     retcode = os.system(command)
     print ( 'gunzip returned ', retcode)
 # handle non-zero return code error from extraction 
+    if RX3_flag:
+       uncompressed_file = convert_rnx3_to_rnx2_file(uncompressed_file)
+       if uncompressed_file == 1:
+         retcode = uncompressed_file
     if(retcode):
       raise No_RINEX_File_Error("Could not run '%s'"%command)
     if(delete_file):
@@ -347,7 +355,7 @@ def get_RINEX_obs_file_from_web(RINEX_filename,
                                 ):
     """use urllib3 to get a RINEX station observation file from the Internet
 
-RINEX_filename    I  The nameof the RINEX file to get.  Should normally be
+RINEX_filename    I  The nameof the RINEX 2 file to get.  Should normally be
                      in the form ssssddd0.yyx, but you already know that.
 year              I  The 4 digit year of the observation
 month             I  the month of the observation
@@ -363,6 +371,8 @@ overwrite         I  May files be overwritten?  0 No, else yes
 OUTPUTS:  None
 """
     assert(FTP_site >= 0)
+    print('*** get_RINEX_obs_file_from_web: original RINEX2 file requested', RINEX_filename)
+    RX3_flag = False
     our_file = output_directory + '/' + RINEX_filename
     # First, if we have run out of FTP sites, bail
     if(FTP_site > 17):
@@ -433,7 +443,7 @@ OUTPUTS:  None
     yy = year - 1900
     if(year >= 2000): yy = year - 2000
     site_str = ""
-    if(FTP_site == 0):
+    if(FTP_site == 0 or FTP_site == 1 ):
         # SOPAC California
         if(RINEX_filename[-1] == 'd'):
             site_str = "ftp://garner.ucsd.edu/pub/rinex/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
@@ -442,9 +452,6 @@ OUTPUTS:  None
         else:
             # guess and pray
             site_str = "ftp://garner.ucsd.edu/pub/data/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
-    elif(FTP_site == 1):
-        # CDDIS Goddard
-        site_str = "ftp://cddis.gsfc.nasa.gov/gps/data/daily/%4.4d/%3.3d/%2.2d%s/%s.Z"%(year, doy, yy, RINEX_filename[-1], RINEX_filename)
     elif(FTP_site == 2):
         # IGS in Germany
         #site_str = "http://igs.ifag.de/root_ftp/IGS/obs/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
@@ -498,9 +505,23 @@ OUTPUTS:  None
         # Boulder site
         site_str = "ftp://data-out.unavco.org/pub/rinex/obs/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
     elif(FTP_site == 12):
+# !@#$#%$%^^& f*ing Aussies - they stopped reporting rinex2 files 
+# and switched to rinex3 in2020
         # Australia site
-        print ( '*********** accessing Australian FTP site!')
-        site_str = "ftp://ftp.ga.gov.au/geodesy-outgoing/gnss/data/daily/%4.4d/%2.2d%3.3d/%s.Z"%(year,yy, doy, RINEX_filename)
+        if year >= 2020:   # need RINEX3
+          RX3_flag = True
+          print('converting to RINEX3 file name from RINEX2 name: ', RINEX_filename)
+          output = subprocess.Popen(['RX3name', RINEX_filename],
+                          stdout=subprocess.PIPE).communicate()[0]
+          RINEX3_filename = output.decode('utf-8')[:-2]
+#         our_Z_file = output_directory + '/' + RINEX_filename + '.gz'
+#         our_file = output_directory + '/' + RINEX_filename
+          print('trying to get ', RINEX3_filename )
+          print ( '*********** accessing Australian FTP site!')
+          site_str = "ftp.data.gnss.ga.gov.au/daily/%4.4d/%3.3d/%s.gz"%(year, doy, RINEX3_filename)
+        else:
+          site_str = "ftp.data.gnss.ga.gov.au/daily/%4.4d/%3.3d/%s.gz"%(year, doy, RINEX_filename)
+        print('aussie site:', site_str)
     elif(FTP_site == 13):
         # Dutch National GPS Network (requires login)
         if(RINEX_filename[0:4] in _RINEX_SITE_LIST_Ned_0):
@@ -545,8 +566,6 @@ OUTPUTS:  None
             print('nz RINEX file name ', RINEX_filename)
             if RINEX_filename[11] == 'o':
               site_str = "ftp://ftp.geonet.org.nz/gnss/rinex/%4.4d/%3.3d/%s.gz"%(year, doy, RINEX_filename)
-            if RINEX_filename[11] == 'd':
-              site_str = "https://apps.linz.govt.nz/ftp/positionz/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
         else:
             pass # site_str = "" from above, which will generate an IOError
     else:
@@ -562,7 +581,7 @@ OUTPUTS:  None
                                     overwrite)
         return
     # uncompress
-    gunzip_some_file(our_Z_file,our_file)
+    gunzip_some_file(our_Z_file,our_file,RX3_flag= RX3_flag)
     return
     
     
@@ -610,7 +629,7 @@ doy           I  day of year
 OUTPUT:  filename
 filename      O  filename of RINEX file, no directory path
 """
-    print ( 'year doy ', year, doy)
+#   print ( 'year doy ', year, doy)
     assert(len(station_name) == 4)
     station_name = station_name.lower()
     assert(year > 1979)
@@ -777,9 +796,10 @@ return_code       O  Status of getting file from web
     if(FTP_site == 0):
         # UCSD
         site_str = "ftp://garner.ucsd.edu/pub/products/%4.4d/%s.Z"%(gps_week, ephemeris_filename)
-    elif(FTP_site == 1):
-        # CDDIS Goddard
-        site_str = "ftp://cddis.gsfc.nasa.gov/pub/gps/products/%4.4d/%s.Z"%(gps_week, ephemeris_filename)
+    elif(FTP_site == 1): # note cddis replaced by CODE
+        # CODE, Switzerland
+        data_file = ephemeris_filename.upper()
+        site_str = "ftp://ftp.aiub.unibe.ch/CODE/%4.4d/%s.Z"%(year, data_file)
     elif(FTP_site == 2):
         # IFAG, Germany
         site_str = "http://igs.ifag.de/root_ftp/IGS/products/orbits/%4.4d/%s.Z"%(gps_week, ephemeris_filename)
@@ -892,9 +912,11 @@ return_code       O  Status of getting file from web
     assert(year < 2080)
     yy = year - 1900
     if(year >= 2000): yy = year - 2000
-    if(FTP_site == 0):
-        # CDDIS Goddard
-        site_str = "ftp://cddis.gsfc.nasa.gov/pub/gps/products/ionex/%4.4d/%3.3d/%s.Z"%(year, doy, IONEX_filename)
+    if(FTP_site == 0): # cddis replaced by CODE
+        # CODE, Switzerland
+        data_file = IONEX_filename.upper()
+        site_str = "ftp://ftp.aiub.unibe.ch/CODE/%4.4d/%s.Z"%(year, data_file)
+        our_Z_file = output_directory + '/' + data_file + ".Z"
     elif(FTP_site == 1):
         # CODE, Switzerland
         data_file = IONEX_filename.upper()
@@ -950,7 +972,8 @@ P1P2_filename     O  The path+name of the P1P2 differential code bias file.
                      If no file found, or other error, this will be set to
                      None.
 """
-    print ( 'in get_CODE_P1P2_file_from_web')
+    print ('in get_CODE_P1P2_file_from_web')
+    print('incoming parameters ', year, month, data_type)
     # First, check that there is a possibility of data
     if((year > 1997) or ((year == 1997) and (month >= 10))):
         pass
@@ -1297,6 +1320,7 @@ overwrite          I  may this function overwrite files? 0 No, else yes
             os.remove(data_file)
         # make a command string to uncompress the data
         command = "crx2rnx %s - > %s"%(rinex_compressed,data_file)
+        print('system executing command', command)
         retcode = os.system(command)
         if(retcode):
             raise No_RINEX_File_Error("Could not run '%s'"%command)
