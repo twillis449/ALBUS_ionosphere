@@ -2,6 +2,7 @@
 # 2008 Mar 04  James M Anderson  --MPIfR  start
 # 2014 May 06  Anthony G Willis updated for use with CASA Measurement Sets
 # 2019 May 06  Anthony G Willis updated for work with python3 interface
+# 2021 Aug 22  Anthony G Willis updated for work with RINEX 3 files
 
 If you want to use the ALBUS software with CASA measurement sets you 
 must install the casacore package from https://code.google.com/p/casacore/ 
@@ -11,8 +12,8 @@ If you do not need/want to work with CASA measurement sets, then at a minimum
 you need to have the Python numpy and PyEphem  (http://rhodesmill.org/pyephem/)
 packages installed.
 
-You should download and install the either the ftplib or PyCurl package 
-needed to get data from remote GPS sites.
+You should download and install the PyCurl package needed to get data from 
+remote GPS sites.
 
 The ALBUS Ionosphere package should be able to install on most Linux
 systems.  This code probably requires something close to the GNU make
