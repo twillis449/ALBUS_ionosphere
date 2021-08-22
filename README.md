@@ -43,4 +43,3 @@ You need to install pycurl, astropy, pyephem or python casacore, numpy
 and matplotlib for the system to work. A number of support programs to handle 
 RINEX files are also needed. These programs are specified in the INSTALL 
 file.
-are 
