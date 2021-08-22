@@ -8,6 +8,7 @@
 
 
 SRCS = \
+	Albus_rnx3_to_rnx2.py \
 	Albus_Coordinates.py \
 	MS_Iono_agw_azel_par.py \
 	Albus_RINEX.py \
@@ -18,6 +19,7 @@ SRCS = \
 	jma_tools.py 
 
 MODULES =  \
+	Albus_rnx3_to_rnx2 \
 	Albus_Coordinates \
         MS_Iono_agw_azel_par \
 	Albus_RINEX \
