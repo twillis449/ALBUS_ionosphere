@@ -1,0 +1,40 @@
+# run this script by entering on the command line 'source example_script'
+
+# first make 'soft' link to the original image
+# first delete any previous version
+/bin/rm -rf 3C236.fits 
+ln -s 3c236_original.fits 3C236.fits
+
+# obtain initial flux density 
+# will call generate_mask_polygons.py program
+get_galaxy_parameters.py 3C236.csv F T F 6 
+
+# generate morphology images
+# will call generate_mask_polygons.py program
+get_morphology_images.py 3C236.csv 3 D 6 F T 
+#
+# rinse and repeat to get rid of a remaining point source in the SW lobe
+/bin/rm -rf 3C236.fits 
+ln -s 3C236_Final-dilated.fits 3C236.fits
+# the following will call generate_mask_polygons.py program 
+get_morphology_images.py 3C236.csv 3 D 40 F T 
+
+# convolve the resulting image by a factor 2
+conv_image.py 3C236.fits 2
+
+# get parameters for the convolved image
+# will call generate_mask_polygons.py program
+get_galaxy_parameters.py 3C236.csv F T T 3  
+
+# that all!
+
+# note: if you look at the position of the nuclear source in the 
+# 3C236_Final-dilated.fits image there is only a maximum residual  of ~ 2mJy 
+# whereas the original peak is ~ 5 Jy so we have a residual of only 
+# ~0.04 percent! 
+
+# also look at 3C236_final_minus-filtered_dilated_all.fits. This show the result
+# of 'blindly' subtracting the filtered data contained within all polygons above
+# the minimum allowable signal. Sometimes thats OK if the source of interest is 
+# faint emission below the specified flux limit, but here we start removing 
+# signal from the actual 3C236 lobes, which is NOT what we want.
