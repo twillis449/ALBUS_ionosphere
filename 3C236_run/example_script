@@ -16,8 +16,13 @@ get_morphology_images.py 3C236.csv 3 D 6 F T
 # rinse and repeat to get rid of a remaining point source in the SW lobe
 /bin/rm -rf 3C236.fits 
 ln -s 3C236_Final-dilated.fits 3C236.fits
+
 # the following will call generate_mask_polygons.py program 
-get_morphology_images.py 3C236.csv 3 D 40 F T 
+# Note: we are now raising the flux offfset level to 40 * noise.
+# By default polygon subtraction essentially removes signal down to ~ 0 level. 
+# If we don't want to drill down to zero we can specify a value (in mJy) which
+# is to be removed from the polygon subtraction in the subt_polygon_data script.
+get_morphology_images.py 3C236.csv 3 D 40 F T 15.0
 
 # convolve the resulting image by a factor 2
 conv_image.py 3C236.fits 2
@@ -28,10 +33,10 @@ get_galaxy_parameters.py 3C236.csv F T T 3
 
 # that all!
 
-# note: if you look at the position of the nuclear source in the 
-# 3C236_Final-dilated.fits image there is only a maximum residual  of ~ 2mJy 
+# Note: if you look at the position of the nuclear source in the 
+# 3C236_Final-dilated.fits image there is only a maximum residual  of ~ 5mJy 
 # whereas the original peak is ~ 5 Jy so we have a residual of only 
-# ~0.04 percent! 
+# ~0.1 percent! 
 
 # also look at 3C236_final_minus-filtered_dilated_all.fits. This show the result
 # of 'blindly' subtracting the filtered data contained within all polygons above
