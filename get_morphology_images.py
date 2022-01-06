@@ -10,7 +10,7 @@ import subprocess
 from astropy.coordinates import SkyCoord
 from read_input_table import process_input_file
 
-def process_images(filename, filter_size, filter_type, offset_flux, use_conv_l, use_dilation):
+def process_images(filename, filter_size, filter_type, offset_flux, use_conv_l, use_dilation, offset_value_flux):
         print('processing file ', filename)
         if use_conv_l =='T':
           print('using convolved_images')
@@ -53,23 +53,23 @@ def process_images(filename, filter_size, filter_type, offset_flux, use_conv_l, 
           print('processing ', cmd)
           returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
           if use_dilation:
-#           cmd =  'make_morphology_mask.py ' + field_name + ' ' + offset_flux + ' ' + offset_value_flux + ' T' 
             cmd =  'make_morphology_mask.py ' + field_name + ' ' + offset_flux + ' T' 
           else:
-#           cmd =  'make_morphology_mask.py ' + field_name + ' ' + offset_flux + ' ' + offset_value_flux + ' F' 
             cmd =  'make_morphology_mask.py ' + field_name + ' ' + offset_flux + ' F' 
           print('processing ', cmd)
           returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
+          cmd = ' '
           if use_dilation:
             json_file = field_name + '-dilated.json_polygons_data'
-            cmd = 'subt_polygon_data.py ' + field_name +'.fits' +  ' ' + json_file + ' T'
+            if os.path.isfile(json_file):
+              cmd = 'subt_polygon_data.py ' + field_name +'.fits' +  ' ' + offset_value_flux + ' ' + json_file + ' T'
           else:
-            print('******************** eroded')
             json_file = field_name + '-eroded.json_polygons_data'
-        
-            cmd = 'subt_polygon_data.py ' + field_name +'.fits' +  ' ' + json_file + ' F'
+            if os.path.isfile(json_file):
+              cmd = 'subt_polygon_data.py ' + field_name +'.fits' +  ' ' + offset_value_flux + ' ' + json_file + ' F'
           print('processing ', cmd)
-          returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
+          if len(cmd) > 2:
+            returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
 
 def main( argv ):
 # argv[1] = name of pipeline input file with information such as frequency, positions
@@ -78,6 +78,7 @@ def main( argv ):
 # argv[4] = value of mask offset (multiplied by noise determined from breizorro) 
 # arvg[5] = T (use a convolved image) or F (used unconvolved image)
 # argv[6] = T (use dilated image) or F (use eroded image)
+# argv[7] = numerical value passed to subtract_polygon_data script
   print('in get_morphology_images script')
   print('argv', argv)
   filename = argv[1]       # name of file containing object positions
@@ -87,10 +88,16 @@ def main( argv ):
   offset_flux = argv[4]    # = factor by which to multiply breizorro noise
   use_conv = argv[5]       # if T, look for a convolved image
   use_dilation = argv[6]   # if T do dilation, else do only erosion
+  try:
+    offset_value_flux  = argv[7] # amount (in mJy) to remove from source 
+                                 # subtraction (default = 0.0)
+                                 # only used in script subt_polygon_data
+  except:
+    offset_value_flux = '0.0'
 
 # e.g. sample run as 'get_morphology_images.py 3C236.csv 3 D 6 F T 
 
-  process_images(filename, filter_size, filter_type, offset_flux, use_conv, use_dilation)
+  process_images(filename, filter_size, filter_type, offset_flux, use_conv, use_dilation, offset_value_flux)
 
 #=============================
 # argv[1]  incoming positions file
