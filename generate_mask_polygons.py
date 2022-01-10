@@ -89,7 +89,6 @@ def onclick(event):
         except:
          pass
         plt.savefig(outpic)
-      print('saved ...')
     if event.button == 3:
       ax = plt.gca()
       for i in range(len(qannotate)):

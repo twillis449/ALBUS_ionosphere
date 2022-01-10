@@ -95,7 +95,6 @@ def process_json_file(filename, pixel_size=0.0):
         if p.contains(Pt):
           poly_coord_list = []
           print('********* containing contour', l)
-          found = True
           for j in range(len(poly_coord)):
             a = poly_coord[j][0]
             b = poly_coord[j][1]
@@ -108,8 +107,6 @@ def process_json_file(filename, pixel_size=0.0):
             print('maxDist angular size and position angle', ang_size, pa)
             las.append(ang_size)
             las_pa.append(pa)
-        if not found:
-          print('no polygon containing',coords[i])
     if pixel_size > 0:  
       max_las = maxDist1(poly_coord_all, pixel_size)
       print('cdist max_las', max_las)
