@@ -33,7 +33,6 @@ def create_circular_mask(h, w, center=None, radius=None):
 
 def filter_images(filename, filter_size, filter_type, use_dilation):
     if use_dilation =='T':
-       print('using dilated images')
        print('generate_morphology_image produces dilated images')
        use_dilation = True
     else:
@@ -44,17 +43,13 @@ def filter_images(filename, filter_size, filter_type, use_dilation):
     # Load the image and the WCS
     file_name = filename+'.fits'
     hdu_list = fits.open(file_name)
-    print ('info',hdu_list.info())
     hdu = hdu_list[0]
     data = check_array(hdu.data)
-    print ('image data min and max', data.min(), data.max())
     data = np.nan_to_num(data)
     input_data = data
-    print('data type ', data.dtype.name)
-    print('data shape', data.shape)
     shape = data.shape
     size_spec = int(filter_size)
-    print('filter_selection type',  filter_type)
+#   print('filter_selection type',  filter_type)
     if filter_type == 'R':
       print('using rectangle for structure element')
       structure_element = rectangle(size_spec,size_spec)
@@ -62,20 +57,19 @@ def filter_images(filename, filter_size, filter_type, use_dilation):
       print('using disk for structure element')
 #     structure_element = create_circular_mask(size_spec, size_spec, center=None, radius=None)
       structure_element = disk(size_spec)
-    print('structure_element', structure_element)
-    print('original max and min', np.max(data), np.min(data))
+#   print('structure_element', structure_element)
+#   print('original max and min', np.max(data), np.min(data))
 # doing one erosion get those wierd structures in the Rudnick paper
     eroded = erosion(data, structure_element)
-    print('eroded')
+#   print('eroded')
 # doing a second erosion then basically gets rid of most suuff except for point sources
     double_erode = True
     if double_erode:
       eroded = erosion(eroded, structure_element)
-      print('eroded')
-    print('eroded max and min', np.max(eroded), np.min(eroded))
-# dilation does not seem to do anythig useful to the image produced by a second erosion
+#     print('eroded')
+#   print('eroded max and min', np.max(eroded), np.min(eroded))
     dilated = dilation(eroded, structure_element)
-    print('dilated max and min', np.max(dilated), np.min(dilated))
+#   print('dilated max and min', np.max(dilated), np.min(dilated))
     if use_dilation:
       hdu.data = dilated
       hdu.header['DATAMAX'] =  dilated.max()
@@ -84,11 +78,11 @@ def filter_images(filename, filter_size, filter_type, use_dilation):
       hdu.writeto(outfile, overwrite=True)
       data = input_data - dilated
       data = np.nan_to_num(data)
-      print('processed signal (input data - dilated)  max and min', np.max(data), np.min(data))
+#     print('processed signal (input data - dilated)  max and min', np.max(data), np.min(data))
       hdu.data = data
       hdu.header['DATAMAX'] =  data.max()
       hdu.header['DATAMIN'] =  data.min()
-      print('output orig-dilated max and min', np.max(data), np.min(data))
+#     print('output orig-dilated max and min', np.max(data), np.min(data))
       outfile = filename + '-dilated.fits'
       hdu.writeto(outfile, overwrite=True)
     else:
@@ -101,7 +95,7 @@ def filter_images(filename, filter_size, filter_type, use_dilation):
       data = np.nan_to_num(data)
       hdu.header['DATAMAX'] =  data.max()
       hdu.header['DATAMIN'] =  data.min()
-      print('processed signal (input data - eroded)  max and min', np.max(data), np.min(data))
+#     print('processed signal (input data - eroded)  max and min', np.max(data), np.min(data))
       hdu.data = data
       outfile = filename + '-eroded.fits'
       hdu.writeto(outfile, overwrite=True)
