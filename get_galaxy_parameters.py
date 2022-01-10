@@ -89,13 +89,13 @@ def process_images(filename, skip_generating_mask, use_breizorro_mask_l, use_con
               try:
                 os.remove(json_data_file)
               except:
-                print('file not found so could not be deleted', json_data_file)
+#               print('file not found so could not be deleted', json_data_file)
                 pass
               info_1 = object_name[:location] + '.mask.fits'
               try:
                 os.remove(info_1)
               except:
-                print('file not found so could not be deleted', info_1)
+#               print('file not found so could not be deleted', info_1)
                 pass
               info_1 = object_name[:location] 
               info_1 = object_name[:location] + '.fits'
@@ -137,8 +137,8 @@ def process_images(filename, skip_generating_mask, use_breizorro_mask_l, use_con
           cmd = 'calculate_source_parms.py ' + ' ' + freq + ' ' +   field_name + ' ' + red_shift[i] + ' ' + spec_index[i] + ' ' +  las_HA + ' ' + use_breizorro_mask_l 
           print('processing cmd', cmd)
           returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
-# multiply original field by mask and generate polygon'
-        print('finished \n')
+
+        print('get_galaxy_parameters: finished \n')
 
 
 def main( argv ):
