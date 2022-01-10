@@ -4,33 +4,13 @@ from scipy.spatial import distance
 import json
 import math
 import numpy as np
+import collections
 
 def worker(input, output):
     for func, args in iter(input.get, 'STOP'):
         result = func(*args)
         output.put(result)
 
-def get_interior_points(i, p):
-  print('in get interior points')
-  print('processing polygon', i)
-  points = []
-  (minx, miny, maxx, maxy) = p.bounds
-  for y in range(int(miny-1), int(maxy+1)):
-     for x in range(int(minx-1), int(maxx+1)):
-       pt = Point(x,y)
-       if p.contains(pt):
-           points.append((x,y))
-# we want the polygon boundary points  to be included
-# --- not at present
-# boundary = list(p.exterior.coords)
-# last = len(boundary)
-# boundary = boundary[:last-1]  # last member == first (added by shapely)
-# print('polygon boundary', boundary)
-# print('polygon points', points)
-# all_points = points + boundary 
-  all_points = points 
-  print('number of points in polygon ', i, len(all_points))
-  return (i, all_points)
 
 def maxDist1(p,scale):
    coords =  np.array(p) * scale
@@ -57,7 +37,6 @@ def simple_distance(p1,p2,scale):
 # distance between any two points
 def maxDist(p,scale):
     n = len(p)
-#   print('number of polygons', n)
     maxm = 0
     tan = 0
     # Iterate over all possible pairs
@@ -129,8 +108,8 @@ def process_json_file(filename, pixel_size=0.0):
             print('maxDist angular size and position angle', ang_size, pa)
             las.append(ang_size)
             las_pa.append(pa)
-    if not found:
-      print('no polygon containing',coords[i])
+        if not found:
+          print('no polygon containing',coords[i])
     if pixel_size > 0:  
       max_las = maxDist1(poly_coord_all, pixel_size)
       print('cdist max_las', max_las)
@@ -140,52 +119,95 @@ def process_json_file(filename, pixel_size=0.0):
     else:
       return polygon_list, coords
 
+def get_contained_points(y, xmin, xmax,i, p): 
+     x_list = []
+     y_list = []
+     for x in range(xmin,xmax):
+       pt = Point(x,y)
+# Testing for contained points can be somewhat slow if you have
+# a big polygon containing many points
+# Note that we flip x and y coordinates going from matplotlib
+# display coordinates to numpy array coordinates
+       if p.contains(pt):
+           x_list.append(y)
+           y_list.append(x)
+     if len(x_list) != len(y_list):
+       print('error x_list and y_list have different lengths',  len(x_list), len(y_list))
+       return (-1, -1, -1.0,-1.0 )
+     else:
+       if len(x_list) > 0 and len(y_list) > 0:
+         return (i, y, (x_list, y_list))
+       else:
+         return (-1, -1, -1.0,-1.0 )
 
 def get_interior_locations(polygon_list):
     num_processors = 1
-    if num_processors <= 2 and len(polygon_list) > 1:
+#   if num_processors <= 2 and len(polygon_list) > 1:
+    if num_processors <= 2:
       try:
         import multiprocessing
         processors =  multiprocessing.cpu_count()
         if processors > num_processors:
           num_processors = processors
-#         print ('*** setting number of processors to',num_processors)
       except:
         pass
     print ('*** setting final number of processors to',num_processors)
     TASKS = []
+    print('getting pixels inside polygon, working ...')
     for i in range(len(polygon_list)):
-      TASKS.append((get_interior_points, (i,polygon_list[i])))
+      p = polygon_list[i]
+# Can we simplify the polygon?
+      if len(p.exterior.coords) > 500:
+        p = p.simplify(0.08)
+      (minx, miny, maxx, maxy) = p.bounds
 
+# set up parallelprocessing
+      for y in range(int(miny-1), int(maxy+1)):
+        TASKS.append((get_contained_points, (y, int(minx-1), int(maxx+1), i, p)))
     NUMBER_OF_PROCESSES = num_processors
-   # Create queues
+# Create queues
     task_queue = Queue()
     done_queue = Queue()
 
-  # Submit tasks
+# Submit tasks
     for task in TASKS:
       task_queue.put(task)
 
-    # Start worker processes
+# Start worker processes
     for i in range(NUMBER_OF_PROCESSES):
       Process(target=worker, args=(task_queue, done_queue)).start()
 
-    interior_points = []
+    interior_polygons = {}
     result_sum = 0
-    for i in range(len(TASKS)):
-      try:
-        result = done_queue.get(timeout=2000)
-#       print('caught polygon', result[0])
-        interior_points.append(result)
-        result_sum = result_sum + 1
-      except:
-        pass
-    print('number of interior point lists', len(interior_points))
+    first = True 
+    for i in range(len(polygon_list)):
+       interior_polygons[i] = ([], [])
 
-# Tell child processes to stop
-    for i in range(NUMBER_OF_PROCESSES):
-        task_queue.put('STOP')
-    print ('*********** finished collecting polygon points ! ******* \n')
+# get output from tasks
+    for i in range(len(TASKS)):
+        result = done_queue.get(timeout=2000)
+        if result[0] >= 0:
+          data = result[2]
+          if len(data[0]) != len(data[1]):
+            print('retrieved data have different lengths!')
+          else:
+             data = interior_polygons[result[0]]
+             x_list = data[0]
+             y_list = data[1]
+             x_list = x_list + result[2][0]
+             y_list = y_list + result[2][1]
+             interior_polygons[result[0]] = (x_list, y_list)
+
+# make sure  things shut down
+    for i in range(num_processors):
+      task_queue.put('STOP')
+
+    interior_points = []
+    for i in range(len(polygon_list)):
+      data = interior_polygons[i]
+      x_list = data[0]
+      y_list = data[1]
+      interior_points.append((i,(np.array(x_list), np.array(y_list))))
     return interior_points
 
 
