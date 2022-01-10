@@ -23,7 +23,7 @@ min      O  minutes (integer)
 sec      O  seconds (float)
 
     """
-    print('in  rad_to_hms')
+#   print('in  rad_to_hms')
     M_RAD2DEG = 180.0/math.pi
     if rad < 0:
       rad = 2.0 * math.pi + rad
@@ -50,7 +50,7 @@ min      O  minutes (integer)
 sec      O  seconds (float)
 
     """
-    print('in  rad_to_dms')
+#   print('in  rad_to_dms')
     M_RAD2DEG = 180.0/math.pi
     d = math.fabs(rad) * M_RAD2DEG
     deg = int(d+2E-13)
