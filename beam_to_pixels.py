@@ -16,9 +16,9 @@ import sys
 def calculate_area(fwhm_arcsec, fwhm_min,pixel = 2):
 # calculation of beam area in pixel sizes, where default pixel size is 2 arcsec
 #fwhm_arcsec = fwhm_arcsec *2
-  print('FWHM (arcsec)', fwhm_arcsec)
-  print('FWHM_min (arcsec)', fwhm_min)
-  print('pixel width (arcsec)', pixel)
+# print('FWHM (arcsec)', fwhm_arcsec)
+# print('FWHM_min (arcsec)', fwhm_min)
+# print('pixel width (arcsec)', pixel)
 
   fwhm_arcsec = float(fwhm_arcsec)
   FWHM_r = math.radians(fwhm_arcsec /3600) 
@@ -26,14 +26,14 @@ def calculate_area(fwhm_arcsec, fwhm_min,pixel = 2):
   FWHM_min_r = math.radians(fwhm_min_arcsec /3600) 
 # following line implicitly converts FWHM to sigma and does the squaring  
   area = (math.pi * FWHM_r * FWHM_min_r) / (4.0 * np.log(2))
-  print ('method 1 initial beam area - stradian squared', area)
+# print ('method 1 initial beam area - stradian squared', area)
   pixel = float(pixel)
 
 # first method
 
   delta = math.radians(pixel / 3600)
   area_pixels = area / (delta * delta)
-  print ('method 1 beam area in pixels', area_pixels)
+# print ('method 1 beam area in pixels', area_pixels)
 
 ############
 # second method
@@ -42,9 +42,9 @@ def calculate_area(fwhm_arcsec, fwhm_min,pixel = 2):
   sigma =  fwhm_arcsec/ convert
   sigma_min =  fwhm_min_arcsec/ convert
   beam_area = 2 * math.pi * sigma * sigma_min
-  print ('method 2 beam area - arcsec squared', beam_area)
+# print ('method 2 beam area - arcsec squared', beam_area)
   num_pixels_beam = beam_area / (pixel * pixel)
-  print ('method 2 beam area in pixels', num_pixels_beam)
+# print ('method 2 beam area in pixels', num_pixels_beam)
   return num_pixels_beam
 
 def main( argv ):
