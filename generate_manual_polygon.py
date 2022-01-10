@@ -90,7 +90,7 @@ def create_polygon(filename):
         try:
           os.remove(outfile)
         except:
-          print('file not found, so could not be deleted',outfile)
+#         print('file not found, so could not be deleted',outfile)
           pass
         f = open(outfile, 'w')
         output = 'polygon outer boundary \n'
