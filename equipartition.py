@@ -18,28 +18,28 @@ c = c / 1000.00     # km / sec
 def ang_path(z, angle):
 #z = redshift
 #angle = angle we wish to guess distance through the source in arcsec 
-  print('input z', z, Ho, Omega_w)
-  print('processing angle', angle)
+#  print('input z', z, Ho, Omega_w)
+# print('processing angle', angle)
   result = cosmocalc(z, H0=Ho, WM=Omega_w)
   LAS_dist = result['DA_Mpc'] *1000.0
   LUM_dist = result['DL_Mpc'] *1000.0
-  print('LAS distance kpc)', LAS_dist)
-  print('LUM distance kpc)', LUM_dist)
-  print('distance ratio LUM_dist /LAS_dist', LUM_dist /LAS_dist)
+# print('LAS distance kpc)', LAS_dist)
+# print('LUM distance kpc)', LUM_dist)
+# print('distance ratio LUM_dist /LAS_dist', LUM_dist /LAS_dist)
   angle = math.radians(angle / 3600.0)
   ang_p = LAS_dist * angle
   return ang_p, LAS_dist, LUM_dist
 
 def equipartition_accurate(freq,theta_1, theta_2, flux, n_flux,z, alpha):
    LAP, LAS_dist, LUM_dist = ang_path(z, theta_2) 
-   print ('LAP in kpc ', LAP)
+#  print ('LAP in kpc ', LAP)
    angle = math.radians(theta_1 / 3600.0)
    source_apparent_size = LAS_dist * angle
-   print('source apparent size (kpc) ', source_apparent_size)
+#  print('source apparent size (kpc) ', source_apparent_size)
    a = 1.0 + z
    lobe_flux = flux - n_flux 
    flux_ratio = lobe_flux/ (theta_1 * theta_2 * LAP)
-   print('flux_ratio', flux_ratio)
+#  print('flux_ratio', flux_ratio)
    b = 2.0 * math.pow(a, 3.8) * flux_ratio  
    mu1 = 0.01
    mu2 = 100
@@ -56,15 +56,15 @@ def equipartition_accurate(freq,theta_1, theta_2, flux, n_flux,z, alpha):
       B_me_1 = 0.0
    B_me = 1.0e-4 * math.pow(a,1.1) *  math.pow(freq,0.22)  * math.pow(flux_ratio, (2.0/7.0))
 
-   print('**** mag fields ', B_me, B_me_1 )
+#  print('**** mag fields ', B_me, B_me_1 )
    u_me = 1.9e-9 * math.pow(a,2.2) *  math.pow(freq,0.44)  * math.pow(flux_ratio, (4.0/7.0))
-   print('min energy', u_me)
+#  print('min energy', u_me)
    u_me1 = (7.0 / 3.0) * (B_me_1 * B_me_1) / (math.pi * 8.0)
-   print('min energy 1', u_me1)
-   print('ratio', u_me1 / u_me)
+#  print('min energy 1', u_me1)
+#  print('ratio', u_me1 / u_me)
    pressure = u_me / 0.3
    B_me_equiv = math.sqrt ((math.pi * 8.0) * (3.0 / 7.0) * u_me)
-   print('mag field equiv', B_me_equiv)
+#  print('mag field equiv', B_me_equiv)
  
 # OK - equipartition parameters calculated - now lets get k-corrected radio luminosity at 1.4 GHz
    S_0_9 = 1.0e-26 * flux    # add in 1e-26 conversion factor to convert Jy to units / m^2
@@ -74,13 +74,13 @@ def equipartition_accurate(freq,theta_1, theta_2, flux, n_flux,z, alpha):
    k_corr = -1.0 * (-1.0*alpha - 1)
    e = 1.0 / math.pow(a, 0.2)                # -0.8 + 1
    e = 1.0 / math.pow(a, k_corr)             # -0.8 + 1
-   print ('k_corr', e)
+#  print ('k_corr', e)
    LUM_dist_m = LUM_dist *1000.0 * 3.085678e+16    # convert lum distance from KPc to metres
    lum_1_4 = 4.0 * math.pi * math.pow(LUM_dist_m, 2.0) * S_1_4  * e
    lum_0_9 = 4.0 * math.pi * math.pow(LUM_dist_m, 2.0) * S_0_9  * e
    out_str = 'calculated ' + str(freq) + ' GHz luminosity'
-   print(out_str, lum_0_9)
-   print('calculated 1.4 GHz luminosity', lum_1_4)
+#  print(out_str, lum_0_9)
+#  print('calculated 1.4 GHz luminosity', lum_1_4)
 #  volume should be in kpc^3 converted to cm^3
 #  1pc= 3.085678e+18
 #  so 1 kpc = 3.085678e+21 cm
