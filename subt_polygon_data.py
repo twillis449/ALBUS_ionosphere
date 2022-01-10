@@ -24,15 +24,19 @@ def analyze_image(filename, json_file, offset_flux,use_dilation):
     points =  json_file
     print('os.path.isfile(points)', os.path.isfile(points))
     interior_points = []
+
+    # Download the polygon points
     if os.path.isfile(points):
         print ("File exists")
         polygon_list, coords = process_json_file(points)
-        print('******** coords', coords)
-        try:
-          interior_points = get_interior_locations(polygon_list)
-#         print('interior points', interior_points)
-        except:
-          interior_points = []
+        num_polygons = len(polygon_list)
+        interior_points = get_interior_locations(polygon_list)
+        polygons_dict = {}
+        for i in range(len(interior_points)):
+          result = interior_points[i]
+          polygon_number = result[0]
+          print('giving polygons_dict key', polygon_number)
+          polygons_dict[polygon_number] = result[1]
     else:
       print('Json file not found - so no processing to be done. Exiting')
       return
@@ -47,32 +51,29 @@ def analyze_image(filename, json_file, offset_flux,use_dilation):
     else:
       fits_file_out = filename[:location] + '_Final-eroded.fits'
     print('subt_polygon_data: processing input fits image file ', fits_file,' \n')
-    # Download the polygon points
+    print('opening orig_file', fits_file)
     hdu_list = fits.open(fits_file)
     hdu = hdu_list[0]
     data = check_array(hdu.data)
+    print('raw input max', data.max())
+    print('opening subt file', fits_file_subt)
     hdu_list_subt = fits.open(fits_file_subt)
     hdu = hdu_list_subt[0]
     data_subt = check_array(hdu.data)
-    if len(interior_points) > 0:
-      for i in range(len(interior_points)):
-        result = interior_points[i]
-        if offset_flux > 0.0:
-          for j in range(len(result[1])):
-             x,y = result[1][j]
-             data[y,x] = data[y,x] - data_subt[y,x] + offset_flux
-        else:
-          for j in range(len(result[1])):
-             x,y = result[1][j]
-             data[y,x] = data[y,x] - data_subt[y,x] 
-      hdu.data = data
-      nans = np.isnan(hdu.data)
-      hdu.data[nans] = 0.0
-      hdu.header['DATAMAX'] =  hdu.data.max()
-      hdu.header['DATAMIN'] =  hdu.data.min()
-      hdu.writeto(fits_file_out, overwrite=True)
-    else:
-      print('subt_polygon_data: no interior points found')
+    for key in polygons_dict.keys():
+       result = polygons_dict[key]
+       x = result[0]
+       y = result[1]
+       if offset_flux > 0.0:
+           data[x,y] = data[x,y] - data_subt[x,y] + offset_flux
+       else:
+           data[x,y] = data[x,y] - data_subt[x,y] 
+    hdu.data = data
+    nans = np.isnan(hdu.data)
+    hdu.data[nans] = 0.0
+    hdu.header['DATAMAX'] =  hdu.data.max()
+    hdu.header['DATAMIN'] =  hdu.data.min()
+    hdu.writeto(fits_file_out, overwrite=True)
 
 def main( argv ):
   filename = argv[1]
