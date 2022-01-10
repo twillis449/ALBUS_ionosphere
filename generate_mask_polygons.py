@@ -22,14 +22,14 @@ qannotate = []
 def onclick(event):
     if event.button == 1:
       ix, iy = event.xdata, event.ydata
-      print('*** raw pos', ix, iy)
+#     print('*** raw pos', ix, iy)
 
     # assign global variable to access outside of function
       global coords
       global qannotate
       loc = (ix, iy)
       coords.append(loc)
-      print('*** updated coords', coords)
+#     print('*** updated coords', coords)
       if len(coords) > 1:
         x = []
         y = []
@@ -72,8 +72,8 @@ def onclick(event):
           bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
           arrowprops=dict(arrowstyle = '->', connectionstyle='arc3,rad=0')) )
         ax.figure.canvas.draw()
-      print('saving png file')
-      print('morph_sign', morph_sign)
+#     print('saving png file')
+#     print('morph_sign', morph_sign)
       if morph_sign == 'T':
         outpic = 'selected_polygons_for_morphology_analysis.png'
         try:
@@ -81,7 +81,7 @@ def onclick(event):
         except:
          pass
         plt.savefig(outpic)
-        print('saved png file')
+#       print('saved png file')
       else:
         outpic = 'selected_polygons_for_flux_density_analysis.png'
         try:
@@ -94,7 +94,7 @@ def onclick(event):
       ax = plt.gca()
       for i in range(len(qannotate)):
          qannotate[i].remove()
-      print('resetting coords to zero')
+#     print('resetting coords to zero')
       qannotate = []
       coords = []
       ax.lines = []
@@ -102,13 +102,13 @@ def onclick(event):
     return
 
 def compare_fields(radio, mask):
-  print('compare_fields: mask file', mask)
-  print('compare_fields: radio file', radio)
+# print('compare_fields: mask file', mask)
+# print('compare_fields: radio file', radio)
   hdu_list = fits.open(radio)
-  print ('info',hdu_list.info())
+# print ('info',hdu_list.info())
   hdu1 = hdu_list[0]
   hdu_list = fits.open(mask)
-  print ('info',hdu_list.info())
+# print ('info',hdu_list.info())
   hdu2 = hdu_list[0]
   cen_x = hdu2.header['CRPIX1']
   cen_y = hdu2.header['CRPIX2']
@@ -128,14 +128,14 @@ def compare_fields(radio, mask):
   hdu1.data[nans] = 0
 
   wcs = WCS(hdu1.header)
-  print('wcs', wcs)
+# print('wcs', wcs)
 
-  print('starting plot')
+# print('starting plot')
   fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(8, 4), sharex=True, sharey=True)
   plt.suptitle (mask[:location])
   interval = vis.PercentileInterval(99.9)
   vmin,vmax = interval.get_limits(hdu1.data)
-  print('original intensities', vmin,vmax)
+# print('original intensities', vmin,vmax)
   vmin = 0.0
   norm = vis.ImageNormalize(vmin=vmin, vmax=vmax, stretch=vis.LogStretch(1000))
   im = ax1.imshow(hdu1.data, cmap =plt.cm.gray_r, norm = norm, origin = 'lower')
@@ -149,7 +149,7 @@ def compare_fields(radio, mask):
 # ax2 = plt.subplot(1,2,2, projection=WCS(hdu1.header))
   interval = vis.PercentileInterval(99.9)
   vmin,vmax = interval.get_limits(hdu2.data)
-  print('adjusted radio intensities', vmin,vmax)
+# print('adjusted radio intensities', vmin,vmax)
   norm = vis.ImageNormalize(vmin=vmin, vmax=vmax, stretch=vis.LogStretch(1000))
   ax2.imshow(hdu2.data, cmap =plt.cm.gray_r, norm = norm, origin = 'lower') 
 # ax2.imshow(hdu2.data, cmap =plt.cm.gray, norm = norm, origin = 'lower') 
@@ -163,11 +163,11 @@ def compare_fields(radio, mask):
   out_data = {}
 # only use first level as all levels are really the same here
   if mask.find('mask') > -1:
-      print('processing data for level',levels[0])
+#     print('processing data for level',levels[0])
       contour = cs.collections[0]
       num_contours = len(contour.get_paths())
       out_data['num_contours'] = num_contours
-      print('number of separate contours', num_contours)
+#     print('number of separate contours', num_contours)
       max_area = 0.0
       max_cntr = 0
       for j in range(num_contours):
@@ -200,11 +200,11 @@ def compare_fields(radio, mask):
   location =  mask.find('-eroded')
   if location > -1:
     json_data_file = mask[:location] + '-eroded.json_polygons_data'
-  print ('json file should be ', json_data_file)
+# print ('json file should be ', json_data_file)
   try:
     os.remove(json_data_file)
   except:
-    print('file not found, so could not be deleted',json_data_file)
+#   print('file not found, so could not be deleted',json_data_file)
     pass
   length = len(outer_list)
   if length > 0:
@@ -236,7 +236,6 @@ def compare_fields(radio, mask):
       for k in range(x.shape[0]):
         x_coord = float(x[k])
         y_coord = float(y[k])
-#        poly_coord.append((y_coord,x_coord))
         poly_coord.append((x_coord,y_coord))
       p = Polygon(poly_coord)
       for j in range(len(poly_coord)):
@@ -252,11 +251,11 @@ def compare_fields(radio, mask):
       fig.canvas.mpl_disconnect(cid)
 
   if len(coords) > 0:
-      print('coords to be dumped', coords)
+#     print('coords to be dumped', coords)
       out_data['coords'] = coords
       with open(json_data_file, 'w') as json_file:
         json.dump(out_data, json_file)
-      print('number of bounds coord', len(coords) )
+#     print('number of bounds coord', len(coords) )
       for i in range(len(coords)):
         a = round(coords[i][0])
         x = round(coords[i][1])
@@ -266,7 +265,7 @@ def compare_fields(radio, mask):
     try:
       os.remove(json_data_file)
     except:
-      print('file not found, so could not be deleted',json_data_file)
+#     print('file not found, so could not be deleted',json_data_file)
       pass
 
 def main( argv ):
