@@ -44,7 +44,7 @@ def process_input_file(filename,return_morphology_parameters=False):
           print('appending angle')
         except:
           las.append('5')
-          print('appending default angular size')
+          print('appending default angle')
     print('-------------------- finished reading input\n')
     if return_morphology_parameters:
        return freq, names, ra_deg, dec_deg
