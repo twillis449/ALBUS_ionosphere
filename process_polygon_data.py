@@ -39,6 +39,8 @@ def maxDist(p,scale):
     n = len(p)
     maxm = 0
     tan = 0
+    p_0 = p[0]
+    p_1 = p[1]
     # Iterate over all possible pairs
     for i in range(n):
         for j in range(i + 1, n):
@@ -47,12 +49,14 @@ def maxDist(p,scale):
             if dist > maxm:
               maxm = dist
               tan = tan1
+              p_0 = p[i]
+              p_1 = p[j]
 #             print('updated tan angle', tan)
     if tan < 0:
       tan = abs(tan)
     else:
       tan = 180 - tan
-    return math.sqrt(maxm), tan
+    return (math.sqrt(maxm), tan, p_0, p_1)
 
 def process_json_file(filename, pixel_size=0.0):
   print('calc parms processing json file', filename)
@@ -82,7 +86,7 @@ def process_json_file(filename, pixel_size=0.0):
     polygon_list = []
     las = []
     las_pa = []
-    poly_coord_all = []
+    p_max = []
     for i in range(n):
       found = False 
       print('coordinate ', coords[i])
@@ -93,25 +97,22 @@ def process_json_file(filename, pixel_size=0.0):
         poly_coord = in_data[str(contour_number)]
         p = Polygon(poly_coord)
         if p.contains(Pt):
-          poly_coord_list = []
           print('********* containing contour', l)
-          for j in range(len(poly_coord)):
-            a = poly_coord[j][0]
-            b = poly_coord[j][1]
-            poly_coord_all.append((a,b))
           polygon_list.append(p)
           if pixel_size > 0.0:
-            ang_size = maxDist1(poly_coord,pixel_size)
-            print('cdist angular size', ang_size)
-            ang_size, pa = maxDist(poly_coord,pixel_size)
-            print('maxDist angular size and position angle', ang_size, pa)
-            las.append(ang_size)
-            las_pa.append(pa)
+#           ang_size = maxDist1(poly_coord,pixel_size)
+#           print('cdist angular size', ang_size)
+            result = maxDist(poly_coord,pixel_size)
+#           print('maxDist angular size and position angle', ang_size, pa)
+            las.append(result[0])
+            las_pa.append(result[1])
+            p_max.append(result[2])
+            p_max.append(result[3])
     if pixel_size > 0:  
-      max_las = maxDist1(poly_coord_all, pixel_size)
-      print('cdist max_las', max_las)
-      max_las, max_pa = maxDist(poly_coord_all,pixel_size)
-      print('maxDist max_las size and position angle', max_las, max_pa)
+      result = maxDist(p_max,pixel_size)
+      max_las = result[0] 
+      max_pa = result[1]
+      print('Source has maximum angular size and position angle', max_las, max_pa)
       return polygon_list, coords, max_las, las, max_pa, las_pa
     else:
       return polygon_list, coords
@@ -138,6 +139,7 @@ def get_contained_points(y, xmin, xmax,i, p):
          return (-1, -1, -1.0,-1.0 )
 
 def get_interior_locations(polygon_list):
+    print('Getting points interior to polygon boundaries ...')
     num_processors = 1
 #   if num_processors <= 2 and len(polygon_list) > 1:
     if num_processors <= 2:
@@ -155,7 +157,12 @@ def get_interior_locations(polygon_list):
       p = polygon_list[i]
 # Can we simplify the polygon?
       if len(p.exterior.coords) > 500:
-        p = p.simplify(0.08)
+        old = len(p.exterior.coords)
+#       p = p.simplify(0.08, preserve_topology=True)
+        p = p.simplify(0.5, preserve_topology=True)
+        new = len(p.exterior.coords)
+        if new < old:
+          print('simplify shrank polygon points from ', old, ' to ', new)
       (minx, miny, maxx, maxy) = p.bounds
 
 # set up parallelprocessing
