@@ -88,22 +88,27 @@ def process_json_file(filename, pixel_size=0.0):
     las_pa = []
     p_max = []
     for i in range(n):
+#     print('outer iteration', i)
       found = False 
       print('coordinate ', coords[i])
       Pt = Point(coords[i])
       for l in range(length):
+#       print('inner iteration', l)
         rslt = sortedArr[l] 
         contour_number = int(rslt[0])
         poly_coord = in_data[str(contour_number)]
         p = Polygon(poly_coord)
+        if len(p.exterior.coords) > 500:
+          old = len(p.exterior.coords)
+          p = p.simplify(0.5, True)
+          new = len(p.exterior.coords)
+          if new < old:
+            in_data[str(contour_number)] = list(p.exterior.coords)
         if p.contains(Pt):
           print('********* containing contour', l)
           polygon_list.append(p)
           if pixel_size > 0.0:
-#           ang_size = maxDist1(poly_coord,pixel_size)
-#           print('cdist angular size', ang_size)
             result = maxDist(poly_coord,pixel_size)
-#           print('maxDist angular size and position angle', ang_size, pa)
             las.append(result[0])
             las_pa.append(result[1])
             p_max.append(result[2])
@@ -158,11 +163,11 @@ def get_interior_locations(polygon_list):
 # Can we simplify the polygon?
       if len(p.exterior.coords) > 500:
         old = len(p.exterior.coords)
-#       p = p.simplify(0.08, preserve_topology=True)
-        p = p.simplify(0.5, preserve_topology=True)
+        p = p.simplify(0.5, True)
         new = len(p.exterior.coords)
         if new < old:
           print('simplify shrank polygon points from ', old, ' to ', new)
+          polygon_list[i] = p
       (minx, miny, maxx, maxy) = p.bounds
 
 # set up parallelprocessing
