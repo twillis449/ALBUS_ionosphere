@@ -128,9 +128,10 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l):
           polygons_dict[polygon_number] = result[1]
         centroid = p.centroid
 #       print('centroid', centroid)
-        ang_size_all, max_pa = maxDist(poly_coords,pixel_size)
-        computer_las = ang_size_all
-        lobe_las = ang_size_all
+        result = maxDist(poly_coords,pixel_size)
+        computer_las = result[0]
+        lobe_las = computer_las
+        max_pa = result[1]
     poly_list = sorted(list(polygons_dict.keys()))
     if multi:
       n = len(poly_list) + 1
@@ -478,7 +479,7 @@ def main( argv ):
   print("calc_source_parameters Start at %s" % startime)
 
 # note - the input parameters should be given in the sequemce shown in
-# the ASCII file 'radio_galaxies_redshifts'
+# the ASCII file ending in .csv
 
   freq = argv[1]        # frequency in GHz
   filename = argv[2]    # name of data file 
