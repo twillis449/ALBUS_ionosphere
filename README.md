@@ -12,8 +12,8 @@ Get_morphology_images uses morphological erosion and dilation to remove backgrou
 
 The process can be described through the following equations:
 
-o = original image
-d - output from erosion/dilation
+o = original image \n
+d - output from erosion/dilation \n
 t = white TopHat, which should show only compact structures smaller than the
     structure element 
 t = o - d  
