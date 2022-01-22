@@ -39,14 +39,14 @@ def make_mask(filename,limiting_sigma, use_dilation):
     orig_image[nans] = 0
 # get noise from breizorro
     median_noise = make_noise_map(orig_image)
-#   print('make_mask: median noise ', median_noise)
+    print('make_mask: median noise ', median_noise)
     limiting_flux = median_noise * limiting_sigma
     print('make_mask: limiting_flux ', limiting_flux)
     # Download the morphology image
     if use_eroded:
-      file_name = filename + '-eroded.fits'
+      file_name = filename + '_eroded.fits'
     else:
-      file_name = filename + '-dilated.fits'
+      file_name = filename + '_dilated.fits'
     # Load the image and the WCS
 #   print('make_mask: loading morphology image', file_name)
     hdu_list = fits.open(file_name)
@@ -54,22 +54,36 @@ def make_mask(filename,limiting_sigma, use_dilation):
     hdu = hdu_list[0]
 #   print('original image type =', hdu.data.dtype)
     image = check_array(hdu.data)
+    white_tophat = orig_image - image
+    hdu.data = white_tophat
+    hdu.header['DATAMIN'] = hdu.data.min()
+    hdu.header['DATAMAX'] = hdu.data.max()
+    if use_eroded:
+      out_tophat = filename +'-eroded.fits'
+      out_tophat = filename +'-eroded_tophat.fits'
+    else:
+      out_tophat = filename +'-dilated_tophat.fits'
+    print
+    print('make_mask: tophat output to ', out_tophat )
+    hdu.writeto(out_tophat, overwrite=True)
+
+    
 # create mask from filtered image, where filtered image signal > limiting flux
-    mask = np.where(image>limiting_flux,1.0,0.0)
+    mask = np.where(white_tophat>limiting_flux,1.0,0.0)
     mask = mask.astype('float32')
     hdu.data = mask
     hdu.header['DATAMIN'] = 0.0
     hdu.header['DATAMAX'] = 1.0
     if use_eroded:
-      outfile = filename +'-eroded.mask.fits'
+      outfile = filename +'-eroded_tophat.mask.fits'
     else:
-      outfile = filename +'-dilated.mask.fits'
+      outfile = filename +'-dilated_tophat.mask.fits'
 #   print('mask output to ', outfile )
     hdu.writeto(outfile, overwrite=True)
 
 # create filtered image from morphology image  * mask
 # so we have filtered data which will be subtracted from original image
-    filtered_data = image * mask
+    filtered_data = white_tophat * mask
     nans = np.isnan(filtered_data)
     filtered_data[nans] = 0
 
@@ -81,10 +95,11 @@ def make_mask(filename,limiting_sigma, use_dilation):
     outfile = filename +'.filtered_data.fits'
 #   print('filtered_data image output to ', outfile )
     hdu.writeto(outfile, overwrite=True)
+# the user can select individual compact objects to delete
     if use_eroded:
-      cmd = 'generate_mask_polygons.py ' + filename +'-eroded T'
+      cmd = 'generate_mask_polygons.py ' + filename +'-eroded_tophat T'
     else:
-      cmd = 'generate_mask_polygons.py ' + filename +'-dilated T' 
+      cmd = 'generate_mask_polygons.py ' + filename +'-dilated_tophat T' 
     print('processing cmd', cmd)
     returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
 
@@ -98,12 +113,43 @@ def make_mask(filename,limiting_sigma, use_dilation):
 
 #   print('hdu.data max and main', hdu.data.max(), hdu.data.min())
     if use_eroded:
-      outfile = filename +'_final_minus-filtered_eroded_all.fits'
+      outfile = filename +'_Final-image_using_all_erosion.fits'
     else:
-      outfile = filename +'_final_minus-filtered_dilated_all.fits'
+      outfile = filename +'_Final-image_using_all_dilation.fits'
 #   print('********** final difference file', outfile)
     hdu.writeto(outfile, overwrite=True)
 #   print('wrote out', outfile)
+
+#   add
+    masked_image = orig_image *mask
+    hdu.data = masked_image
+    hdu.header['DATAMAX'] =  hdu.data.max()
+    hdu.header['DATAMIN'] =  hdu.data.min()
+
+#   print('hdu.data max and main', hdu.data.max(), hdu.data.min())
+    if use_eroded:
+      outfile = filename +'_compact_structure_eroded.fits'
+    else:
+      outfile = filename +'_compact_structure_dilated.fits'
+#   print('********** final compact file', outfile)
+    hdu.writeto(outfile, overwrite=True)
+#   print('wrote out', outfile)
+
+    diffuse_image = orig_image - masked_image
+    hdu.data = diffuse_image
+    hdu.header['DATAMAX'] =  hdu.data.max()
+    hdu.header['DATAMIN'] =  hdu.data.min()
+
+#   print('hdu.data max and main', hdu.data.max(), hdu.data.min())
+    if use_eroded:
+      outfile = filename +'_diffuse_structure_eroded.fits'
+    else:
+       outfile = filename +'_diffuse_structure_dilated.fits'
+#   print('********** final diffuse', outfile)
+    hdu.writeto(outfile, overwrite=True)
+#   print('wrote out', outfile)
+
+
 
 
 def main( argv ):

@@ -52,7 +52,7 @@ def filter_images(filename, filter_size, filter_type, use_dilation):
 #   print('filter_selection type',  filter_type)
     if filter_type == 'R':
       print('using rectangle for structure element')
-      structure_element = rectangle(size_spec,size_spec)
+      structure_element = rectangle(2* size_spec,size_spec)
     else:
       print('using disk for structure element')
 #     structure_element = create_circular_mask(size_spec, size_spec, center=None, radius=None)
@@ -76,28 +76,11 @@ def filter_images(filename, filter_size, filter_type, use_dilation):
       hdu.header['DATAMIN'] =  dilated.min()
       outfile = filename + '_dilated.fits'
       hdu.writeto(outfile, overwrite=True)
-      data = input_data - dilated
-      data = np.nan_to_num(data)
-#     print('processed signal (input data - dilated)  max and min', np.max(data), np.min(data))
-      hdu.data = data
-      hdu.header['DATAMAX'] =  data.max()
-      hdu.header['DATAMIN'] =  data.min()
-#     print('output orig-dilated max and min', np.max(data), np.min(data))
-      outfile = filename + '-dilated.fits'
-      hdu.writeto(outfile, overwrite=True)
     else:
       hdu.data = eroded
       hdu.header['DATAMAX'] =  eroded.max()
       hdu.header['DATAMIN'] =  eroded.min()
       outfile = filename + '_eroded.fits'
-      hdu.writeto(outfile, overwrite=True)
-      data = input_data - eroded
-      data = np.nan_to_num(data)
-      hdu.header['DATAMAX'] =  data.max()
-      hdu.header['DATAMIN'] =  data.min()
-#     print('processed signal (input data - eroded)  max and min', np.max(data), np.min(data))
-      hdu.data = data
-      outfile = filename + '-eroded.fits'
       hdu.writeto(outfile, overwrite=True)
 
 def main( argv ):

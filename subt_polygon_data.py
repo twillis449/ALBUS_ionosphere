@@ -44,12 +44,11 @@ def analyze_image(filename, json_file, offset_flux,use_dilation):
     location =  filename.find('.fits')
     fits_file =  filename
     filename = filename[:location]
-#   fits_file_subt = filename[:location] + '-dilated.fits'
     fits_file_subt = filename[:location] +'.filtered_data.fits'
     if use_dilated:
-      fits_file_out = filename[:location] + '_Final-dilated.fits'
+      fits_file_out = filename[:location] + '_Final-image_using_selected_dilation.fits'
     else:
-      fits_file_out = filename[:location] + '_Final-eroded.fits'
+      fits_file_out = filename[:location] + '_Final-image_using_selected_erosion.fits'
     print('subt_polygon_data: processing input fits image file ', fits_file,' \n')
     print('opening orig_file', fits_file)
     hdu_list = fits.open(fits_file)
