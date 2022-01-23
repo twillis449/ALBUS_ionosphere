@@ -8,6 +8,7 @@ from check_array import check_array
 from astropy.io import fits
 from astropy.wcs import WCS
 from breizorro_extract import make_noise_map
+from generate_morphology_image import make_morphology_image
 
 #def subt_image(img, dilated_image):
 #    sampFunc = np.fft.fft2(img) # visibility of raw sky
@@ -16,8 +17,17 @@ from breizorro_extract import make_noise_map
 #    return np.real((np.fft.ifft2(sampFunc))) 
 
 
-def make_mask(filename,limiting_sigma, use_dilation):
-    if use_dilation == 'T':
+def make_mask(filename,limiting_sigma, use_dilate,filter_size, filter_type):
+    """
+    The parameters for doing morphological erosion
+    filename: name of fits file  to process
+    limiting_sigma: amount by which noise to to be multiplied for mask cutoff
+    use_dialate: T = do dilation, F = just do erosion
+    filter_size: size for structure element = radius of D or size of with for R
+    filter_type: D = Disk, R = Rectangle
+    """
+
+    if use_dilate == 'T':
       use_dilation = True
       use_eroded = False
     else:
@@ -27,7 +37,7 @@ def make_mask(filename,limiting_sigma, use_dilation):
     print('make_mask: incoming file name ', filename)
     print('make_mask: limiting_sigma ', limiting_sigma)
     print('make_mask: use_eroded ', use_eroded)
-    
+    print('make_mask: filter size', filter_size)
 
 #   print('make_mask: processing original file', filename+'.fits')
     hdu_list = fits.open(filename+'.fits')
@@ -37,33 +47,28 @@ def make_mask(filename,limiting_sigma, use_dilation):
     orig_image = check_array(hdu.data)
     nans = np.isnan(orig_image)
     orig_image[nans] = 0
+#   print('original image  data max and min', hdu.data.max(), hdu.data.min())
 # get noise from breizorro
     median_noise = make_noise_map(orig_image)
     print('make_mask: median noise ', median_noise)
     limiting_flux = median_noise * limiting_sigma
     print('make_mask: limiting_flux ', limiting_flux)
     # Download the morphology image
-    if use_eroded:
-      file_name = filename + '_eroded.fits'
-    else:
-      file_name = filename + '_dilated.fits'
     # Load the image and the WCS
-#   print('make_mask: loading morphology image', file_name)
-    hdu_list = fits.open(file_name)
-#   print ('info',hdu_list.info())
-    hdu = hdu_list[0]
-#   print('original image type =', hdu.data.dtype)
-    image = check_array(hdu.data)
-    white_tophat = orig_image - image
+    print('calling make_morphology_image with size', filter_size)
+    morphology_image = make_morphology_image(filename, filter_size, filter_type, use_dilate)
+#   print('morphology image data max and min', morphology_image.max(), morphology_image.min())
+
+    white_tophat = orig_image - morphology_image
     hdu.data = white_tophat
     hdu.header['DATAMIN'] = hdu.data.min()
     hdu.header['DATAMAX'] = hdu.data.max()
+#   print('tophat image  data max and min', hdu.data.max(), hdu.data.min())
     if use_eroded:
       out_tophat = filename +'-eroded.fits'
       out_tophat = filename +'-eroded_tophat.fits'
     else:
       out_tophat = filename +'-dilated_tophat.fits'
-    print
     print('make_mask: tophat output to ', out_tophat )
     hdu.writeto(out_tophat, overwrite=True)
 
@@ -89,6 +94,7 @@ def make_mask(filename,limiting_sigma, use_dilation):
 
 #   print('filtered_data min and max', filtered_data.min(),  filtered_data.max())
     hdu.data = filtered_data
+#   print('filtered data max and min', hdu.data.max(), hdu.data.min())
     hdu.header['DATAMAX'] =  filtered_data.max()
     hdu.header['DATAMIN'] =  filtered_data.min()
 
@@ -108,6 +114,7 @@ def make_mask(filename,limiting_sigma, use_dilation):
     median_noise = make_noise_map(data)
 #   print('output noise ', median_noise)
     hdu.data = data
+#   print('final output image data max and min', hdu.data.max(), hdu.data.min())
     hdu.header['DATAMAX'] =  data.max()
     hdu.header['DATAMIN'] =  data.min()
 
@@ -122,6 +129,7 @@ def make_mask(filename,limiting_sigma, use_dilation):
 
 #   add
     masked_image = orig_image *mask
+#   print('compact image data max and min', hdu.data.max(), hdu.data.min())
     hdu.data = masked_image
     hdu.header['DATAMAX'] =  hdu.data.max()
     hdu.header['DATAMIN'] =  hdu.data.min()
@@ -135,8 +143,10 @@ def make_mask(filename,limiting_sigma, use_dilation):
     hdu.writeto(outfile, overwrite=True)
 #   print('wrote out', outfile)
 
-    diffuse_image = orig_image - masked_image
+#   diffuse_image = orig_image - masked_image + limiting_flux
+    diffuse_image = orig_image - masked_image 
     hdu.data = diffuse_image
+#   print('diffuse image data max and min', hdu.data.max(), hdu.data.min())
     hdu.header['DATAMAX'] =  hdu.data.max()
     hdu.header['DATAMIN'] =  hdu.data.min()
 
@@ -150,16 +160,25 @@ def make_mask(filename,limiting_sigma, use_dilation):
 #   print('wrote out', outfile)
 
 
-
-
 def main( argv ):
-  filename = argv[1]
+  """
+   The parameters for doing morphological erosion
+   filename: name of fits file  to process
+   limiting_sigma: amount by which noise to to be multiplied for mask cutoff
+   use_dialate: T = do dilation, F = just do erosion
+   filter_size: size for structure element = radius of D or size of with for R
+   filter_type: D = Disk, R = Rectangle
+  """
+  filename = argv[1] # fits file name without '.fits' extension
   limiting_sigma = argv[2]
-# offset_flux_factor = argv[3]
   use_dilation = argv[3]
-  
-  make_mask(filename, limiting_sigma, use_dilation)
+  filter_size = argv[4] # integer number
+  filter_type = argv[5] # 'D' or 'R'
+  make_mask(filename, limiting_sigma, use_dilation, filter_size, filter_type)
 
+# example of command:  'make_morphology_mask.py AbellS1063 6 T 3 D'
 if __name__ == '__main__':
     main(sys.argv)
+
+
 

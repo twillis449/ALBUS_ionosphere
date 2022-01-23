@@ -47,15 +47,9 @@ def process_images(filename, filter_size, filter_type, offset_flux, use_conv_l, 
             field_name = names[i] 
           print('i, field_name_i ', i, field_name)
           if use_dilation:
-            cmd =  'generate_morphology_image.py ' + field_name + ' ' + filter_size + ' ' + filter_type + ' T'
+            cmd =  'make_morphology_mask.py ' + field_name + ' ' + offset_flux + ' T ' + filter_size + ' ' + filter_type 
           else:
-            cmd =  'generate_morphology_image.py ' + field_name + ' ' + filter_size + ' ' + filter_type + ' F'
-          print('processing ', cmd)
-          returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
-          if use_dilation:
-            cmd =  'make_morphology_mask.py ' + field_name + ' ' + offset_flux + ' T' 
-          else:
-            cmd =  'make_morphology_mask.py ' + field_name + ' ' + offset_flux + ' F' 
+            cmd =  'make_morphology_mask.py ' + field_name + ' ' + offset_flux + ' F ' + filter_size + ' ' + filter_type 
           print('processing ', cmd)
           returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
           cmd = ' '

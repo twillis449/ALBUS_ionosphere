@@ -16,7 +16,6 @@ from check_array import check_array
 from astropy.io import fits
 from astropy.wcs import WCS
 
-# from https://stackoverflow.com/questions/44865023/how-can-i-create-a-circular-mask-for-a-numpy-array
 
 def create_circular_mask(h, w, center=None, radius=None):
 
@@ -31,9 +30,9 @@ def create_circular_mask(h, w, center=None, radius=None):
     mask = dist_from_center <= radius
     return mask
 
-def filter_images(filename, filter_size, filter_type, use_dilation):
+def make_morphology_image(filename, filter_size, filter_type, use_dilation):
     if use_dilation =='T':
-       print('generate_morphology_image produces dilated images')
+       print('generate_morphology_image: creating dilated image')
        use_dilation = True
     else:
        use_dilation = False
@@ -50,9 +49,10 @@ def filter_images(filename, filter_size, filter_type, use_dilation):
     shape = data.shape
     size_spec = int(filter_size)
 #   print('filter_selection type',  filter_type)
+#   print('filter_selection size',  filter_size)
     if filter_type == 'R':
       print('using rectangle for structure element')
-      structure_element = rectangle(2* size_spec,size_spec)
+      structure_element = rectangle(size_spec,size_spec)
     else:
       print('using disk for structure element')
 #     structure_element = create_circular_mask(size_spec, size_spec, center=None, radius=None)
@@ -71,25 +71,28 @@ def filter_images(filename, filter_size, filter_type, use_dilation):
     dilated = dilation(eroded, structure_element)
 #   print('dilated max and min', np.max(dilated), np.min(dilated))
     if use_dilation:
+      filter_image = dilated
       hdu.data = dilated
       hdu.header['DATAMAX'] =  dilated.max()
       hdu.header['DATAMIN'] =  dilated.min()
       outfile = filename + '_dilated.fits'
       hdu.writeto(outfile, overwrite=True)
     else:
+      filter_image = eroded
       hdu.data = eroded
       hdu.header['DATAMAX'] =  eroded.max()
       hdu.header['DATAMIN'] =  eroded.min()
       outfile = filename + '_eroded.fits'
       hdu.writeto(outfile, overwrite=True)
+    return filter_image
 
 def main( argv ):
-  filename = argv[1] # image test file with model point sources
-  filter_size = argv[2] # integer number - should be odd
-  filter_type = argv[3] # 'D' or 'R'
-  use_dilation = argv[4] # T or F
-  filter_images(filename, filter_size, filter_type, use_dilation)
+  filename = argv[1]       # image test file with model point sources
+  filter_size = argv[2]    # size of structure element
+                           # = radius for 'D' element, width for 'R' element
+  filter_type = argv[3]    # 'D' or 'R'
+  use_dilation = argv[4]   # T or F
+  make_morphology_image(filename, filter_size, filter_type, use_dilation)
 
 if __name__ == '__main__':
     main(sys.argv)
-
