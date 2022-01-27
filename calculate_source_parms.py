@@ -14,6 +14,7 @@ from shapely.geometry import Polygon, MultiPolygon, Point
 from beam_to_pixels import calculate_area
 from process_polygon_data import *
 from breizorro_extract import make_noise_map
+from skimage.draw import polygon
 
 import os.path
 import numpy as np
@@ -77,7 +78,6 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l):
 # figure out name of polygon points file
     num_polygons = 0
     if use_mask:
-      print('getting polygons')
       points = filename + '.json_polygons_data'
 #     print('looking for json file ', points)
 #     print('os.path.isfile(points)', os.path.isfile(points))
@@ -86,7 +86,6 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l):
         polygon_list, coords, ang_size_all, lobe_las, max_pa, lobe_pa = process_json_file(points,pixel_size)
 #       print('****** angular sizes ', lobe_las)
         num_polygons = len(polygon_list)
-        print('number of polygons ', num_polygons)
         if len(polygon_list) > 1:
           p = MultiPolygon(polygon_list)
           multi = True
@@ -99,12 +98,7 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l):
           max_pa = lobe_pa[0]
 #         print('we have one polygon')
 #         print('we have a single polygon with las = ', computer_las)
-        interior_points = get_interior_locations(polygon_list)
-        polygons_dict = {}
-        for i in range(len(interior_points)):
-          result = interior_points[i]
-          polygon_number = result[0]
-          polygons_dict[polygon_number] = result[1]
+        #interior_points = get_interior_locations(polygon_list)
 #         print('setting polygons_dict to ', polygons_dict.keys())
       else:
          print(points, ':This file does not exist!')
@@ -113,28 +107,22 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l):
     else:
       points = filename + '.simple_polygon'
 #     print('looking for test file ', points)
-      polygons_dict = {}
+      polygon_list = [] 
       if os.path.isfile(points):
         poly_coords = process_simple_polygon_file(points)
         multi = False
 #       print('simple coords', poly_coords)
         list_p = []
         p = Polygon(poly_coords)
-        list_p.append(p)
-        interior_points = get_interior_locations(list_p)
-        for i in range(len(interior_points)):
-          result = interior_points[i]
-          polygon_number = result[0]
-          polygons_dict[polygon_number] = result[1]
+        polygon_list.append(p)
         centroid = p.centroid
 #       print('centroid', centroid)
         result = maxDist(poly_coords,pixel_size)
         computer_las = result[0]
         lobe_las = computer_las
         max_pa = result[1]
-    poly_list = sorted(list(polygons_dict.keys()))
     if multi:
-      n = len(poly_list) + 1
+      n = len(polygon_list) + 1
     else:
       n = 1
 # open reporting file
@@ -272,32 +260,42 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l):
 #     print('y range slow  = ', int(miny-1), int(maxy+1))
 #     print('data shape', data.shape)
 #     print('polygons_dict has keys', polygons_dict.keys())
+      img_mask = np.zeros(data.shape, dtype=np.float)
       if i == 0:
-        contained_points = 0
-        for key in polygons_dict.keys():
-          result = polygons_dict[key]
-          x = result[0]
-          y = result[1]
-          data_result = data[x,y] 
-          max_val = data_result.max()
-          sum = sum + data_result.sum()
-          if max_val > max_signal:
-            max_signal = max_val
-          shape = x.shape
-          contained_points = contained_points + shape[0]
+        for ii in range(len(polygon_list)):
+          result = polygon_list[ii]
+          x, y = result.exterior.coords.xy
+# Switch x, y  because retrieved x, y values are matplotlib display coordinates
+# which are opposite to numpy array coordinates
+          temp = x
+          x = y
+          y = temp
+# Use the scikit polygon function to fill the area inside a polygon derived
+# from a given contour level. This is much fasted than using shapely to 
+# determine all points inside a polygon.
+          rr, cc = polygon(x,y, data.shape)
+          img_mask[rr, cc] = 1
+        data_result = data *img_mask 
+        sum =  data_result.sum()
+        max_signal = data_result.max()
+        contained_points = int(img_mask.sum())
+        print('contained points', contained_points)
+        print('sum (mJy)', sum* 1000)
       else:
-         index = poly_list[i-1]
-#        print('i index', i, index)
-         result = polygons_dict[index]
-         x = result[0]
-         y = result[1]
-         data_result = data[x,y] 
-         max_val = data_result.max()
-         sum = sum + data_result.sum()
-         if max_val > max_signal:
-           max_signal = max_val
-         shape = x.shape
-         contained_points = shape[0]
+        result = polygon_list[i-1]
+        x, y = result.exterior.coords.xy
+# switch x, y as retrieved x, y are matplotlib display coordinates
+        temp = x
+        x = y
+        y = temp
+        rr, cc = polygon(x,y, data.shape)
+        img_mask[rr, cc] = 1
+        data_result = data *img_mask
+        max_val = data_result.max()
+        sum = sum + data_result.sum()
+        if max_val > max_signal:
+          max_signal = max_val
+        contained_points = int(img_mask.sum())
       flux = sum / pixels_beam
 #     print('raw total flux density', flux)
       n_flux = 0.0
