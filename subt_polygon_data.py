@@ -4,6 +4,7 @@
 from astropy.io import fits
 from check_array import check_array
 from process_polygon_data import *
+from skimage.draw import  polygon
 
 import os.path
 import numpy as np
@@ -23,28 +24,20 @@ def analyze_image(filename, json_file, offset_flux,use_dilation):
     print('subt_polygon_data: use_dilation:', use_dilation)
     points =  json_file
     print('os.path.isfile(points)', os.path.isfile(points))
-    interior_points = []
 
     # Download the polygon points
     if os.path.isfile(points):
         print ("File exists")
         polygon_list, coords = process_json_file(points)
         num_polygons = len(polygon_list)
-        interior_points = get_interior_locations(polygon_list)
-        polygons_dict = {}
-        for i in range(len(interior_points)):
-          result = interior_points[i]
-          polygon_number = result[0]
-          print('giving polygons_dict key', polygon_number)
-          polygons_dict[polygon_number] = result[1]
     else:
       print('Json file not found - so no processing to be done. Exiting')
       return
 
     location =  filename.find('.fits')
     fits_file =  filename
+    print('original image data  in file ', fits_file)
     filename = filename[:location]
-    fits_file_subt = filename[:location] +'.filtered_data.fits'
     if use_dilated:
       fits_file_out = filename[:location] + '_Final-image_using_selected_dilation.fits'
     else:
@@ -55,26 +48,38 @@ def analyze_image(filename, json_file, offset_flux,use_dilation):
     hdu = hdu_list[0]
     data = check_array(hdu.data)
     print('raw input max', data.max())
-    print('opening subt file', fits_file_subt)
-    hdu_list_subt = fits.open(fits_file_subt)
-    hdu = hdu_list_subt[0]
-    data_subt = check_array(hdu.data)
-    for key in polygons_dict.keys():
-       result = polygons_dict[key]
-       x = result[0]
-       y = result[1]
+    img = np.zeros(data.shape, dtype=np.float)
+    for i in range(len(polygon_list)):
+       result = polygon_list[i]
+       x, y = result.exterior.coords.xy
+# switch x, y as retrieved x, y are matplotlib display coordinates
+       temp = x
+       x = y
+       y = temp
+       rr, cc = polygon(x,y, data.shape)
+       img[rr, cc] = 1
        if offset_flux > 0.0:
-           data[x,y] = data[x,y] - data_subt[x,y] + offset_flux
+           data = data - (data - offset_flux) * img 
        else:
-           data[x,y] = data[x,y] - data_subt[x,y] 
+           data = data - data * img
+
     hdu.data = data
     nans = np.isnan(hdu.data)
     hdu.data[nans] = 0.0
     hdu.header['DATAMAX'] =  hdu.data.max()
     hdu.header['DATAMIN'] =  hdu.data.min()
+    print('sending output to ', fits_file_out)
     hdu.writeto(fits_file_out, overwrite=True)
 
+    hdu.data = img
+    nans = np.isnan(hdu.data)
+    hdu.data[nans] = 0.0
+    hdu.header['DATAMAX'] =  hdu.data.max()
+    hdu.header['DATAMIN'] =  hdu.data.min()
+    hdu.writeto('scikit_mask.fits', overwrite=True)
+
 def main( argv ):
+  print('subt_polygon_data: doing data subtraction')
   filename = argv[1]
   offset_flux = argv[2] # value in mJy to be omitted from source subtraction
   json_file = argv[3]
