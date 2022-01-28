@@ -38,10 +38,6 @@ def analyze_image(filename, json_file, offset_flux,use_dilation):
     fits_file =  filename
     print('original image data  in file ', fits_file)
     filename = filename[:location]
-    if use_dilated:
-      fits_file_out = filename[:location] + '_Final-image_using_selected_dilation.fits'
-    else:
-      fits_file_out = filename[:location] + '_Final-image_using_selected_erosion.fits'
     print('subt_polygon_data: processing input fits image file ', fits_file,' \n')
     print('opening orig_file', fits_file)
     hdu_list = fits.open(fits_file)
@@ -68,6 +64,7 @@ def analyze_image(filename, json_file, offset_flux,use_dilation):
     hdu.data[nans] = 0.0
     hdu.header['DATAMAX'] =  hdu.data.max()
     hdu.header['DATAMIN'] =  hdu.data.min()
+    fits_file_out = filename[:location] + '_image_with_selected_emission_removed.fits'
     print('sending output to ', fits_file_out)
     hdu.writeto(fits_file_out, overwrite=True)
 
