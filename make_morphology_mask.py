@@ -9,15 +9,9 @@ from astropy.io import fits
 from astropy.wcs import WCS
 from breizorro_extract import make_noise_map
 from generate_morphology_image import make_morphology_image
+from larrys_script import generate_morphology_images
 
-#def subt_image(img, dilated_image):
-#    sampFunc = np.fft.fft2(img) # visibility of raw sky
-#    skyModelVis = np.fft.fft2(dilated_image) # visibilities of dilated image
-#    sampFunc = sampFunc - skyModelVis # subtracts dilated from raw
-#    return np.real((np.fft.ifft2(sampFunc))) 
-
-
-def make_mask(filename,limiting_sigma, use_dilate,filter_size, filter_type):
+def make_mask(argv):
     """
     The parameters for doing morphological erosion
     filename: name of fits file  to process
@@ -26,7 +20,12 @@ def make_mask(filename,limiting_sigma, use_dilate,filter_size, filter_type):
     filter_size: size for structure element = radius of D or size of with for R
     filter_type: D = Disk, R = Rectangle
     """
-
+    filename = argv[1] # fits file name without '.fits' extension
+    limiting_sigma = argv[2]
+    use_dilate = argv[3]
+    filter_size = argv[4] # integer number
+    filter_type = argv[5] # 'D' or 'R'
+    
     if use_dilate == 'T':
       use_dilation = True
       use_eroded = False
@@ -103,15 +102,15 @@ def make_mask(filename,limiting_sigma, use_dilate,filter_size, filter_type):
 #   print('filtered_data image output to ', outfile )
     hdu.writeto(outfile, overwrite=True)
 # the user can select individual compact objects to delete
-    if use_eroded:
-      cmd = 'generate_mask_polygons.py ' + filename +'-eroded_tophat T'
-    else:
-      cmd = 'generate_mask_polygons.py ' + filename +'-dilated_tophat T' 
-    print('processing cmd', cmd)
-    returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
+#   if use_eroded:
+#     cmd = 'display_mask_data.py ' + filename +'-eroded_tophat T'
+#   else:
+#     cmd = 'display_mask_data.py ' + filename +'-dilated_tophat T' 
+#   print('processing cmd', cmd)
+#   returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
 
-# don't write the following out anymore - the appropriate information can be gotten from the diffuse
-# and compact images written out below
+# don't write the following out anymore - the appropriate information can be 
+# gotten from the diffuse and compact images written out below
 
 # create image from original image - filtered_data
 #   data = orig_image - filtered_data
@@ -139,11 +138,11 @@ def make_mask(filename,limiting_sigma, use_dilate,filter_size, filter_type):
 
 #   print('hdu.data max and main', hdu.data.max(), hdu.data.min())
     if use_eroded:
-      outfile = filename +'_compact_structure_eroded.fits'
+      compact_outfile = filename +'_compact_structure_eroded.fits'
     else:
-      outfile = filename +'_compact_structure_dilated.fits'
+      compact_outfile = filename +'_compact_structure_dilated.fits'
 #   print('********** final compact file', outfile)
-    hdu.writeto(outfile, overwrite=True)
+    hdu.writeto(compact_outfile, overwrite=True)
 #   print('wrote out', outfile)
 
 #   diffuse_image = orig_image - masked_image + limiting_flux
@@ -175,6 +174,10 @@ def make_mask(filename,limiting_sigma, use_dilate,filter_size, filter_type):
     hdu.writeto(outfile, overwrite=True)
 #   print('wrote out', outfile)
 
+# do we need to combine some of compact structure back into diffuse image?
+    cmd = 'generate_mask_polygons.py ' + filename  + ' T'
+    print('processing cmd', cmd)
+    returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
 
 def main( argv ):
   """
@@ -185,12 +188,16 @@ def main( argv ):
    filter_size: size for structure element = radius of D or size of with for R
    filter_type: D = Disk, R = Rectangle
   """
-  filename = argv[1] # fits file name without '.fits' extension
-  limiting_sigma = argv[2]
-  use_dilation = argv[3]
-  filter_size = argv[4] # integer number
-  filter_type = argv[5] # 'D' or 'R'
-  make_mask(filename, limiting_sigma, use_dilation, filter_size, filter_type)
+  if len(argv) > 4 :
+# run AGW's code
+    make_mask(argv)
+  else:
+# otherwise run larry's code
+# for the function call
+# argv[1] = input file name
+# argv[2] = X size of rectangle
+# argv[3] = Y size of rectangle
+    generate_morphology_images(argv)
 
 # example of command:  'make_morphology_mask.py AbellS1063 6 T 3 D'
 if __name__ == '__main__':
