@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+# A script that examines an image and generates polygons (== contours) at 
+# locations where the signal in the image is above a specified level.
+# It outputs the contours for analysis in later acripts
+
 import sys
 import os
 import json
@@ -16,9 +20,10 @@ from astropy.wcs import WCS
 from check_array import check_array
 
 coords = []
-morph_sign = 'Y'
 qannotate = []
+morph_sign = 'Y'
 # Simple mouse click function to store coordinates
+
 def onclick(event):
     if event.button == 1:
       ix, iy = event.xdata, event.ydata
@@ -28,8 +33,9 @@ def onclick(event):
       global coords
       global qannotate
       loc = (ix, iy)
+      print('even_loc', loc)
       coords.append(loc)
-#     print('*** updated coords', coords)
+      print('*** updated coords', coords)
       if len(coords) > 1:
         x = []
         y = []
@@ -42,11 +48,9 @@ def onclick(event):
           if i > 0:
             x_pos = coords [i][0]
             y_pos = coords [i][1]
-            deltax = x_pos - x_ref
-            deltay = y_pos - y_ref
-            las = math.sqrt(deltax*deltax + deltay*deltay)
         x =  np.array(x)
         y =  np.array(y)
+        print('x,y', x,y)
         ax = plt.gca()
         ax.lines = plt.plot(x, y)
         labels = ['lobe {0}'.format(i+1) for i in range(len(coords))]
@@ -131,7 +135,12 @@ def compare_fields(radio, mask):
 
 # print('starting plot')
   fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(8, 4), sharex=True, sharey=True)
-  plt.suptitle (mask[:location])
+  if morph_sign  == 'T':
+    location = radio.find('_')
+    plt.suptitle (radio[:location] + ' Comparison of Diffuse and Compact Structures')
+  else:
+    location = radio.find('.fits')
+    plt.suptitle (radio[:location]+ ' image' )
   interval = vis.PercentileInterval(99.9)
   vmin,vmax = interval.get_limits(hdu1.data)
 # print('original intensities', vmin,vmax)
@@ -142,7 +151,10 @@ def compare_fields(radio, mask):
 
   ax1.imshow(hdu1.data, cmap =plt.cm.gray, norm = norm, origin = 'lower') 
   ax1.scatter(cen_x-1, cen_y-1, s=40, marker='+')
-  ax1.set_title('Radio Image')
+  if morph_sign == 'T':
+    ax1.set_title('Diffuse Image')
+  else:
+    ax1.set_title('Radio Image')
 
   levels = [0.5]
 # ax2 = plt.subplot(1,2,2, projection=WCS(hdu1.header))
@@ -154,19 +166,23 @@ def compare_fields(radio, mask):
 # ax2.imshow(hdu2.data, cmap =plt.cm.gray, norm = norm, origin = 'lower') 
   ax2.scatter(cen_x-1, cen_y-1, s=40, marker='+')
   cs = ax2.contour(hdu2.data, levels, linewidths = 1.0)
-  ax2.set_title('Radio Mask')
+  if morph_sign == 'T':
+    ax2.set_title('Compact Mask')
+  else:
+    ax2.set_title('Radio Mask')
   cid = fig.canvas.mpl_connect('button_press_event', onclick)
 
 # Get one of the contours from the plot.
   outer_list =  []
   out_data = {}
 # only use first level as all levels are really the same here
+  print('mask is', mask)
   if mask.find('mask') > -1:
-#     print('processing data for level',levels[0])
+      print('**** processing data for level',levels[0])
       contour = cs.collections[0]
       num_contours = len(contour.get_paths())
       out_data['num_contours'] = num_contours
-#     print('number of separate contours', num_contours)
+      print('number of separate contours', num_contours)
       max_area = 0.0
       max_cntr = 0
       for j in range(num_contours):
@@ -184,7 +200,7 @@ def compare_fields(radio, mask):
           out_data[str(j)] = poly_coord
           inner_list = [j,p.area]
           outer_list.append(inner_list)
-#   print('number of contour elements', len(outer_list))
+  print('number of contour elements', len(outer_list))
 
 # set up json file for polygons
 
@@ -199,9 +215,10 @@ def compare_fields(radio, mask):
   location =  mask.find('-eroded')
   if location > -1:
     json_data_file = mask[:location] + '-eroded.json_polygons_data'
-# print ('json file should be ', json_data_file)
+  print ('json file should be ', json_data_file)
   try:
     os.remove(json_data_file)
+    print('generate mask polygons should have deleted ', json_data_file)
   except:
 #   print('file not found, so could not be deleted',json_data_file)
     pass
@@ -236,11 +253,6 @@ def compare_fields(radio, mask):
         x_coord = float(x[k])
         y_coord = float(y[k])
         poly_coord.append((x_coord,y_coord))
-      p = Polygon(poly_coord)
-      for j in range(len(poly_coord)):
-        coords_p = poly_coord[j]
-        a = round(coords_p[0])
-        b = round(coords_p[1])
 
 # weird - to get the global variable stuff printed out I have to shut down the display
 # via the mpl_disconnect function
@@ -250,15 +262,11 @@ def compare_fields(radio, mask):
       fig.canvas.mpl_disconnect(cid)
 
   if len(coords) > 0:
-#     print('coords to be dumped', coords)
+      print('************* coords to be dumped', coords)
       out_data['coords'] = coords
       with open(json_data_file, 'w') as json_file:
         json.dump(out_data, json_file)
-#     print('number of bounds coord', len(coords) )
-      for i in range(len(coords)):
-        a = round(coords[i][0])
-        x = round(coords[i][1])
-        output = str(a) + ' ' +  str(b)  + '\n'
+      print('number of bounds coord', len(coords) )
       json_file.close()
   else:
     try:
@@ -269,11 +277,14 @@ def compare_fields(radio, mask):
 
 def main( argv ):
   global morph_sign
-  radio_field = argv[1] + '.fits'
-  mask_field = argv[1] + '.mask.fits'
   morph_sign = argv[2]
+  if morph_sign == 'T':
+    radio_field = argv[1] + '_diffuse_structure_dilated.fits'
+    mask_field = argv[1] + '-dilated_tophat.mask.fits'
+  else:
+    radio_field = argv[1] + '.fits'
+    mask_field = argv[1] + '.mask.fits'
   print('generate_mask_polygon for ' + radio_field + ' ' + mask_field)
   compare_fields(radio_field, mask_field)
 if __name__ == '__main__':
     main(sys.argv)
-
