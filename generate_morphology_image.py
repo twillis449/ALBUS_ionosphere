@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+# This script performs morphological erosion and / or dilation on
+# an imput image
+
 import sys
 import numpy as np
 import astropy.visualization as vis
@@ -9,10 +12,6 @@ from skimage.morphology import erosion, dilation, opening, closing, white_tophat
 from skimage.morphology import black_tophat, skeletonize, convex_hull_image
 from skimage.morphology import disk, rectangle
 from check_array import check_array
-
-
-# Download an example FITS file, create a 2D cutout, and save it to a
-# new FITS file, including the updated cutout WCS.
 from astropy.io import fits
 from astropy.wcs import WCS
 
@@ -48,8 +47,6 @@ def make_morphology_image(filename, filter_size, filter_type, use_dilation):
     input_data = data
     shape = data.shape
     size_spec = int(filter_size)
-#   print('filter_selection type',  filter_type)
-#   print('filter_selection size',  filter_size)
     if filter_type == 'R':
       print('using rectangle for structure element')
       structure_element = rectangle(size_spec,size_spec)
@@ -57,19 +54,15 @@ def make_morphology_image(filename, filter_size, filter_type, use_dilation):
       print('using disk for structure element')
 #     structure_element = create_circular_mask(size_spec, size_spec, center=None, radius=None)
       structure_element = disk(size_spec)
-#   print('structure_element', structure_element)
-#   print('original max and min', np.max(data), np.min(data))
-# doing one erosion get those wierd structures in the Rudnick paper
+    print('structure_element', structure_element)
+# doing one erosion gets those wierd structures in the Rudnick paper
     eroded = erosion(data, structure_element)
-#   print('eroded')
-# doing a second erosion then basically gets rid of most suuff except for point sources
+# doing a second erosion helps get rid od stuff missed in a first erosion
+#   double_erode = False
     double_erode = True
     if double_erode:
       eroded = erosion(eroded, structure_element)
-#     print('eroded')
-#   print('eroded max and min', np.max(eroded), np.min(eroded))
     dilated = dilation(eroded, structure_element)
-#   print('dilated max and min', np.max(dilated), np.min(dilated))
     if use_dilation:
       filter_image = dilated
       hdu.data = dilated
