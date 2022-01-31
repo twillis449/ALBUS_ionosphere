@@ -55,21 +55,22 @@ def process_images(filename, filter_size, filter_type, offset_flux, use_conv_l, 
           cmd = ' '
           if use_dilation:
             json_file = field_name + '-dilated.json_polygons_data'
-            if os.path.isfile(json_file):
-              cmd = 'subt_polygon_data.py ' + field_name +'.fits' +  ' ' + offset_value_flux + ' ' + json_file + ' T'
+            print('sending json file ', json_file)
+            cmd = 'combine_images.py ' + field_name  +  ' ' + offset_value_flux + ' ' + json_file + ' T'
           else:
             json_file = field_name + '-eroded.json_polygons_data'
-            if os.path.isfile(json_file):
-              cmd = 'subt_polygon_data.py ' + field_name +'.fits' +  ' ' + offset_value_flux + ' ' + json_file + ' F'
-          print('processing ', cmd)
+            cmd = 'combine_images.py ' + field_name +  ' ' + offset_value_flux + ' ' + json_file + ' F'
+          print('************* processing ', cmd)
           if len(cmd) > 2:
             returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
 
 def main( argv ):
-# argv[1] = name of pipeline input file with information such as frequency, positions
+# argv[1] = name of pipeline input file with information such as 
+#           frequency, positions
 # argv[2] = size of structure element
 # argv[3] = type of structure element D(isk) or R(ectangle)
-# argv[4] = value of mask offset (multiplied by noise determined from breizorro) 
+# argv[4] = value of mask offset (multiplied by noise determined from 
+#           breizorro) 
 # arvg[5] = T (use a convolved image) or F (used unconvolved image)
 # argv[6] = T (use dilated image) or F (use eroded image)
 # argv[7] = numerical value passed to subtract_polygon_data script
@@ -85,7 +86,7 @@ def main( argv ):
   try:
     offset_value_flux  = argv[7] # amount (in mJy) to remove from source 
                                  # subtraction (default = 0.0)
-                                 # only used in script subt_polygon_data
+                                 # only used in script combine_images.py
   except:
     offset_value_flux = '0.0'
 
