@@ -21,7 +21,7 @@ from check_array import check_array, update_dimensions
 import timeit
 
 
-def convolve_image(fits_input_image, conv_factor, use_fft='F', downsize_image = 'T'):
+def convolve_image(fits_input_image, conv_factor, use_fft='F', downsize_image = 'F'):
 # Load the image to be convolved
   hdu_list = fits.open(fits_input_image)
   hdu = hdu_list[0]
@@ -153,8 +153,9 @@ def convolve_image(fits_input_image, conv_factor, use_fft='F', downsize_image = 
   hdu.header['BPA']  = bpa
   hdu.header['DATAMAX'] =  hdu.data.max()
   hdu.header['DATAMIN'] =  hdu.data.min()
-  hdu.header['CDELT1'] = hdu.header['CDELT1']  * conv_factor_int
-  hdu.header['CDELT2'] = hdu.header['CDELT2']  * conv_factor_int
+  if downsize_image == 'T':
+    hdu.header['CDELT1'] = hdu.header['CDELT1']  * conv_factor_int
+    hdu.header['CDELT2'] = hdu.header['CDELT2']  * conv_factor_int
 # need to flip array references vs what's seen on the display
   hdu.header['CRPIX1'] = int(shape_y)
   hdu.header['CRPIX2'] = int(shape_x)

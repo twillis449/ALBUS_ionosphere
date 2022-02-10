@@ -277,9 +277,8 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l):
           img_mask[rr, cc] = 1
         data_result = data *img_mask 
         sum =  data_result.sum()
-        max_signal = data_result.max()
         contained_points = int(img_mask.sum())
-        print('contained points', contained_points)
+        max_signal = data_result.max()
         print('sum (mJy)', sum* 1000)
       else:
         result = polygon_list[i-1]
@@ -292,12 +291,11 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l):
         img_mask[rr, cc] = 1
         data_result = data *img_mask
         max_val = data_result.max()
-        sum = sum + data_result.sum()
+        sum = data_result.sum()
         if max_val > max_signal:
           max_signal = max_val
         contained_points = int(img_mask.sum())
       flux = sum / pixels_beam
-#     print('raw total flux density', flux)
       n_flux = 0.0
       p_cont = False
 #     print('max_signal vs total flux ', max_signal, flux)
