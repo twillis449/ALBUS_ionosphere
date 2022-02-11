@@ -4,45 +4,73 @@ import sys
 import numpy as np
 import subprocess
 from astropy.io import fits
-from check_array import check_array
+from check_array import check_array, update_dimensions
 from astropy.io import fits
 from astropy.wcs import WCS
 from breizorro_extract import make_noise_map
 from generate_morphology_image import make_morphology_image
 from larrys_script import generate_morphology_images
+from combine_images import combine_images
+from process_polygon_data import *
+import generate_mask_polygons as gen_p
+import os
 
 def make_mask(argv):
     """
     The parameters for doing morphological erosion
     filename: name of fits file  to process
     limiting_sigma: amount by which noise to to be multiplied for mask cutoff
-    use_dialate: T = do dilation, F = just do erosion
     filter_size: size for structure element = radius of D or size of with for R
     filter_type: D = Disk, R = Rectangle
+
+    The process can be described through the following equations:
+
+    o = original image
+    d - output from erosion-> erosion-> dilation
+    t = white TopHat, which should show only compact structures smaller than the
+        structure element
+    t = o - d  
+    m = mask derived from a comparison where  t > some signal
+    m * t = m * (o - d)
+    o_d = output diffuse image
+        = o - m * t  
+        = o - (m * o - m * d)
+        = o - m * o + (m * d)
+
+    we don't know the flux scale of m * d as we don't know the flux scale of the
+    dilated image, but it is buried in the output image, so get rid of it
+    by subtracting it off, which equates to
+
+    o_d  = o - m * o
+    and
+    o_c = image of compact objects
+        = m * o  
+
     """
     filename = argv[1] # fits file name without '.fits' extension
     limiting_sigma = argv[2]
-    use_dilate = argv[3]
-    filter_size = argv[4] # integer number
-    filter_type = argv[5] # 'D' or 'R'
+    filter_size = argv[3] # integer number
+    filter_type = argv[4] # 'D' or 'R'
+    do_batch = argv[5]
     
-    if use_dilate == 'T':
-      use_dilation = True
-      use_eroded = False
-    else:
-      use_dilation = False
-      use_eroded = True
     limiting_sigma = float(limiting_sigma)
     print('make_mask: incoming file name ', filename)
     print('make_mask: limiting_sigma ', limiting_sigma)
-    print('make_mask: use_eroded ', use_eroded)
     print('make_mask: filter size', filter_size)
+    print('make_mask: filter type', filter_type)
+    print('make_mask: batch_processing', do_batch)
+    if do_batch == 'T':
+      do_batch = True
+    else:
+      do_batch = False
 
 #   print('make_mask: processing original file', filename+'.fits')
     hdu_list = fits.open(filename+'.fits')
 #   print ('info',hdu_list.info())
     hdu = hdu_list[0]
 #   print('original image type =', hdu.data.dtype)
+    incoming_dimensions = hdu.header['NAXIS']
+
     orig_image = check_array(hdu.data)
     nans = np.isnan(orig_image)
     orig_image[nans] = 0
@@ -55,38 +83,41 @@ def make_mask(argv):
     # Download the morphology image
     # Load the image and the WCS
     print('calling make_morphology_image with size', filter_size)
-    morphology_image = make_morphology_image(filename, filter_size, filter_type, use_dilate)
+
+#   o = original image
+    morphology_image = make_morphology_image(filename, filter_size, filter_type)
+#   d - output from erosion-> erosion-> dilation
+
 #   print('morphology image data max and min', morphology_image.max(), morphology_image.min())
 
+
+#   t = white TopHat, which should show only compact structures smaller than the
+#       structure element
+#   t = o - d  
     white_tophat = orig_image - morphology_image
     hdu.data = white_tophat
     hdu.header['DATAMIN'] = hdu.data.min()
     hdu.header['DATAMAX'] = hdu.data.max()
 #   print('tophat image  data max and min', hdu.data.max(), hdu.data.min())
-    if use_eroded:
-      out_tophat = filename +'-eroded.fits'
-      out_tophat = filename +'-eroded_tophat.fits'
-    else:
-      out_tophat = filename +'-dilated_tophat.fits'
+    out_tophat = filename +'-dilated_tophat.fits'
 #   print('make_mask: tophat output to ', out_tophat )
-    hdu.writeto(out_tophat, overwrite=True)
+#   hdu.writeto(out_tophat, overwrite=True)
 
     
+#   m = mask derived from a comparison where  t > some signal
 # create mask from filtered image, where filtered image signal > limiting flux
     mask = np.where(white_tophat>limiting_flux,1.0,0.0)
     mask = mask.astype('float32')
     hdu.data = mask
     hdu.header['DATAMIN'] = 0.0
     hdu.header['DATAMAX'] = 1.0
-    if use_eroded:
-      outfile = filename +'-eroded_tophat.mask.fits'
-    else:
-      outfile = filename +'-dilated_tophat.mask.fits'
-#   print('mask output to ', outfile )
-    hdu.writeto(outfile, overwrite=True)
+    outfile = filename +'-dilated_tophat.mask.fits'
+    print('mask output to ', outfile )
+#   hdu.writeto(outfile, overwrite=True)
 
 # create filtered image from morphology image  * mask
 # so we have filtered data which will be subtracted from original image
+#   m * t = m * (o - d)
     filtered_data = white_tophat * mask
     filtered_morphology_image = morphology_image * mask
     nans = np.isnan(filtered_data)
@@ -100,52 +131,35 @@ def make_mask(argv):
 
     outfile = filename +'.filtered_data.fits'
 #   print('filtered_data image output to ', outfile )
-    hdu.writeto(outfile, overwrite=True)
-# the user can select individual compact objects to delete
-#   if use_eroded:
-#     cmd = 'display_mask_data.py ' + filename +'-eroded_tophat T'
-#   else:
-#     cmd = 'display_mask_data.py ' + filename +'-dilated_tophat T' 
-#   print('processing cmd', cmd)
-#   returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
-
-# don't write the following out anymore - the appropriate information can be 
-# gotten from the diffuse and compact images written out below
-
-# create image from original image - filtered_data
-#   data = orig_image - filtered_data
-#   median_noise = make_noise_map(data)
-#   print('output noise ', median_noise)
-#   hdu.data = data
-#   print('final output image data max and min', hdu.data.max(), hdu.data.min())
-#   hdu.header['DATAMAX'] =  data.max()
-#   hdu.header['DATAMIN'] =  data.min()
-
-#   print('hdu.data max and main', hdu.data.max(), hdu.data.min())
-#   if use_eroded:
-#     outfile = filename +'_Final-image_using_all_erosion.fits'
-#   else:
-#     outfile = filename +'_Final-image_using_all_dilation.fits'
-#   print('********** final difference file', outfile)
 #   hdu.writeto(outfile, overwrite=True)
-#   print('wrote out', outfile)
 
+#   o_d = output diffuse image
+#       = o - m * t  
+#       = o - (m * o - m * d)
+#       = o - m * o + (m * d)
+
+#   we don't want m*d, but it is buried in the output image, so get rid of it
+#   by subtracting it off, which equates to
+
+#   m * o -> stuff with 'sharp' edges
     masked_image = orig_image *mask
 #   print('compact image data max and min', hdu.data.max(), hdu.data.min())
+
+    masked_image = update_dimensions(masked_image,incoming_dimensions)
+    masked_image = masked_image.astype('float32')
     hdu.data = masked_image
     hdu.header['DATAMAX'] =  hdu.data.max()
     hdu.header['DATAMIN'] =  hdu.data.min()
 
 #   print('hdu.data max and main', hdu.data.max(), hdu.data.min())
-    if use_eroded:
-      compact_outfile = filename +'_compact_structure_eroded.fits'
-    else:
-      compact_outfile = filename +'_compact_structure_dilated.fits'
+    compact_outfile = filename +'_compact_structure_dilated.fits'
 #   print('********** final compact file', outfile)
     hdu.writeto(compact_outfile, overwrite=True)
 #   print('wrote out', outfile)
 
-#   diffuse_image = orig_image - masked_image + limiting_flux
+#   o - m * o -> mostly diffuse features
+    orig_image = update_dimensions(orig_image,incoming_dimensions)
+    orig_image = orig_image.astype('float32')
     diffuse_image = orig_image - masked_image 
     hdu.data = diffuse_image
 #   print('diffuse image data max and min', hdu.data.max(), hdu.data.min())
@@ -153,53 +167,54 @@ def make_mask(argv):
     hdu.header['DATAMIN'] =  hdu.data.min()
 
 #   print('hdu.data max and main', hdu.data.max(), hdu.data.min())
-    if use_eroded:
-      outfile = filename +'_diffuse_structure_eroded.fits'
-    else:
-       outfile = filename +'_diffuse_structure_dilated.fits'
+    diffuse_outfile = filename +'_diffuse_structure_dilated.fits'
 #   print('********** final diffuse', outfile)
-    hdu.writeto(outfile, overwrite=True)
+    hdu.writeto(diffuse_outfile, overwrite=True)
 #   print('wrote out', outfile)
 
-    hdu.data = filtered_morphology_image
-#   print('diffuse image data max and min', hdu.data.max(), hdu.data.min())
-    hdu.header['DATAMAX'] =  hdu.data.max()
-    hdu.header['DATAMIN'] =  hdu.data.min()
+# we may want to add some 'compact' features back into the diffuse image ...
+# get locations of the features we want to add to the diffuse image 
+# with the polygon selection tool
+    print('make_morph do_batch ', do_batch)
+    if not do_batch:
+      polygon_gen = gen_p.make_polygon(hdu, mask, 'T')
+      polygons = polygon_gen.out_data
+      coords = polygons['coords']
+      if len(coords) > 0:
+        combine_images(filename, polygons, original_noise=median_noise) 
+        return
 
-#   print('hdu.data max and main', hdu.data.max(), hdu.data.min())
-    if use_eroded:
-      outfile = filename +'_masked_eroded_image.fits'
-    else:
-      outfile = filename +'_masked_dilated_image.fits'
-    hdu.writeto(outfile, overwrite=True)
-#   print('wrote out', outfile)
-
-# do we need to combine some of compact structure back into diffuse image?
-    cmd = 'generate_mask_polygons.py ' + filename  + ' T'
-    print('processing cmd', cmd)
-    returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
+# otherewise, just link the diffuse file to final processed file
+    fits_file_out = filename + '_final_image.fits'
+    print('making a symbolic link')
+    if os.path.isfile(fits_file_out):
+      os.remove(fits_file_out)
+    os.symlink(diffuse_outfile , fits_file_out)
+    return
 
 def main( argv ):
   """
-   The parameters for doing morphological erosion
-   filename: name of fits file  to process
-   limiting_sigma: amount by which noise to to be multiplied for mask cutoff
-   use_dialate: T = do dilation, F = just do erosion
-   filter_size: size for structure element = radius of D or size of with for R
-   filter_type: D = Disk, R = Rectangle
+   The parameters for doing morphological erosion:
+   filename: argv[1] name of fits file  to process
+   limiting_sigma: argv[2] amount by which noise to to be multiplied
+                   for mask cutoff
+   filter_size: argv[3] size for structure element 
+              = radius of D or size of with for R
+   filter_type: argv[4] D = Disk, R = Rectangle
+   do_batch = argv[5] do batch processing? T = Yes, F = don't
+
   """
   if len(argv) > 4 :
 # run AGW's code
-    make_mask(argv)
+    make_mask(argv)     # e.g. make_morphology_mask.py 3C236 6 5 D F
   else:
-# otherwise run larry's code
+# otherwise run larry's code # eg make_orphology_mask.py XXX 5 5
 # for the function call
 # argv[1] = input file name
 # argv[2] = X size of rectangle
 # argv[3] = Y size of rectangle
     generate_morphology_images(argv)
 
-# example of command:  'make_morphology_mask.py AbellS1063 6 T 3 D'
 if __name__ == '__main__':
     main(sys.argv)
 
