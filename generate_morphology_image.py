@@ -29,13 +29,7 @@ def create_circular_mask(h, w, center=None, radius=None):
     mask = dist_from_center <= radius
     return mask
 
-def make_morphology_image(filename, filter_size, filter_type, use_dilation):
-    if use_dilation =='T':
-       print('generate_morphology_image: creating dilated image')
-       use_dilation = True
-    else:
-       use_dilation = False
-       print('generate_morphology_image produces eroded images')
+def make_morphology_image(filename, filter_size, filter_type):
 
     # Download the image
     # Load the image and the WCS
@@ -58,25 +52,17 @@ def make_morphology_image(filename, filter_size, filter_type, use_dilation):
 # doing one erosion gets those wierd structures in the Rudnick paper
     eroded = erosion(data, structure_element)
 # doing a second erosion helps get rid od stuff missed in a first erosion
-#   double_erode = False
     double_erode = True
     if double_erode:
       eroded = erosion(eroded, structure_element)
     dilated = dilation(eroded, structure_element)
-    if use_dilation:
-      filter_image = dilated
-      hdu.data = dilated
-      hdu.header['DATAMAX'] =  dilated.max()
-      hdu.header['DATAMIN'] =  dilated.min()
-      outfile = filename + '_dilated.fits'
-      hdu.writeto(outfile, overwrite=True)
-    else:
-      filter_image = eroded
-      hdu.data = eroded
-      hdu.header['DATAMAX'] =  eroded.max()
-      hdu.header['DATAMIN'] =  eroded.min()
-      outfile = filename + '_eroded.fits'
-      hdu.writeto(outfile, overwrite=True)
+    filter_image = dilated
+    hdu.data = dilated
+    hdu.header['DATAMAX'] =  dilated.max()
+    hdu.header['DATAMIN'] =  dilated.min()
+    outfile = filename + '_dilated.fits'
+# don't bother writing this image to disk
+#    hdu.writeto(outfile, overwrite=True)
     return filter_image
 
 def main( argv ):
@@ -84,8 +70,7 @@ def main( argv ):
   filter_size = argv[2]    # size of structure element
                            # = radius for 'D' element, width for 'R' element
   filter_type = argv[3]    # 'D' or 'R'
-  use_dilation = argv[4]   # T or F
-  make_morphology_image(filename, filter_size, filter_type, use_dilation)
+  make_morphology_image(filename, filter_size, filter_type)
 
 if __name__ == '__main__':
     main(sys.argv)
