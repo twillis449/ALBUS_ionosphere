@@ -141,7 +141,7 @@ def make_mask(argv):
 #   we don't want m*d, but it is buried in the output image, so get rid of it
 #   by subtracting it off, which equates to
 
-#   m * o -> stuff with 'sharp' edges
+#   m * o -> stuff with 'sharp' edges, o_c
     masked_image = orig_image *mask
 #   print('compact image data max and min', hdu.data.max(), hdu.data.min())
 
@@ -157,7 +157,7 @@ def make_mask(argv):
     hdu.writeto(compact_outfile, overwrite=True)
 #   print('wrote out', outfile)
 
-#   o - m * o -> mostly diffuse features
+#   o - m * o -> mostly diffuse features, o_d
     orig_image = update_dimensions(orig_image,incoming_dimensions)
     orig_image = orig_image.astype('float32')
     diffuse_image = orig_image - masked_image 
@@ -174,14 +174,13 @@ def make_mask(argv):
 
 # we may want to add some 'compact' features back into the diffuse image ...
 # get locations of the features we want to add to the diffuse image 
-# with the polygon selection tool
-    print('make_morph do_batch ', do_batch)
+# with the polygon selection tool - to obtaim mask m_c
     if not do_batch:
-      polygon_gen = gen_p.make_polygon(hdu, mask, 'T')
+      polygon_gen = gen_p.make_polygon(hdu, mask, 'T')   # gives m_c
       polygons = polygon_gen.out_data
       coords = polygons['coords']
       if len(coords) > 0:
-        combine_images(filename, polygons, original_noise=median_noise) 
+        combine_images(filename, polygons, original_noise=median_noise)  # gives a modified image o* = o_d + m_c * o_c
         return
 
 # otherewise, just link the diffuse file to final processed file
