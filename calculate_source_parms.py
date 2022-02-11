@@ -13,8 +13,10 @@ from astropy.io import fits
 from shapely.geometry import Polygon, MultiPolygon, Point
 from beam_to_pixels import calculate_area
 from process_polygon_data import *
+from check_array import check_array
 from breizorro_extract import make_noise_map
-from skimage.draw import polygon
+from skimage.draw import polygon as skimage_polygon
+import generate_mask_polygons as gen_p
 
 import os.path
 import numpy as np
@@ -40,7 +42,7 @@ def process_simple_polygon_file(points):
   return poly_coord
 
 
-def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l):
+def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,threshold_value):
 # note - no '.fits' extension expected ... but
     if filename.find('conv'):
       use_conv = True
@@ -78,14 +80,30 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l):
 # figure out name of polygon points file
     num_polygons = 0
     if use_mask:
-      points = filename + '.json_polygons_data'
-#     print('looking for json file ', points)
-#     print('os.path.isfile(points)', os.path.isfile(points))
-      if os.path.isfile(points):
-#       print ("File exists")
-        polygon_list, coords, ang_size_all, lobe_las, max_pa, lobe_pa = process_json_file(points,pixel_size)
-#       print('****** angular sizes ', lobe_las)
+      print('calling make_polygon from calc')
+      data = check_array(hdu.data)
+      noise = make_noise_map(data)
+      print('calculate_parametersk:  noise ', noise)
+      if noise <= 0:
+         print('***** warning: breizorro returning noise = ', noise)
+         noise = np.std(data)
+         print('***** warning: np.std gives noise = ', noise)
+      limiting_flux = noise * float(threshold_value)
+      print('make_mask: limiting_flux ', limiting_flux)
+      mask = np.where(data >= limiting_flux, 1.0, 0.0)
+      mask = mask.astype('float32')
+
+      hdu.data = data
+      polygon_gen = gen_p.make_polygon(hdu, mask, 'F')
+      json_polygons = polygon_gen.out_data
+      try:
+        polygon_list, coords, ang_size_all, lobe_las, max_pa, lobe_pa = process_json_file(json_polygons,pixel_size)
         num_polygons = len(polygon_list)
+#       print('**************number of polygons', num_polygons)
+      except:
+        num_polygons = 0
+      if num_polygons > 0:
+#       print('****** angular sizes ', lobe_las)
         if len(polygon_list) > 1:
           p = MultiPolygon(polygon_list)
           multi = True
@@ -101,8 +119,8 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l):
         #interior_points = get_interior_locations(polygon_list)
 #         print('setting polygons_dict to ', polygons_dict.keys())
       else:
-         print(points, ':This file does not exist!')
-         print('So unable to do calculations, so exiting')
+         print('No Polygons selected!')
+         print('Unable to do calculations, so exiting')
          return
     else:
       points = filename + '.simple_polygon'
@@ -220,21 +238,7 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l):
 
 # set NaNs to zero
         data = np.nan_to_num(data)
-#       print('data range ', data.max(), data.min())
 
-# get mask
-        if points.find('mask') > -1:
-          try:
-            mask_file = filename + '.mask.fits'
-#           print('reading in mask file ', mask_file, '\n')
-            hdu_list_mask = fits.open(mask_file)
-            hdu_mask = hdu_list_mask[0]
-            data_mask = hdu_mask.data
-#           print('data mask shape', data_mask.shape)
-            data = data * data_mask
-          except:
-            print('failure to get mask file ', mask_file, '\n')
-            pass
   # check on calculation
       else:
         try:
@@ -252,7 +256,6 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l):
       new_area = theta_big * theta_small * math.pi /(4.0 *pixel_size * pixel_size)
 #     print('calc_check: theta_big theta_small new area', theta_big,theta_small, new_area)
 
-      sum = 0.0
       max_signal = 0.0
       std_list = []
 #     print('poly minx, miny, maxx, maxy', minx, miny, maxx, maxy)
@@ -261,41 +264,40 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l):
 #     print('data shape', data.shape)
 #     print('polygons_dict has keys', polygons_dict.keys())
       img_mask = np.zeros(data.shape, dtype=np.float)
+#     print('len polygon list', len(polygon_list))
       if i == 0:
         for ii in range(len(polygon_list)):
           result = polygon_list[ii]
           x, y = result.exterior.coords.xy
 # Switch x, y  because retrieved x, y values are matplotlib display coordinates
 # which are opposite to numpy array coordinates
-          temp = x
-          x = y
-          y = temp
 # Use the scikit polygon function to fill the area inside a polygon derived
 # from a given contour level. This is much fasted than using shapely to 
 # determine all points inside a polygon.
-          rr, cc = polygon(x,y, data.shape)
+          rr, cc = skimage_polygon(x,y, data.shape)
           img_mask[rr, cc] = 1
         data_result = data *img_mask 
         sum =  data_result.sum()
-        contained_points = int(img_mask.sum())
+#       print('*** total sum is ', sum)
         max_signal = data_result.max()
-        print('sum (mJy)', sum* 1000)
+        contained_points = int(img_mask.sum())
+#       print('contained points', contained_points)
+#       print('sum (mJy)', sum* 1000)
       else:
+#       print('processing polygon ', i-1)
         result = polygon_list[i-1]
         x, y = result.exterior.coords.xy
-# switch x, y as retrieved x, y are matplotlib display coordinates
-        temp = x
-        x = y
-        y = temp
-        rr, cc = polygon(x,y, data.shape)
+        rr, cc = skimage_polygon(x,y, data.shape)
         img_mask[rr, cc] = 1
         data_result = data *img_mask
         max_val = data_result.max()
         sum = data_result.sum()
+#       print ('individual polygon sum', sum)
         if max_val > max_signal:
           max_signal = max_val
         contained_points = int(img_mask.sum())
       flux = sum / pixels_beam
+#     print('raw total flux density', flux)
       n_flux = 0.0
       p_cont = False
 #     print('max_signal vs total flux ', max_signal, flux)
