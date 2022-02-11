@@ -21,26 +21,22 @@ from check_array import check_array, update_dimensions
 import timeit
 
 
-def convolve_image(fits_input_image, conv_factor, use_fft='F', downsize_image = 'F'):
+def convolve_image(fits_input_image, conv_factor, use_fft='F', do_downsize = 'F'):
 # Load the image to be convolved
   hdu_list = fits.open(fits_input_image)
   hdu = hdu_list[0]
   incoming_dimensions = hdu.header['NAXIS']
-  print('incoming dimensions',incoming_dimensions)
 
 # get the pixel size - square images assumed
   pixel_size = hdu.header['CDELT2'] * 3600
-  print ('pixel size', pixel_size)
   try:
     bmaj_old = hdu.header['BMAJ'] *3600
     bmin_old = hdu.header['BMIN'] *3600
     bpa_old =  hdu.header['BPA']
-    print('input beam parameters', bmaj_old, bmin_old, bpa_old)
     bmaj = bmaj_old * conv_factor
     bmin = bmin_old * conv_factor
     bpa = bpa_old
     beam_size_gain = (bmaj * bmin) / (bmaj_old * bmin_old )
-    print('beam size gain', beam_size_gain)
     if conv_factor > 1:
       x_conv = math.sqrt(bmaj*bmaj - bmaj_old * bmaj_old)
       y_conv = math.sqrt(bmin*bmin - bmin_old * bmin_old)
@@ -50,20 +46,17 @@ def convolve_image(fits_input_image, conv_factor, use_fft='F', downsize_image = 
     else:
       x_conv = bmaj
       y_conv = bmin
-    print('x conv', x_conv)
-    print('y conv', y_conv)
 
 # get reference position
     w = WCS(hdu.header)
     w =w.celestial
     ref_ra = hdu.header['CRVAL1']
     ref_dec = hdu.header['CRVAL2']
-# determine ra, and dec of new reference pixel, which will be thw midpoint
+# determine ra, and dec of new reference pixel, which will be the midpoint
 # of output image    
     cen_pos_x = hdu.header['NAXIS1'] // 2
     cen_pos_y = hdu.header['NAXIS2'] // 2
     lon, lat = w.all_pix2world(cen_pos_x,cen_pos_y,0)
-    print('new central coord', lon, lat)
 #   pixels = w.all_world2pix([[ref_ra,ref_dec]],0)
 
   except:
@@ -75,21 +68,15 @@ def convolve_image(fits_input_image, conv_factor, use_fft='F', downsize_image = 
 # need to adjust for new beam vs old beam size ratio
   x_stddev = x_conv / (2.355 *pixel_size) 
   y_stddev = y_conv / (2.355 *pixel_size) 
-  print('conv x stddev', x_stddev)
-  print('conv y stddev', y_stddev)
   theta = math.radians(bpa + 90.0) # theta from E-W line 
   kernel = Gaussian2DKernel(x_stddev, y_stddev, theta )
-  print('kernel shape ', kernel.shape)
-  # from pprint import pprint; pprint(vars(kernel))
 
   original_array = hdu.data
   num_axes = len(hdu.data.shape)
 # now convolved the image
-  print('initial data shape', original_array.shape)
   img_source = check_array(hdu.data)
 # set NaNs to zero
   img_source = np.nan_to_num(img_source)
-  print ('source initial max and min', img_source.max(), img_source.min())
   if use_fft == 'T':
     print('**** using FFT for convolution')
     astropy_conv = convolve_fft(img_source, kernel, allow_huge=True)
@@ -127,7 +114,6 @@ def convolve_image(fits_input_image, conv_factor, use_fft='F', downsize_image = 
   else:
     plt.suptitle (fits_input_image + ' convolved')
   shape = astropy_conv.shape
-  print('downsizing')
   conv_factor_int = int(conv_factor)
 # see  https://moonbooks.org/Articles/How-to-downsampling-a-matrix-by-averaging-elements-nn-with-numpy-in-python-/
   if conv_factor_int > 1:
@@ -135,25 +121,26 @@ def convolve_image(fits_input_image, conv_factor, use_fft='F', downsize_image = 
       outfile = fits_input_image[:end_point] + '_conv.fits'
     else:
       outfile = fits_input_image +  '_conv.fits'
-    if downsize_image == 'T':
-      output_array = astropy_conv[::conv_factor_int, ::conv_factor_int] 
+    if do_downsize == 'T':
+      print('shrinking convolved image')
+      smaller_astropy_conv = astropy_conv[::conv_factor_int, ::conv_factor_int] 
     else:
-      output_array = astropy_conv
+      smaller_astropy_conv = astropy_conv
   else:
     outfile = fits_input_image
-    output_array = astropy_conv
-  shape = output_array.shape
+    smaller_astropy_conv = astropy_conv
+  shape = smaller_astropy_conv.shape
   shape_x = shape[0] // 2
   shape_y = shape[1] // 2
-  print('output max and min',output_array.max(), output_array.min())
-  output_image = update_dimensions(output_array,incoming_dimensions)
+# hdu.data = flush_fits(smaller_astropy_conv,hdu_list)
+  output_image = update_dimensions(smaller_astropy_conv,incoming_dimensions)
   hdu.data = output_image
   hdu.header['BMAJ']  = bmaj / 3600
   hdu.header['BMIN']  = bmin / 3600
   hdu.header['BPA']  = bpa
   hdu.header['DATAMAX'] =  hdu.data.max()
   hdu.header['DATAMIN'] =  hdu.data.min()
-  if downsize_image == 'T':
+  if do_downsize == 'T':
     hdu.header['CDELT1'] = hdu.header['CDELT1']  * conv_factor_int
     hdu.header['CDELT2'] = hdu.header['CDELT2']  * conv_factor_int
 # need to flip array references vs what's seen on the display
@@ -162,7 +149,7 @@ def convolve_image(fits_input_image, conv_factor, use_fft='F', downsize_image = 
 # no idea why I have to explicity wrap a float inside a float here
   hdu.header['CRVAL1'] = float(lon) 
   hdu.header['CRVAL2'] = float(lat)
-  hdu.header.set('CONVFACT', conv_factor, 'factor by which the incoming image was convolved')
+  hdu.header.set('CONVFACT', conv_factor, 'factor used to convolve input image')
   today = date.today()
   d4 = today.strftime("%b-%d-%Y")
   hdu.header['HISTORY'] = d4 + ' convolved by a factor ' + str(conv_factor)
@@ -179,7 +166,6 @@ def convolve_image(fits_input_image, conv_factor, use_fft='F', downsize_image = 
 
 def main( argv ):
   start_time = timeit.default_timer()
-  print('incoming argv', argv)
 # argv[1] = incoming fits image
 # argv[2] convolution factor
   print('convolving image ', argv[1])
@@ -188,7 +174,12 @@ def main( argv ):
    use_fft = argv[3]
   except:
    use_fft = 'F'
-  convolve_image(argv[1], conv_factor, use_fft)
+  try:
+   do_downsize = argv[4]
+  except:
+   do_downsize = 'T'
+  print('calling convolve with do_downsize', do_downsize)
+  convolve_image(argv[1], conv_factor, use_fft,do_downsize)
   elapsed = timeit.default_timer() - start_time
   print("Run Time:",elapsed,"seconds")
 
