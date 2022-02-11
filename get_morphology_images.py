@@ -6,22 +6,19 @@ import os.path
 import sys
 import numpy
 import math
+import timeit
 import subprocess
 from astropy.coordinates import SkyCoord
 from read_input_table import process_input_file
+from make_morphology_mask import make_mask
 
-def process_images(filename, filter_size, filter_type, offset_flux, use_conv_l, use_dilation, offset_value_flux):
+def process_images(filename, filter_size, filter_type, offset_flux, use_conv_l, do_batch):
         print('processing file ', filename)
         if use_conv_l =='T':
           print('using convolved_images')
           use_conv = True
         else:
           use_conv = False
-        if use_dilation =='T':
-          print('using dilated images')
-          use_dilation = True
-        else:
-          use_dilation = False
         text = open(filename, 'r').readlines()
         info = text[0].split()
         print('opening info ', info)
@@ -30,7 +27,6 @@ def process_images(filename, filter_size, filter_type, offset_flux, use_conv_l, 
 
 # not all these parameters are used here
         freq, names, ra_deg, dec_deg = process_input_file(filename, True)
-
         num_proc = len(ra_deg)
         for i in range (num_proc):
           position = SkyCoord(ra_deg[i], dec_deg[i], unit='deg',frame='icrs')
@@ -46,23 +42,14 @@ def process_images(filename, filter_size, filter_type, offset_flux, use_conv_l, 
           else:
             field_name = names[i] 
           print('i, field_name_i ', i, field_name)
-          if use_dilation:
-            cmd =  'make_morphology_mask.py ' + field_name + ' ' + offset_flux + ' T ' + filter_size + ' ' + filter_type 
-          else:
-            cmd =  'make_morphology_mask.py ' + field_name + ' ' + offset_flux + ' F ' + filter_size + ' ' + filter_type 
-          print('processing ', cmd)
-          returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
-          cmd = ' '
-          if use_dilation:
-            json_file = field_name + '-dilated.json_polygons_data'
-            print('sending json file ', json_file)
-            cmd = 'combine_images.py ' + field_name  +  ' ' + offset_value_flux + ' ' + json_file + ' T'
-          else:
-            json_file = field_name + '-eroded.json_polygons_data'
-            cmd = 'combine_images.py ' + field_name +  ' ' + offset_value_flux + ' ' + json_file + ' F'
-          print('************* processing ', cmd)
-          if len(cmd) > 2:
-            returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
+          parameter_list = []
+          parameter_list.append(' ')
+          parameter_list.append(field_name)
+          parameter_list.append(offset_flux)
+          parameter_list.append(filter_size)
+          parameter_list.append(filter_type)
+          parameter_list.append(do_batch)
+          make_mask(parameter_list)
 
 def main( argv ):
 # argv[1] = name of pipeline input file with information such as 
@@ -82,17 +69,17 @@ def main( argv ):
   print('incoming filter type', filter_type)
   offset_flux = argv[4]    # = factor by which to multiply breizorro noise
   use_conv = argv[5]       # if T, look for a convolved image
-  use_dilation = argv[6]   # if T do dilation, else do only erosion
-  try:
-    offset_value_flux  = argv[7] # amount (in mJy) to remove from source 
-                                 # subtraction (default = 0.0)
-                                 # only used in script combine_images.py
-  except:
-    offset_value_flux = '0.0'
+  do_batch = argv[6]   # if T do batch processing, else do not
+  print('do_batch', do_batch)
 
 # e.g. sample run as 'get_morphology_images.py 3C236.csv 3 D 6 F T 
 
-  process_images(filename, filter_size, filter_type, offset_flux, use_conv, use_dilation, offset_value_flux)
+  start_time = timeit.default_timer()
+  process_images(filename, filter_size, filter_type, offset_flux, use_conv, do_batch)
+  elapsed = timeit.default_timer() - start_time
+  print("Run Time:",elapsed,"seconds")
+
+
 
 #=============================
 # argv[1]  incoming positions file
