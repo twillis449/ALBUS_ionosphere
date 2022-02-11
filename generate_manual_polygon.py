@@ -25,7 +25,7 @@ def onclick(event):
       global coords
       loc = (ix, iy)
       coords.append(loc)
-      print('*** updated coords', coords)
+#     print('*** updated coords', coords)
       if len(coords) > 1:
         x = []
         y = []
@@ -87,11 +87,8 @@ def create_polygon(filename):
     if len(coords) > 2:
         location =  filename.find('.fits')
         outfile = filename[:location] + '.simple_polygon'
-        try:
+        if os.path.isfile(outfile):
           os.remove(outfile)
-        except:
-#         print('file not found, so could not be deleted',outfile)
-          pass
         f = open(outfile, 'w')
         output = 'polygon outer boundary \n'
         f.write(output)
