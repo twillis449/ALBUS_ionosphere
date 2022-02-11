@@ -18,7 +18,7 @@
 <P class="p6 ft0">The process can be described through the following equations:</P>
 <P class="p6 ft0">o = original image</P>
 <P class="p7 ft0">d - output from erosion/dilation</P>
-<P class="p8 ft1">t = white TopHat, which should show only compact structures smaller than the structure element</P>
+<P class="p8 ft1">t = white TopHat, which should show only 'compact' structures </P>
 <P class="p7 ft0">t = o - d</P>
 <P class="p9 ft1">m = mask derived from a comparison where t &gt; some signal m * t = m * (o - d)</P>
 <P class="p7 ft0">o_d = output diffuse image</P>
