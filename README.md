@@ -4,43 +4,6 @@
 <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <TITLE>pdf-html</TITLE>
 <META name="generator" content="BCL easyConverter SDK 5.0.252">
-<STYLE type="text/css">
-
-body {margin-top: 0px;margin-left: 0px;}
-
-#page_1 {position:relative; overflow: hidden;margin: 74px 0px 208px 76px;padding: 0px;border: none;width: 740px;}
-
-
-
-
-
-.ft0{font: 13px 'Courier New';line-height: 16px;}
-.ft1{font: 13px 'Courier New';line-height: 15px;}
-.ft2{font: 13px 'Courier New';margin-left: 8px;line-height: 15px;}
-.ft3{font: 13px 'Courier New';margin-left: 8px;line-height: 16px;}
-
-.p0{text-align: left;padding-right: 84px;margin-top: 0px;margin-bottom: 0px;}
-.p1{text-align: left;margin-top: 10px;margin-bottom: 0px;}
-.p2{text-align: left;padding-right: 228px;margin-top: 1px;margin-bottom: 0px;}
-.p3{text-align: left;padding-right: 76px;margin-top: 14px;margin-bottom: 0px;}
-.p4{text-align: left;padding-right: 164px;margin-top: 12px;margin-bottom: 0px;}
-.p5{text-align: left;padding-right: 84px;margin-top: 14px;margin-bottom: 0px;}
-.p6{text-align: left;margin-top: 12px;margin-bottom: 0px;}
-.p7{text-align: left;margin-top: 0px;margin-bottom: 0px;}
-.p8{text-align: left;padding-left: 32px;padding-right: 132px;margin-top: 0px;margin-bottom: 0px;text-indent: -31px;}
-.p9{text-align: left;padding-right: 284px;margin-top: 0px;margin-bottom: 0px;}
-.p10{text-align: left;padding-left: 32px;margin-top: 0px;margin-bottom: 0px;}
-.p11{text-align: left;padding-right: 76px;margin-top: 12px;margin-bottom: 0px;}
-.p12{text-align: left;padding-right: 612px;margin-top: 0px;margin-bottom: 0px;}
-.p13{text-align: left;padding-left: 32px;padding-right: 500px;margin-top: 1px;margin-bottom: 0px;text-indent: -31px;}
-.p14{text-align: left;margin-top: 13px;margin-bottom: 0px;}
-.p15{text-align: left;padding-right: 100px;margin-top: 14px;margin-bottom: 0px;}
-.p16{text-align: justify;padding-right: 116px;margin-top: 14px;margin-bottom: 0px;}
-
-
-
-
-</STYLE>
 </HEAD>
 
 <BODY>
