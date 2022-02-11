@@ -24,6 +24,9 @@ import numpy as np
 from astropy.io import fits
 from scipy.ndimage.filters import minimum_filter as minf2D
 from scipy.ndimage.filters import maximum_filter as maxf2D
+from skimage.morphology import erosion, dilation
+from skimage.morphology import  rectangle
+
 import sys
 
 # copied from breizorro
@@ -38,6 +41,7 @@ def check_array(data):
 
 def generate_morphology_images(argv):
   file=sys.argv[1]
+  file = file + '.fits'
   X=int(sys.argv[2])
   Y=int(sys.argv[3])
 
@@ -47,21 +51,18 @@ def generate_morphology_images(argv):
   data = check_array(hdu.data)
 
 # do morphology imaging
-  mins = minf2D(data, size=(X,Y))
-  openmp = maxf2D(mins, size=(X,Y))
-  newmp=data-openmp
+  structure_element = rectangle(X, Y)
+  eroded = erosion(data, structure_element)
+  eroded = erosion(eroded, structure_element)
+  dilated = dilation(eroded, structure_element)
+  openmp = dilated
+  newmp = data - dilated
 
 # write out results
-  location = file.find('.fits')
-  hdu.data = mins
-  hdu.header['DATAMAX'] =  hdu.data.max()
-  hdu.header['DATAMIN'] =  hdu.data.min()
-  outfile = file[:location] + '_min.fits'
-  hdu.writeto(outfile, overwrite=True) # this file is not used further
-
 # Note: fits.writeto('min.fits',mins,clobber=True) writes out the
 # absolute minimum fits file with just about zero header information
 
+  location =  file.find('.fits')
   hdu.data = openmp
   hdu.header['DATAMAX'] =  hdu.data.max()
   hdu.header['DATAMIN'] =  hdu.data.min()
