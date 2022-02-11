@@ -7,12 +7,14 @@ import os.path
 import sys
 import numpy as np
 import math 
+import timeit
 import subprocess
 from astropy.io import fits
 from astropy.coordinates import SkyCoord
 from check_array import check_array
 from breizorro_extract import make_noise_map
 from read_input_table import  process_input_file
+from calculate_source_parms import analyze_image
 
 
 def process_images(filename, skip_generating_mask, use_breizorro_mask_l, use_conv_l, threshold_value):
@@ -50,7 +52,7 @@ def process_images(filename, skip_generating_mask, use_breizorro_mask_l, use_con
             out_ra_dec = names[i]
           else:
             out_ra_dec = ra_dec.replace(blank, underscore)
-          print('output ra_dec ', out_ra_dec)
+#         print('output ra_dec ', out_ra_dec)
           if use_conv:
             field_name = out_ra_dec +'_conv'
           else:
@@ -74,7 +76,6 @@ def process_images(filename, skip_generating_mask, use_breizorro_mask_l, use_con
 #add .fits to name
           location = field_name.find('.fits')
           if location < 0:
-            print('adding fits extension')
             object_name = field_name + '.fits'
           print('looking for ', object_name)
           if os.path.isfile(object_name):
@@ -84,46 +85,7 @@ def process_images(filename, skip_generating_mask, use_breizorro_mask_l, use_con
             continue
           location = object_name.find('.fits')
           if not skip_generating_mask:  
-            if use_b_mask:
-              json_data_file = field_name + '.json_polygons_data'
-              try:
-                os.remove(json_data_file)
-              except:
-#               print('file not found so could not be deleted', json_data_file)
-                pass
-              info_1 = object_name[:location] + '.mask.fits'
-              try:
-                os.remove(info_1)
-              except:
-#               print('file not found so could not be deleted', info_1)
-                pass
-              info_1 = object_name[:location] 
-              info_1 = object_name[:location] + '.fits'
-# get noise from breizorro
-              hdu_list = fits.open(info_1)
-              hdu = hdu_list[0]
-              data = check_array(hdu.data)
-              noise = make_noise_map(data)
-              print('make_mask:  noise ', noise)
-              if noise <= 0:
-                print('***** warning: breizorro returning noise = ', noise)
-                noise = np.std(data)
-                print('***** warning: np.std gives noise = ', noise)
-              limiting_flux = noise * float(threshold_value)
-              print('make_mask: limiting_flux ', limiting_flux)
-              hdu.data = np.where(data >= limiting_flux, 1.0, 0.0)
-              hdu.data = hdu.data.astype('float32')
-              out_file = object_name[:location] + '.mask.fits'
-              hdu.writeto(out_file, overwrite=True)
-# create  polygon from mask or image bounds
-              info_1 = object_name[:location] 
-              cmd = 'generate_mask_polygons.py ' + info_1 + ' F'
-              print('processing cmd ', cmd)
-              returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
-#             cmd = 'mv selected_polygons.png ' + info_1 + '.mask.png'
-#             print('processing cmd ', cmd)
-#             returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
-            else:
+            if not use_b_mask:
               print('generating manual mask')
 # use breizorro to get noise
               info_1 = object_name[:location] + '.fits'
@@ -134,14 +96,12 @@ def process_images(filename, skip_generating_mask, use_breizorro_mask_l, use_con
               cmd = 'mv selected_polygons.png ' + info_1 + '.simple_mask.png'
               print('processing cmd ', cmd)
               returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
-          cmd = 'calculate_source_parms.py ' + ' ' + freq + ' ' +   field_name + ' ' + red_shift[i] + ' ' + spec_index[i] + ' ' +  las_HA + ' ' + use_breizorro_mask_l 
-          print('processing cmd', cmd)
-          returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
+          analyze_image(field_name,freq,red_shift[i],spec_index[i],las_HA,use_breizorro_mask_l,threshold_value)
 
-        print('get_galaxy_parameters: finished \n')
 
 
 def main( argv ):
+  start_time = timeit.default_timer()
 # nominally use a .csv file such as '3C236.csv' as input foe argv[1]
   # argv[1] = name of pipeline input file with information such as frequency, positions, redshifts
   # argv[2] T = skip the mask making process 
@@ -151,6 +111,9 @@ def main( argv ):
   #         multiply breizorro noise)
   process_images(argv[1], argv[2], argv[3], argv[4], argv[5])
 
+  print('get_galaxy_parameters: finished \n')
+  elapsed = timeit.default_timer() - start_time
+  print("Run Time:",elapsed,"seconds")
 #=============================
 # argv[1]  incoming positions file 
 if __name__ == "__main__":
