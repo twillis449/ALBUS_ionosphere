@@ -82,7 +82,7 @@ def combine_images(filename, json_polygons, original_noise=0.0):
     else:
 # just link the diffuse file to final processed file
       diffuse_fits_file = filename + '_diffuse_structure_dilated.fits'
-      fits_file_out = filename + '_final_processed_image.fits'
+      fits_file_out = filename + '_final_image.fits'
       print('making a symbolic link')
       if os.path.isfile(fits_file_out):
         os.remove(fits_file_out)
