@@ -61,12 +61,16 @@ def combine_images(filename, json_polygons, original_noise=0.0):
       compact_data = check_array(hdu.data)
 
       img = np.zeros(compact_data.shape, dtype=np.float)
+      mask_update = np.ones(compact_data.shape, dtype=np.float)
       print('creating addition mask')
       for i in range(len(polygon_list)):
          result = polygon_list[i]
          x, y = result.exterior.coords.xy
          rr, cc = skimage_polygon(x,y, compact_data.shape)
          img[rr, cc] = 1
+         mask_update[rr, cc] = 0
+      img = img.astype('float32')
+      mask_update = mask_update.astype('float32')
       compact_data_masked = compact_data * img 
       diffuse_data = diffuse_data + compact_data_masked 
 
@@ -79,6 +83,20 @@ def combine_images(filename, json_polygons, original_noise=0.0):
       fits_file_out = filename + '_final_image.fits'
       print('sending output to ', fits_file_out)
       hdu.writeto(fits_file_out, overwrite=True)
+      
+      # we need to update the mask file as some masked components have now been 
+      # moved into the combined final output file
+      mask_file = filename + '-dilated_tophat.mask.fits'
+      mask_file_out = 'updated_' + mask_file
+      print('mask file to be updated ', mask_file)
+      hdu_list = fits.open(mask_file)
+      hdu = hdu_list[0]
+      incoming_dimensions = hdu.header['NAXIS']
+      mask_array = check_array(hdu.data) 
+      mask_array = mask_array * mask_update
+      hdu.data = mask_array
+      hdu.writeto(mask_file_out, overwrite=True)
+
     else:
 # just link the diffuse file to final processed file
       diffuse_fits_file = filename + '_diffuse_structure_dilated.fits'
