@@ -15,7 +15,6 @@ from astropy.wcs import WCS
 from astropy.io import fits
 from astropy.convolution import convolve, convolve_fft,Gaussian2DKernel, Tophat2DKernel
 from astropy.modeling.models import Gaussian2D
-from reproject import reproject_interp
 import astropy.visualization as vis
 from check_array import check_array, update_dimensions
 import timeit
