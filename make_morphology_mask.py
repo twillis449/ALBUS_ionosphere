@@ -101,7 +101,7 @@ def make_mask(argv):
 #   print('tophat image  data max and min', hdu.data.max(), hdu.data.min())
     out_tophat = filename +'-dilated_tophat.fits'
 #   print('make_mask: tophat output to ', out_tophat )
-#   hdu.writeto(out_tophat, overwrite=True)
+    hdu.writeto(out_tophat, overwrite=True)
 
     
 #   m = mask derived from a comparison where  t > some signal
@@ -113,7 +113,7 @@ def make_mask(argv):
     hdu.header['DATAMAX'] = 1.0
     outfile = filename +'-dilated_tophat.mask.fits'
     print('mask output to ', outfile )
-#   hdu.writeto(outfile, overwrite=True)
+    hdu.writeto(outfile, overwrite=True)
 
 # create filtered image from morphology image  * mask
 # so we have filtered data which will be subtracted from original image
@@ -124,14 +124,16 @@ def make_mask(argv):
     filtered_data[nans] = 0
 
 #   print('filtered_data min and max', filtered_data.min(),  filtered_data.max())
-    hdu.data = filtered_data
+    masked_diffuse_image = mask * morphology_image
+    hdu.data = masked_diffuse_image
 #   print('filtered data max and min', hdu.data.max(), hdu.data.min())
     hdu.header['DATAMAX'] =  filtered_data.max()
     hdu.header['DATAMIN'] =  filtered_data.min()
 
-    outfile = filename +'.filtered_data.fits'
+    outfile = filename +'.masked_diffuse_data.fits'
 #   print('filtered_data image output to ', outfile )
-#   hdu.writeto(outfile, overwrite=True)
+#   write out m * d
+    hdu.writeto(outfile, overwrite=True)
 
 #   o_d = output diffuse image
 #       = o - m * t  
@@ -180,6 +182,7 @@ def make_mask(argv):
       polygons = polygon_gen.out_data
       coords = polygons['coords']
       if len(coords) > 0:
+        print('calling combine_images')
         combine_images(filename, polygons, original_noise=median_noise)  # gives a modified image o* = o_d + m_c * o_c
         return
 
