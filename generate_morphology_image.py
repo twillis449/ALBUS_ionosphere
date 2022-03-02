@@ -8,8 +8,7 @@ import numpy as np
 import astropy.visualization as vis
 import scipy.special
 from astropy.io import fits
-from skimage.morphology import erosion, dilation, opening, closing, white_tophat
-from skimage.morphology import black_tophat, skeletonize, convex_hull_image
+from skimage.morphology import erosion, dilation, opening, white_tophat
 from skimage.morphology import disk, rectangle
 from check_array import check_array
 from astropy.io import fits
@@ -29,7 +28,7 @@ def create_circular_mask(h, w, center=None, radius=None):
     mask = dist_from_center <= radius
     return mask
 
-def make_morphology_image(filename, filter_size, filter_type):
+def make_morphology_image(filename, filter_size, filter_type, double_erode=True):
 
     # Download the image
     # Load the image and the WCS
@@ -52,7 +51,6 @@ def make_morphology_image(filename, filter_size, filter_type):
 # doing one erosion gets those wierd structures in the Rudnick paper
     eroded = erosion(data, structure_element)
 # doing a second erosion helps get rid od stuff missed in a first erosion
-    double_erode = True
     if double_erode:
       eroded = erosion(eroded, structure_element)
     dilated = dilation(eroded, structure_element)
@@ -62,7 +60,7 @@ def make_morphology_image(filename, filter_size, filter_type):
     hdu.header['DATAMIN'] =  dilated.min()
     outfile = filename + '_dilated.fits'
 # don't bother writing this image to disk
-#    hdu.writeto(outfile, overwrite=True)
+    hdu.writeto(outfile, overwrite=True)
     return filter_image
 
 def main( argv ):
