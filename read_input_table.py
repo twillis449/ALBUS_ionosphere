@@ -27,7 +27,11 @@ def process_input_file(filename,return_morphology_parameters=False):
         if len(info) > 20:
           index = 3
         else:
-          index = 2
+          index = 1
+          try:
+            test = float(info[index])
+          except:
+            index = 2
         ra_deg.append(info[index])
         dec_deg.append(info[index+1])
         las_raw.append(info[index+2])
