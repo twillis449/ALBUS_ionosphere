@@ -14,6 +14,11 @@ from check_array import check_array
 import astropy.visualization as vis
 from read_input_table import  process_input_file
 import matplotlib.pyplot as plt
+use_cv2 = True
+try:
+  import cv2 as cv
+except:
+  use_cv2 = False
 
 def paint_image(filename):
    freq, names, ra_deg, dec_deg, las, las_raw, red_shift, spec_index = process_input_file(filename)
@@ -24,16 +29,24 @@ def paint_image(filename):
      hdu_list = fits.open(names[i]+'.fits') 
      hdu = hdu_list[0]
      image = check_array(hdu.data)
-     orig_image = image.astype(np.float, copy=True)
+     image = image.astype(np.float32)
+     orig_image = image.astype(np.float32, copy=True)
+     x_min = image.min()
+     x_max = image.max()
+# Although openCV claims that floating point arrays can be processed
+# by the impainting algorithms it still seems necesssary to scale the 
+# images so that the actual values are in the range 0.0 to 255.0
+# (See ex 8 at https://www.programcreek.com/python/example/89305/cv2.inpaint)
+     if use_cv2:
+       image = 255 * (image - x_min) / (x_max - x_min)
+     print('incoming image type', image.dtype)
+     print('incoming image max and min', image.max(), image.min())
 
      hdu_list_m = fits.open(names[i] + '-dilated_tophat.mask.fits')
      hdu1 = hdu_list_m[0]
      mask = check_array(hdu1.data)
-#mask = mask.astype(np.uint8)
-     mask = mask.astype(bool, copy=False)
-     print('image max and min', image.max(), image.min())
+     mask = mask.astype(np.uint8)
      print('mask max and min', mask.max(), mask.min())
-
      print('mask shape', mask.shape)
      print('image shape', image.shape)
      print(' ')
@@ -46,13 +59,23 @@ def paint_image(filename):
 # "damaged" areas that inpainting will try to correct
 # perform inpainting using OpenCV
 
-     pyheal.inpaint(image, mask, 5)
-     hdu.data = image
-     hdu.header['DATAMIN'] = hdu.data.min()
-     hdu.header['DATAMAX'] = hdu.data.max()
-     hdu.writeto(names[i] +'_FMM_inpaint_result.fits', overwrite=True)
+     if use_cv2:
+       inpainted = cv.inpaint(image,mask,inpaintRadius=5, flags=cv.INPAINT_TELEA)
+       inpainted = inpainted / 255.0 * (x_max - x_min) + x_min
+       print('returned max and min', inpainted.max(), inpainted.min())
+       hdu.data = inpainted
+       hdu.header['DATAMIN'] = hdu.data.min()
+       hdu.header['DATAMAX'] = hdu.data.max()
+       hdu.writeto(names[i] +'_CV_FMM_inpaint_result.fits', overwrite=True)
+     else:
+       print('calling pyheal')
+       pyheal.inpaint(image, mask, 5)
+       hdu.data = image
+       hdu.header['DATAMIN'] = hdu.data.min()
+       hdu.header['DATAMAX'] = hdu.data.max()
+       print('returned max and min', hdu.data.max(), hdu.data.min())
+       hdu.writeto(names[i] +'_pyheal_FMM_inpaint_result.fits', overwrite=True)
 
-# Image inpainting with OpenCV and Python
 # show the original input image, mask, and output image after
 # applying inpainting
 
@@ -66,20 +89,22 @@ def paint_image(filename):
      ax[1].imshow(mask, cmap=plt.cm.gray, origin='lower')
 
      ax[2].set_title('inpainted_diffuse_source')
-     ax[2].imshow(image,origin='lower')
+     if use_cv2:
+       ax[2].imshow(inpainted,origin='lower')
+     else:
+       ax[2].imshow(image,origin='lower')
 
      for a in ax:
        a.axis('off')
 
      fig.tight_layout()
      plt.savefig(names[i] +'-InPaint_comparison.png')
-     plt.show()
+#    plt.show()
  
 def main( argv ):
   start_time = timeit.default_timer()
 # nominally use a .csv file such as '3C236.csv' as input foe argv[1]
   # argv[1] = name of pipeline input file with information such as frequency, positions, redshifts
-  #         multiply breizorro noise)
   paint_image(argv[1])
   elapsed = timeit.default_timer() - start_time
   print("Run Time:",elapsed,"seconds")
