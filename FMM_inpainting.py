@@ -25,8 +25,8 @@ def paint_image(filename):
    num_proc = len(names)
    print('number of images to process', num_proc)
    for i in range(num_proc):
-     print('input inage', names[i]+'.fits')
-     hdu_list = fits.open(names[i]+'.fits') 
+     print('input inage', names[i]+'_final_image.fits')
+     hdu_list = fits.open(names[i]+'_final_image.fits')
      hdu = hdu_list[0]
      image = check_array(hdu.data)
      image = image.astype(np.float32)
@@ -42,6 +42,7 @@ def paint_image(filename):
      print('incoming image type', image.dtype)
      print('incoming image max and min', image.max(), image.min())
 
+     print('input mask', names[i] + '-dilated_tophat.mask.fits')
      hdu_list_m = fits.open(names[i] + '-dilated_tophat.mask.fits')
      hdu1 = hdu_list_m[0]
      mask = check_array(hdu1.data)
@@ -66,6 +67,7 @@ def paint_image(filename):
        hdu.data = inpainted
        hdu.header['DATAMIN'] = hdu.data.min()
        hdu.header['DATAMAX'] = hdu.data.max()
+       print('inpainted result file ', names[i] +'_CV_FMM_inpaint_result.fits')
        hdu.writeto(names[i] +'_CV_FMM_inpaint_result.fits', overwrite=True)
      else:
        print('calling pyheal')
