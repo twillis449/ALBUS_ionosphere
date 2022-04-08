@@ -38,9 +38,10 @@ def paint_image(filename):
 # images so that the actual values are in the range 0.0 to 255.0
 # (See ex 8 at https://www.programcreek.com/python/example/89305/cv2.inpaint)
      if use_cv2:
+       print('Inpainting using openCV') 
        image = 255 * (image - x_min) / (x_max - x_min)
      print('incoming image type', image.dtype)
-     print('incoming image max and min', image.max(), image.min())
+     print('normalized incoming image max and min', image.max(), image.min())
 
      print('input mask', names[i] + '-dilated_tophat.mask.fits')
      hdu_list_m = fits.open(names[i] + '-dilated_tophat.mask.fits')
@@ -63,19 +64,20 @@ def paint_image(filename):
      if use_cv2:
        inpainted = cv.inpaint(image,mask,inpaintRadius=5, flags=cv.INPAINT_TELEA)
        inpainted = inpainted / 255.0 * (x_max - x_min) + x_min
-       print('returned max and min', inpainted.max(), inpainted.min())
+       print('inpainted image max and min', inpainted.max(), inpainted.min())
        hdu.data = inpainted
        hdu.header['DATAMIN'] = hdu.data.min()
        hdu.header['DATAMAX'] = hdu.data.max()
        print('inpainted result file ', names[i] +'_CV_FMM_inpaint_result.fits')
        hdu.writeto(names[i] +'_CV_FMM_inpaint_result.fits', overwrite=True)
      else:
+       print('Inpainting using pyheal') 
        print('calling pyheal')
        pyheal.inpaint(image, mask, 5)
        hdu.data = image
        hdu.header['DATAMIN'] = hdu.data.min()
        hdu.header['DATAMAX'] = hdu.data.max()
-       print('returned max and min', hdu.data.max(), hdu.data.min())
+       print('inpainted image max and min', hdu.data.max(), hdu.data.min())
        hdu.writeto(names[i] +'_pyheal_FMM_inpaint_result.fits', overwrite=True)
 
 # show the original input image, mask, and output image after
