@@ -3,7 +3,7 @@
 # first make 'soft' link to the original image
 # first delete any previous version
 /bin/rm -rf 3C236.*fits 
-ln -s 3c236_original.fits 3C236.fits
+ln -s 3C236_original.FITS 3C236.fits
 
 # obtain initial flux density 
 # will call generate_mask_polygons.py program
