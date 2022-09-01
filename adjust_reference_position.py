@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 # This program is adapted from the conv_image script and adjusts the FITS
-reference pixels and coordinates of a cutout image so that the reference
-coordinates and pixels are at the centre of the image.
+# reference pixels and coordinates of a cutout image so that the reference
+# coordinates and pixels are at the centre of the image.
 
 import math
 import sys
