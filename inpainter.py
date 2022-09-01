@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
-# gratefully derived from https://github.com/olvb/pyheal
-# by replacing  RGB stuff with floating point stuff for
+# script to use inpainting to fill in holes of FITS images
 # FITS images
 
 # import the necessary packages
