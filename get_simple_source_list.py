@@ -256,7 +256,7 @@ def generate_source_list(filename, threshold_value, noise):
 
 def main( argv ):
    parser = OptionParser(usage = '%prog [options] ')
-   parser.add_option('-f', '--file', dest = 'filename', help = 'Filename with radio source names, positions, redshift etc (default = None)', default = None)
+   parser.add_option('-f', '--file', dest = 'filename', help = 'FITS file with radio image  (default = None)', default = None)
    parser.add_option('-t', '--threshold', dest = 'threshold', help = 'Threshold value for source detection in units of noise (default = 6)', default = 6)
    parser.add_option('-n', '--noise', dest = 'noise', help = 'noise specification in mJy, where noise cannot be found from image (default = 0)', default = 0.0)
    (options,args) = parser.parse_args()
