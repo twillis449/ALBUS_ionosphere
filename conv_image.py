@@ -22,6 +22,7 @@ import timeit
 
 def convolve_image(fits_input_image, conv_factor, use_fft='F', do_downsize = 'F'):
 # Load the image to be convolved
+  print('loading input_image', fits_input_image)
   hdu_list = fits.open(fits_input_image)
   hdu = hdu_list[0]
   incoming_dimensions = hdu.header['NAXIS']
@@ -56,7 +57,6 @@ def convolve_image(fits_input_image, conv_factor, use_fft='F', do_downsize = 'F'
     cen_pos_x = hdu.header['NAXIS1'] // 2
     cen_pos_y = hdu.header['NAXIS2'] // 2
     lon, lat = w.all_pix2world(cen_pos_x,cen_pos_y,0)
-#   pixels = w.all_world2pix([[ref_ra,ref_dec]],0)
 
   except:
     print('Sorry - your input image must contain the FITS kewords BMAJ, BIN, and BPA')
@@ -177,6 +177,7 @@ def main( argv ):
    do_downsize = argv[4]
   except:
    do_downsize = 'T'
+  print('conv_image incoming image', argv[1])
   print('calling convolve with do_downsize', do_downsize)
   convolve_image(argv[1], conv_factor, use_fft,do_downsize)
   elapsed = timeit.default_timer() - start_time

@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 
-# a simple script to insert synthesis beam parameters into a fits image
+# a simple script to insert aperture synthesis beam parameters into a fits image
 # which does not have them.
 
-import numpy as np
-from astropy.wcs import WCS
 from astropy.io import fits
 import sys
 

@@ -3,6 +3,7 @@
 # FWHM = 2.355 σ = 2* sqrt(2*ln(2))
 # see https://en.wikipedia.org/wiki/Full_width_at_half_maximum   and
 # https://www.eaobservatory.org/jcmt/faq/how-can-i-convert-from-mjybeam-to-mjy/
+# or https://www.eaobservatory.org/jcmt/?s=beam+to+pixels
 # for a description of what's going on
 
 # This script derives the beam area response in pixels required to normalize the
@@ -48,10 +49,9 @@ def calculate_area(fwhm_arcsec, fwhm_min,pixel = 2):
   return num_pixels_beam
 
 def main( argv ):
-# argv[1] = beam FWHM in arcarc)
 # pixel = width of pixel in arcsec, default is 2 arcsec
-  beam = argv[1]   # FWHM of beam in arcsec
-  beam_min = argv[2]   # FWHM of beam in arcsec
+  beam = argv[1]   # FWHM of beam major axis in arcsec
+  beam_min = argv[2]   # FWHM of beam minor axis in arcsec
   if len(argv) >= 4:
      pixel = argv[3]
      num_pixels_beam = calculate_area(beam, beam_min,pixel)
