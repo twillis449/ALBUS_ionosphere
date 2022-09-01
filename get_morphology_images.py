@@ -11,14 +11,10 @@ import subprocess
 from astropy.coordinates import SkyCoord
 from read_input_table import process_input_file
 from make_morphology_mask import make_mask
+from optparse import OptionParser
 
-def process_images(filename, filter_size, filter_type, offset_flux, use_conv_l, do_batch):
+def process_images(filename, filter_size, filter_type, offset_flux, use_conv, double_erode, do_batch):
         print('processing file ', filename)
-        if use_conv_l =='T':
-          print('using convolved_images')
-          use_conv = True
-        else:
-          use_conv = False
         text = open(filename, 'r').readlines()
         info = text[0].split()
         print('opening info ', info)
@@ -49,35 +45,41 @@ def process_images(filename, filter_size, filter_type, offset_flux, use_conv_l, 
           parameter_list.append(filter_size)
           parameter_list.append(filter_type)
           parameter_list.append(do_batch)
+          parameter_list.append(double_erode)
           make_mask(parameter_list)
 
 def main( argv ):
-# argv[1] = name of pipeline input file with information such as 
-#           frequency, positions
-# argv[2] = size of structure element
-# argv[3] = type of structure element D(isk) or R(ectangle)
-# argv[4] = value of mask offset (multiplied by noise determined from 
-#           breizorro) 
-# arvg[5] = T (use a convolved image) or F (used unconvolved image)
-# argv[6] = T (use dilated image) or F (use eroded image)
-# argv[7] = numerical value passed to subtract_polygon_data script
-  print('in get_morphology_images script')
-  print('argv', argv)
-  filename = argv[1]       # name of file containing object positions
-  filter_size = argv[2]    # interger, should be an odd number
-  filter_type = argv[3]    # 'D' or 'R'   
-  print('incoming filter type', filter_type)
-  offset_flux = argv[4]    # = factor by which to multiply breizorro noise
-  use_conv = argv[5]       # if T, look for a convolved image
-  do_batch = argv[6]   # if T do batch processing, else do not
-  print('do_batch', do_batch)
+   parser = OptionParser(usage = '%prog [options] ')
+   parser.add_option('-f', '--file', dest = 'filename', help = 'Filename with radio source names, positions, redshit etc (default = None)', default = None)
+   parser.add_option('-s', '--filter_size', dest = 'filter_size', help = 'Size of structure element (default = 0)', default = 0)
+   parser.add_option('-t', '--filter_type', dest = 'filter_type', help = 'Type of structure element D(isk) or R(ectangle) (default = D)', default = 'D')
+   parser.add_option('--th', '--threshold', dest = 'threshold', help = 'Threshhold value for mask, in units of noise (default = 6)', default = 6)
+   parser.add_option('--use_conv', dest = 'use_conv', help = 'Select a convolved image (default = F)', default = False)
+   parser.add_option('--use_batch', dest = 'use_batch', help = 'Run in batch mode (no interactive response) (default = F)', default = False)
+   parser.add_option('--use_double_e', dest = 'use_double', help = 'Use second erode (no interactive response) (default = T)', default = True)
+   (options,args) = parser.parse_args()
+   (options,args) = parser.parse_args()
+   print('options', options)
+   filename = options.filename
+   filter_size = int(options.filter_size)
+   filter_type = options.filter_type
+   offset_flux = float(options.threshold)
+   use_conv = options.use_conv
+   if use_conv != False:
+     use_conv = True
+   use_batch = options.use_batch
+   if use_batch != False:
+     use_Batch = True
+   use_double_erode = options.use_double
+   if use_double_erode != True:
+     use_double_erode = False
 
 # e.g. sample run as 'get_morphology_images.py 3C236.csv 3 D 6 F T 
 
-  start_time = timeit.default_timer()
-  process_images(filename, filter_size, filter_type, offset_flux, use_conv, do_batch)
-  elapsed = timeit.default_timer() - start_time
-  print("Run Time:",elapsed,"seconds")
+   start_time = timeit.default_timer()
+   process_images(filename, filter_size, filter_type, offset_flux, use_conv, use_double_erode, use_batch)
+   elapsed = timeit.default_timer() - start_time
+   print("Run Time:",elapsed,"seconds")
 
 
 

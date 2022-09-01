@@ -2,6 +2,7 @@
 
 # This script performs morphological erosion and / or dilation on
 # an imput image
+# see https://en.wikipedia.org/wiki/Mathematical_morphology
 
 import sys
 import numpy as np
@@ -28,8 +29,9 @@ def create_circular_mask(h, w, center=None, radius=None):
     mask = dist_from_center <= radius
     return mask
 
-def make_morphology_image(filename, filter_size, filter_type, double_erode=True):
+def make_morphology_image(filename, filter_size, filter_type, double_erode):
 
+    print('double_erode =', double_erode)
     # Download the image
     # Load the image and the WCS
     file_name = filename+'.fits'
@@ -48,18 +50,27 @@ def make_morphology_image(filename, filter_size, filter_type, double_erode=True)
 #     structure_element = create_circular_mask(size_spec, size_spec, center=None, radius=None)
       structure_element = disk(size_spec)
     print('structure_element', structure_element)
-# doing one erosion gets those wierd structures in the Rudnick paper
-    eroded = erosion(data, structure_element)
-# doing a second erosion helps get rid od stuff missed in a first erosion
     if double_erode:
-      eroded = erosion(eroded, structure_element)
-    dilated = dilation(eroded, structure_element)
-    filter_image = dilated
-    hdu.data = dilated
-    hdu.header['DATAMAX'] =  dilated.max()
-    hdu.header['DATAMIN'] =  dilated.min()
+      if filter_type == 'R':
+        double_structure_element = rectangle(2*size_spec, 2*size_spec)
+      else:
+        double_structure_element = disk(2 * size_spec)
+      print('double structure_element', double_structure_element)
+# see wikipedia article referenced above
+# this will be faster as we only have to do one erode for the entire image
+#     double_structure_element = dilation(structure_element,structure_element)
+# double erosion equites to erosion with structure element having 4x the area of
+# single erosion element
+      eroded = erosion(data, double_structure_element)
+    else:
+# doing one erosion gets those wierd structures in the Rudnick paper
+      eroded = erosion(data, structure_element)
+# doing a second erosion helps get rid of stuff missed in a first erosion
+    filter_image = dilation(eroded, structure_element)
+    hdu.data = filter_image
+    hdu.header['DATAMAX'] =  filter_image.max()
+    hdu.header['DATAMIN'] =  filter_image.min()
     outfile = filename + '_dilated.fits'
-# don't bother writing this image to disk
     hdu.writeto(outfile, overwrite=True)
     return filter_image
 
