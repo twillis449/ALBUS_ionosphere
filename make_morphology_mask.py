@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# see https://en.wikipedia.org/wiki/Mathematical_morphology
+
 import sys
 import numpy as np
 import subprocess
@@ -11,8 +13,10 @@ from breizorro_extract import make_noise_map
 from generate_morphology_image import make_morphology_image
 from larrys_script import generate_morphology_images
 from combine_images import combine_images
+from beam_to_pixels import calculate_area
 from process_polygon_data import *
 import generate_mask_polygons as gen_p
+import math
 import os
 
 def make_mask(argv):
@@ -47,22 +51,21 @@ def make_mask(argv):
         = m * o  
 
     """
+    print('make_mask received argv', argv)
     filename = argv[1] # fits file name without '.fits' extension
     limiting_sigma = argv[2]
     filter_size = argv[3] # integer number
     filter_type = argv[4] # 'D' or 'R'
     do_batch = argv[5]
+    double_erode = argv[6]
     
     limiting_sigma = float(limiting_sigma)
     print('make_mask: incoming file name ', filename)
     print('make_mask: limiting_sigma ', limiting_sigma)
     print('make_mask: filter size', filter_size)
     print('make_mask: filter type', filter_type)
+    print('make_mask: double_erode ', double_erode)
     print('make_mask: batch_processing', do_batch)
-    if do_batch == 'T':
-      do_batch = True
-    else:
-      do_batch = False
 
 #   print('make_mask: processing original file', filename+'.fits')
     hdu_list = fits.open(filename+'.fits')
@@ -70,6 +73,26 @@ def make_mask(argv):
     hdu = hdu_list[0]
 #   print('original image type =', hdu.data.dtype)
     incoming_dimensions = hdu.header['NAXIS']
+
+    pixel_size = hdu.header['CDELT2'] * 3600.0
+    bmaj = hdu.header['BMAJ'] * 3600.0
+    bmin = hdu.header['BMIN'] * 3600.0
+    pixels_beam = calculate_area(bmaj, bmin, pixel_size)
+    print('calculated pixels per beam', pixels_beam)
+#  calculate structure function disk radius
+    if filter_size == 0:
+      if filter_type == 'D':
+        radius_squared = pixels_beam / math.pi 
+        radius = math.sqrt(radius_squared)
+# assign a value for disk radius 2 greater than rounded area radius
+        filter_size = round(radius+0.5) + 1
+        print('**************** setting filter size to ', filter_size)
+      else:
+        side = math.sqrt(pixels_beam)
+        filter_size = round(side+0.5) + 1
+        print('**************** setting filter size to ', filter_size)
+      
+    
 
     orig_image = check_array(hdu.data)
     nans = np.isnan(orig_image)
@@ -85,7 +108,7 @@ def make_mask(argv):
     print('calling make_morphology_image with size', filter_size)
 
 #   o = original image
-    morphology_image = make_morphology_image(filename, filter_size, filter_type)
+    morphology_image = make_morphology_image(filename, filter_size, filter_type, double_erode = double_erode)
 #   d - output from erosion-> erosion-> dilation
 
 #   print('morphology image data max and min', morphology_image.max(), morphology_image.min())
@@ -107,6 +130,7 @@ def make_mask(argv):
 #   m = mask derived from a comparison where  t > some signal
 # create mask from filtered image, where filtered image signal > limiting flux
     mask = np.where(white_tophat>limiting_flux,1.0,0.0)
+    mask = update_dimensions(mask,incoming_dimensions)
     mask = mask.astype('float32')
     hdu.data = mask
     hdu.header['DATAMIN'] = 0.0
@@ -124,13 +148,14 @@ def make_mask(argv):
     filtered_data[nans] = 0
 
 #   print('filtered_data min and max', filtered_data.min(),  filtered_data.max())
-    masked_diffuse_image = mask * morphology_image
-    hdu.data = masked_diffuse_image
+#   write out m * d
+    masked_dilated_image = mask * morphology_image
+    hdu.data = masked_dilated_image
 #   print('filtered data max and min', hdu.data.max(), hdu.data.min())
-    hdu.header['DATAMAX'] =  filtered_data.max()
-    hdu.header['DATAMIN'] =  filtered_data.min()
+    hdu.header['DATAMAX'] =  masked_dilated_image.max()
+    hdu.header['DATAMIN'] =  masked_dilated_image.min()
 
-    outfile = filename +'.masked_diffuse_data.fits'
+    outfile = filename +'.masked_dilated_image.fits'
 #   print('filtered_data image output to ', outfile )
 #   write out m * d
     hdu.writeto(outfile, overwrite=True)
@@ -154,7 +179,7 @@ def make_mask(argv):
     hdu.header['DATAMIN'] =  hdu.data.min()
 
 #   print('hdu.data max and main', hdu.data.max(), hdu.data.min())
-    compact_outfile = filename +'_compact_structure_dilated.fits'
+    compact_outfile = filename +'.masked_compact_structure.fits'
 #   print('********** final compact file', outfile)
     hdu.writeto(compact_outfile, overwrite=True)
 #   print('wrote out', outfile)
@@ -169,7 +194,7 @@ def make_mask(argv):
     hdu.header['DATAMIN'] =  hdu.data.min()
 
 #   print('hdu.data max and main', hdu.data.max(), hdu.data.min())
-    diffuse_outfile = filename +'_diffuse_structure_dilated.fits'
+    diffuse_outfile = filename +'_diffuse_structure.fits'
 #   print('********** final diffuse', outfile)
     hdu.writeto(diffuse_outfile, overwrite=True)
 #   print('wrote out', outfile)
@@ -178,7 +203,7 @@ def make_mask(argv):
 # get locations of the features we want to add to the diffuse image 
 # with the polygon selection tool - to obtaim mask m_c
     if not do_batch:
-      polygon_gen = gen_p.make_polygon(hdu, mask, 'T')   # gives m_c
+      polygon_gen = gen_p.make_polygon(hdu, mask, 'T',  filename)   # gives m_c
       polygons = polygon_gen.out_data
       coords = polygons['coords']
       if len(coords) > 0:
@@ -203,12 +228,14 @@ def main( argv ):
    filter_size: argv[3] size for structure element 
               = radius of D or size of with for R
    filter_type: argv[4] D = Disk, R = Rectangle
-   do_batch = argv[5] do batch processing? T = Yes, F = don't
+   do_batch = argv[4] do batch processing? T = Yes, F = don't
+   double_erode =  argv[5] do double_erode? T = Yes, F = don't
 
   """
   if len(argv) > 4 :
+    print(' in main', argv)
 # run AGW's code
-    make_mask(argv)     # e.g. make_morphology_mask.py 3C236 6 5 D F
+    make_mask(argv)     # e.g. make_morphology_mask.py 3C236 6 5 D T F
   else:
 # otherwise run larry's code # eg make_orphology_mask.py XXX 5 5
 # for the function call

@@ -30,17 +30,20 @@ def ang_path(z, angle):
   ang_p = LAS_dist * angle
   return ang_p, LAS_dist, LUM_dist
 
-def equipartition_accurate(freq,theta_1, theta_2, flux, n_flux,z, alpha):
+def equipartition_accurate(freq,theta_1, theta_2, theta_actual, flux, n_flux,z, alpha):
    LAP, LAS_dist, LUM_dist = ang_path(z, theta_2) 
+   print('equipartition fluxes: total, nuclear ', flux, n_flux)
 #  print ('LAP in kpc ', LAP)
-   angle = math.radians(theta_1 / 3600.0)
+   angle = math.radians(theta_actual/ 3600.0)
    source_apparent_size = LAS_dist * angle
 #  print('source apparent size (kpc) ', source_apparent_size)
    a = 1.0 + z
    lobe_flux = flux - n_flux 
+   print('lobe flux is ', lobe_flux)
    flux_ratio = lobe_flux/ (theta_1 * theta_2 * LAP)
 #  print('flux_ratio', flux_ratio)
-   b = 2.0 * math.pow(a, 3.8) * flux_ratio  
+   gain = 3.0 - alpha
+   b = 2.0 * math.pow(a, gain) * flux_ratio  
    mu1 = 0.01
    mu2 = 100
    mu0 =  freq

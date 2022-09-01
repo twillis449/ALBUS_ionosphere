@@ -17,6 +17,7 @@ from check_array import check_array
 from breizorro_extract import make_noise_map
 from skimage.draw import polygon as skimage_polygon
 import generate_mask_polygons as gen_p
+import generate_manual_polygon as gen_m
 
 import os.path
 import numpy as np
@@ -29,28 +30,29 @@ from equipartition import *
 
 
 def process_simple_polygon_file(points):
-  print('processing polygon file ', points,' \n')
   poly_coord = []
-  text = open(points, 'r').readlines()
-  L = len(text)
-  for i in range(1,L):
-    info = text[i].split()
+  try:
+    print('processing polygon file ', points,' \n')
+    text = open(points, 'r').readlines()
+    L = len(text)
+    for i in range(1,L):
+      info = text[i].split()
 #   print('i info ', i, info)
-    x_coord = float(info[0])
-    y_coord = float(info[1])
-    poly_coord.append((x_coord,y_coord))
+      x_coord = float(info[0])
+      y_coord = float(info[1])
+      poly_coord.append((x_coord,y_coord))
+  except:
+    pass
   return poly_coord
 
 
-def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,threshold_value):
+def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,do_subt, threshold_value, noise):
 # note - no '.fits' extension expected ... but
     if filename.find('conv'):
       use_conv = True
     else :
       use_conv = False
-    use_mask = True
-    if use_mask_l == 'F':
-      use_mask = False
+    use_mask = use_mask_l
     multi = False
     location =  filename.find('.fits')
     if location > 0:
@@ -58,7 +60,7 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,th
         filename = filename[:location]
     if location < 0:
       fits_file =  filename + '.fits'
-#   print('processing fits image file ', fits_file,' \n')
+    print('processing fits image file ', fits_file,' \n')
     hdu_list = fits.open(fits_file)
     hdu = hdu_list[0]
     w = WCS(hdu.header)
@@ -73,6 +75,7 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,th
     bmin = hdu.header['BMIN'] * 3600.0
     pixels_beam = calculate_area(bmaj, bmin, pixel_size)
 #   print('calculated pixels per beam', pixels_beam)
+    mean_beam = 0.5 * (bmaj + bmin)
 
     # Download the polygon points
     poly_coord = []
@@ -80,10 +83,12 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,th
 # figure out name of polygon points file
     num_polygons = 0
     if use_mask:
+      print('looking for a breizorro mask file')
       print('calling make_polygon from calc')
       data = check_array(hdu.data)
-      noise = make_noise_map(data)
-      print('calculate_parametersk:  noise ', noise)
+      if noise == 0:
+        noise = make_noise_map(data)
+      print('calculate_parameters:  noise ', noise)
       if noise <= 0:
          print('***** warning: breizorro returning noise = ', noise)
          noise = np.std(data)
@@ -94,16 +99,14 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,th
       mask = mask.astype('float32')
 
       hdu.data = data
-      polygon_gen = gen_p.make_polygon(hdu, mask, 'F')
-      json_polygons = polygon_gen.out_data
-      try:
-        polygon_list, coords, ang_size_all, lobe_las, max_pa, lobe_pa = process_json_file(json_polygons,pixel_size)
+      json_polygons = gen_p.make_polygon(hdu, mask, 'F', fits_file)
+      if len(json_polygons.out_data['coords']) > 0:
+        polygon_list, coords, ang_size_all, lobe_las, max_pa, lobe_pa = process_json_file(json_polygons.out_data,pixel_size)
         num_polygons = len(polygon_list)
-#       print('**************number of polygons', num_polygons)
-      except:
+      else:
         num_polygons = 0
       if num_polygons > 0:
-#       print('****** angular sizes ', lobe_las)
+        print('****** angular sizes ', lobe_las)
         if len(polygon_list) > 1:
           p = MultiPolygon(polygon_list)
           multi = True
@@ -114,31 +117,43 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,th
           total_area = p.area
           computer_las = lobe_las[0]
           max_pa = lobe_pa[0]
-#         print('we have one polygon')
-#         print('we have a single polygon with las = ', computer_las)
+          print('we have one polygon')
+          print('we have a single polygon with las = ', computer_las-mean_beam)
         #interior_points = get_interior_locations(polygon_list)
-#         print('setting polygons_dict to ', polygons_dict.keys())
       else:
          print('No Polygons selected!')
          print('Unable to do calculations, so exiting')
+         print(' ')
          return
     else:
-      points = filename + '.simple_polygon'
-#     print('looking for test file ', points)
-      polygon_list = [] 
-      if os.path.isfile(points):
-        poly_coords = process_simple_polygon_file(points)
-        multi = False
-#       print('simple coords', poly_coords)
-        list_p = []
-        p = Polygon(poly_coords)
-        polygon_list.append(p)
-        centroid = p.centroid
-#       print('centroid', centroid)
-        result = maxDist(poly_coords,pixel_size)
-        computer_las = result[0]
-        lobe_las = computer_las
-        max_pa = result[1]
+      print('using manual interface')
+      json_polygons = gen_m.make_manual_polygon(fits_file)
+      print('***** manual json polygons',  json_polygons.out_data)
+      if json_polygons.out_data:
+        polygon_list, coords, ang_size_all, lobe_las, max_pa, lobe_pa = process_json_file(json_polygons.out_data,pixel_size)
+        num_polygons = len(polygon_list)
+      else:
+        num_polygons = 0
+      if num_polygons > 0:
+        print('****** angular sizes ', lobe_las)
+        if len(polygon_list) > 1:
+          p = MultiPolygon(polygon_list)
+          multi = True
+          total_area = p.area
+          computer_las = ang_size_all
+        else:
+          p = Polygon(polygon_list[0])
+          total_area = p.area
+          computer_las = lobe_las[0]
+          max_pa = lobe_pa[0]
+          print('we have one polygon')
+          print('we have a single polygon with las = ', computer_las)
+        #interior_points = get_interior_locations(polygon_list)
+      else:
+         print('No Polygons selected!')
+         print('Unable to do calculations, so exiting')
+         print(' ')
+         return
     if multi:
       n = len(polygon_list) + 1
     else:
@@ -167,15 +182,17 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,th
        p =  polygon_list[i-1]
        relative_area = p.area / total_area
        centroid = p.centroid
-#      print('centroid location', centroid.x,centroid.y)
-       lon, lat = w.all_pix2world(centroid.x,centroid.y,0)
-#      print('*********  lon, lat ',  lon, lat )
-#      print('centroid ra, dec', lon, lat)
+       print('centroid location', centroid.x,centroid.y)
+#      lon, lat = w.all_pix2world(centroid.x,centroid.y,0)
+# as usual stupid x and y cordinate switching problem
+       lon, lat = w.all_pix2world(centroid.y, centroid.x,0)
+       print('*********  lon, lat ',  lon, lat )
+       print('centroid ra, dec', lon, lat)
        h,m,s = rad_to_hms(math.radians(lon))
        h_m_s = str(h) + 'h'+str(m)+'m'+ str(round(s,2))+'s'
-#      print('h m s',h,m,round(s,2))
+       print('h m s',h,m,round(s,2))
        d,m,s = rad_to_dms(math.radians(lat))
-#      print('d m s',d,m,round(s,2))
+       print('d m s',d,m,round(s,2))
        d_m_s = str(d) + 'd'+str(m)+'m'+ str(round(s,2))+'s'
        source = h_m_s + ' ' + d_m_s
 
@@ -186,20 +203,18 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,th
 #     print('poly minx, miny, maxx, maxy', minx, miny, maxx, maxy)
 
       if i == 0:
+        print('loading WCS etc')
     # Load the image and the WCS
 # note there doesn't seem to be any 'standard' way to describe
 # frequency in FITS
 # note: RACS frequency = 887.5 MHz
         freq_str = str(round(freq,3))
 #       print('using frequency (ghz)', freq_str)
-        data = hdu.data
-        if len(data.shape) == 2:
-           data = np.array(data[:, :])
-        elif len(data.shape) == 3:
-           data = np.array(data[0, :, :])
+        data = check_array(hdu.data)
+        if noise == 0:
+          rms_noise = make_noise_map(data)
         else:
-           data = np.array(data[0, 0, :, :])
-        rms_noise = make_noise_map(data)
+          rms_noise = noise
 #       print('rms_noise will tested for value 1e-10')
         breizorro_noise = True
         if rms_noise <= 1e-10:
@@ -215,26 +230,26 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,th
 #       print('initial theta_small', theta_small)
 # now adjust thetas by beam smearing factor
         theta_big = computer_las
+        theta_actual = computer_las - mean_beam
 #       print('theta_small arcsec', theta_small)
         try:
-#         print('reference ra and dec', ref_ra, ref_dec)
+          print('reference ra and dec', ref_ra, ref_dec)
           pixels = w.all_world2pix([[ref_ra,ref_dec]],0)
-#         print ('pixels', pixels)
-#         print('pixels[0][0]', pixels[0][0])
-#         print('pixels[0][1]', pixels[0][1])
-          nuclear_pos = Point(pixels[0][0], pixels[0][1])
-#         print('nuclear_pos', nuclear_pos)
+          print ('pixels', pixels)
+          print('pixels[0][0]', pixels[0][0])
+          print('pixels[0][1]', pixels[0][1])
           y = int(pixels[0][1])
           x = int(pixels[0][0])
-#         print('y x', y,x)
+          print('nuclear pos y x', y,x)
           n_flux_mjy = data[y,x] * 1000.0
-#         print('signal (mJy) at nuclear_position', n_flux_mjy)
+          print('signal (mJy) at nuclear_position', n_flux_mjy)
+          nuclear_pos = Point(y, x)
         except:
           print('failure to get pixels from central source coordinates')
           ref_ra = hdu.header['CRPIX1']
           ref_dec = hdu.header['CRPIX2']
           nuclear_pos = Point(ref_ra, ref_dec)
-#         print('*** nuclear_pos', nuclear_pos)
+          print('*** nuclear_pos', nuclear_pos)
 
 # set NaNs to zero
         data = np.nan_to_num(data)
@@ -249,6 +264,7 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,th
 #         print('i hypotenuse , minor ellipse',i, hypotenuse, ellipse_half_size)
           theta_small =  ellipse_half_size *2 * pixel_size   # twice size times pixel size
           theta_big = float(lobe_las[i-1])
+          theta_actual = float(lobe_las[i-1]) - mean_beam
 #         print('area based theta_big and theta_small', theta_big, theta_small)
         except:
           theta_big = pixel_size * pixel_size *math.sqrt(p.area / math.pi)
@@ -262,12 +278,14 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,th
 #     print('x range fast  = ', int(minx-1), int(maxx+1))
 #     print('y range slow  = ', int(miny-1), int(maxy+1))
 #     print('data shape', data.shape)
-#     print('polygons_dict has keys', polygons_dict.keys())
       img_mask = np.zeros(data.shape, dtype=np.float)
 #     print('len polygon list', len(polygon_list))
       if i == 0:
         for ii in range(len(polygon_list)):
           result = polygon_list[ii]
+#         print('selected polygon', result)
+          if result.contains(nuclear_pos) and do_subt:
+            print('polygon containing nuclear source ', ii)
           x, y = result.exterior.coords.xy
 # Switch x, y  because retrieved x, y values are matplotlib display coordinates
 # which are opposite to numpy array coordinates
@@ -276,15 +294,13 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,th
 # determine all points inside a polygon.
           rr, cc = skimage_polygon(x,y, data.shape)
           img_mask[rr, cc] = 1
+        hdu.data = img_mask
+        hdu.writeto('simple_polygon_mask.fits',overwrite=True)
         data_result = data *img_mask 
         sum =  data_result.sum()
-#       print('*** total sum is ', sum)
         max_signal = data_result.max()
         contained_points = int(img_mask.sum())
-#       print('contained points', contained_points)
-#       print('sum (mJy)', sum* 1000)
       else:
-#       print('processing polygon ', i-1)
         result = polygon_list[i-1]
         x, y = result.exterior.coords.xy
         rr, cc = skimage_polygon(x,y, data.shape)
@@ -296,28 +312,35 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,th
         if max_val > max_signal:
           max_signal = max_val
         contained_points = int(img_mask.sum())
+      num_beams =  contained_points / pixels_beam
       flux = sum / pixels_beam
 #     print('raw total flux density', flux)
       n_flux = 0.0
       p_cont = False
 #     print('max_signal vs total flux ', max_signal, flux)
       max_flux_ratio = np.abs((max_signal - flux) / max_signal) 
+      max_flux_ratio = np.abs((max_signal - flux) / flux) 
 #     print('max_flux_ratio ', max_flux_ratio)
       if max_flux_ratio < 0.2:
          point_source = True
       else:
          point_source = False
-      if p.contains(nuclear_pos):
-#       print('polygon containing nuclear soure ', i)
+#     print('nuclear_pos testing ', nuclear_pos)
+#     print('polygon', p)
+      if p.contains(nuclear_pos) and do_subt:
+        print('*** polygon containing nuclear source ', i)
         n_flux = n_flux_mjy / 1000.0 # convert to Jy
-#       print('nuclear flux', n_flux)
+        print('nuclear flux', n_flux)
         p_cont = True
         p_subt = False
-#       print('i comparison fluxes ', i, flux, n_flux) # fluxes in units of Jy
+        print('i comparison fluxes ', i, flux, n_flux) # fluxes in units of Jy
         if n_flux > 0.0:
-#         flux = flux - n_flux
-#         p_subt = True
+          diff_flux = flux - n_flux
+          if diff_flux > 0.0:
+            p_subt = True
+        else:
           n_flux = 0.0
+          p_cont = False
 #         print('i adjusted comparison fluxes ', i, flux, n_flux) # fluxes in units of Jy
 #     print('points in polygon', contained_points)
 #     print ('sums good', sum)
@@ -330,7 +353,7 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,th
 
 # adjust angular sizes for convolution
 #        print('calling equipartition')
-         B_me, u_me, LAS_dist, LAP, LUM_dist, lum, source_size, volume = equipartition_accurate(freq, theta_big, theta_small, flux, n_flux, z, alpha)
+         B_me, u_me, LAS_dist, LAP, LUM_dist, lum, source_size, volume = equipartition_accurate(freq, theta_big, theta_small, theta_actual, flux, n_flux, z, alpha)
 #        print('magnetic field (gauss)',  B_me)
 #        print('energy_density (erg/cm^3', u_me)
          if i > 0:
@@ -356,7 +379,7 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,th
         output = 'luminosity distance (Mpc) : ' + str(round(LUM_dist/1000.0,2)) + '\n'
         f.write(output)
         if not point_source:
-          output = 'Computer generated source angular size (arcsec): ' + str(round(computer_las,2)) +'\n'
+          output = 'Computer generated source angular size (arcsec): ' + str(round(computer_las-mean_beam,2)) +'\n'
           f.write(output)
           output = '  At position angle (degrees): ' + str(round(max_pa,0)) +'\n'
           f.write(output)
@@ -407,6 +430,9 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,th
       else:
         output = 'lobe flux density (mJy) : ' + str(round(flux*1000.0,2)) + ' \n'
       f.write(output)
+      beam_error = num_beams  * rms_noise * 1000
+      ten_pc_error = 0.1 * flux * 1000
+#     flux_density_error = math.sqrt(ten_pc_error * ten_pc_error + beam_error * beam_error)
       flux_density_error = math.sqrt(contained_points) * rms_noise * 1000 
       if i == 0:
         output = 'source flux density error (mJy) : ' + str(round(flux_density_error,2)) + ' \n'
@@ -418,9 +444,9 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,th
           output = 'polygon contains nuclear source \n'
           f.write(output)
           if p_subt:
-            output = 'nuclear flux density  (mJy) ' + str(round(n_flux_mjy,3)) + ' subtracted from total flux density \n'
+            output = 'for equipartition: nuclear flux density ' + str(round(n_flux_mjy,3)) + ' mJy subtracted from total flux density \n'
           else:
-            output = 'nuclear flux density  (mJy) ' + str(round(n_flux_mjy,3)) + ' not subtracted from total flux density \n'
+            output = 'nuclear flux density ' + str(round(n_flux_mjy,3)) + ' mJy not subtracted from total flux density \n'
           f.write(output)
       output = 'equipartition calculations etc assume a spectral index of ' + alpha_str + ' \n'
       f.write(output)

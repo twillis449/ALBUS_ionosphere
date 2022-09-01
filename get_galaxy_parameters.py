@@ -11,29 +11,18 @@ import timeit
 import subprocess
 from astropy.io import fits
 from astropy.coordinates import SkyCoord
-from check_array import check_array
-from breizorro_extract import make_noise_map
 from read_input_table import  process_input_file
 from calculate_source_parms import analyze_image
+from optparse import OptionParser
 
 
-def process_images(filename, skip_generating_mask, use_breizorro_mask_l, use_conv_l, threshold_value):
+def process_images(filename, use_b_mask, use_conv, do_subt, threshold_value,noise):
         print('processing file ', filename)
-        if use_breizorro_mask_l =='T':
-          use_b_mask = True
-          print('using mask')
-        else:
-          use_b_mask = False
-        if use_conv_l =='T':
-          print('using convolved_images')
-          use_conv = True
-        else:
-          use_conv = False
-        if skip_generating_mask == 'T':
-          skip_generating_mask = True
-          print('skipping mask')
-        else:
-          skip_generating_mask = False
+        print('use_b_mask', use_b_mask)
+        print('use_conv', use_conv)
+        print('do_subt', do_subt)
+        print('threshold value', threshold_value)
+        print('default noise (Jy)', noise)
         freq, names, ra_deg, dec_deg, las, las_raw, red_shift, spec_index = process_input_file(filename)
 # for testing
         perform_test = False
@@ -57,6 +46,7 @@ def process_images(filename, skip_generating_mask, use_breizorro_mask_l, use_con
             field_name = out_ra_dec +'_conv'
           else:
             field_name = out_ra_dec 
+
           print('i, field_name_i ', i, field_name)
           print('fits_file is ', field_name)
           location = las_raw[i].find('>')
@@ -84,24 +74,34 @@ def process_images(filename, skip_generating_mask, use_breizorro_mask_l, use_con
             print ("File does not exist")
             continue
           location = object_name.find('.fits')
-          if not skip_generating_mask:  
-            if not use_b_mask:
-              print('generating manual mask')
-# use breizorro to get noise
-              info_1 = object_name[:location] + '.fits'
-              cmd = 'generate_manual_polygon.py '  + info_1
-              print('processing cmd', cmd)
-              returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
-              info_1 = object_name[:location] 
-              cmd = 'mv selected_polygons.png ' + info_1 + '.simple_mask.png'
-              print('processing cmd ', cmd)
-              returned_value = subprocess.call(cmd, shell=True)  # returns the exit code in unix
-          analyze_image(field_name,freq,red_shift[i],spec_index[i],las_HA,use_breizorro_mask_l,threshold_value)
-
+          analyze_image(field_name,freq,red_shift[i],spec_index[i],las_HA,use_b_mask,do_subt, threshold_value, noise)
 
 
 def main( argv ):
-  start_time = timeit.default_timer()
+   parser = OptionParser(usage = '%prog [options] ')
+   parser.add_option('-f', '--file', dest = 'filename', help = 'Filename with radio source names, positions, redshift etc (default = None)', default = None)
+   parser.add_option('-m', '--use_m', dest = 'use_mask', help = 'use mask (default = T)', default = True)
+   parser.add_option('-c','--use_conv', dest = 'use_conv', help = 'use convolved image (default = F)', default = False)
+   parser.add_option('-s','--subt', dest = 'do_subt', help = 'subtract central pixel flux density for equipartition (default = T)', default = True)
+   parser.add_option('--th', '--threshold', dest = 'threshold', help = 'Threshold value forsoure detection in units of noise (default = 6)', default = 6)
+   parser.add_option('-n', '--noise', dest = 'noise', help = 'noise specification in mJy, where noise cannot be found from image (default = 0)', default = 0)
+   (options,args) = parser.parse_args()
+   print('options', options)
+   filename = options.filename
+   use_conv = options.use_conv
+   do_subt = options.do_subt
+   print('do_subt', do_subt)
+   use_mask = options.use_mask
+   noise = float(options.noise) / 1000.0
+   signal_flux = float(options.threshold)
+   if use_conv != False:
+     use_conv = True
+   if use_mask != True:
+     use_mask = False
+   if do_subt != True:
+     do_subt = False
+
+   start_time = timeit.default_timer()
 # nominally use a .csv file such as '3C236.csv' as input foe argv[1]
   # argv[1] = name of pipeline input file with information such as frequency, positions, redshifts
   # argv[2] T = skip the mask making process 
@@ -109,11 +109,11 @@ def main( argv ):
   # argv[4] T = use a convolved radio image
   # argv[5] threshold value for signal derection ( = factor by which to 
   #         multiply breizorro noise)
-  process_images(argv[1], argv[2], argv[3], argv[4], argv[5])
+   process_images(filename, use_mask, use_conv, do_subt,signal_flux, noise)
 
-  print('get_galaxy_parameters: finished \n')
-  elapsed = timeit.default_timer() - start_time
-  print("Run Time:",elapsed,"seconds")
+   print('get_galaxy_parameters: finished \n')
+   elapsed = timeit.default_timer() - start_time
+   print("Run Time:",elapsed,"seconds")
 #=============================
 # argv[1]  incoming positions file 
 if __name__ == "__main__":

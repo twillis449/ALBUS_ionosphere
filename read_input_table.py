@@ -3,7 +3,10 @@
 # have varied over time
 
 def process_input_file(filename,return_morphology_parameters=False):
+    print('filename is', filename)
+    print('return_morphology_parameters', return_morphology_parameters)
     text = open(filename, 'r').readlines()
+    print('text is ', text)
     info = text[0].split()
     print('opening info ', info)
     freq = info[1]
@@ -39,6 +42,7 @@ def process_input_file(filename,return_morphology_parameters=False):
         red_shift.append(info[index+3])
         try: 
           spec_index.append(info[index+4])
+          print('using spectral index of ', spec_index)
         except:
           print('using default spectral index')
           spec_index.append('-0.75')

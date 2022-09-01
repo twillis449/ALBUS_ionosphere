@@ -20,7 +20,7 @@ from astropy.wcs import WCS
 from check_array import check_array
 
 class make_polygon:
-  def __init__(self,hdu,mask,morph_signal):
+  def __init__(self,hdu,mask,morph_signal, file_name):
     self.coords = []
     self.qannotate = []
     self.out_data = {}
@@ -29,6 +29,7 @@ class make_polygon:
     self.hdu = hdu
     self.hdu.data = check_array(self.hdu.data)
     self.mask = check_array(mask)
+    self.file_name = file_name
 
     self.compare_fields()
 
@@ -70,8 +71,7 @@ class make_polygon:
           textcoords='offset points', ha='right', va='bottom',
           bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
           arrowprops=dict(arrowstyle = '->', connectionstyle='arc3,rad=0')) )
-
-        ax.figure.canvas.draw()
+#       ax.figure.canvas.draw()
       else: 
         ax = plt.gca()
         label  = 'main lobe'
@@ -81,17 +81,11 @@ class make_polygon:
           textcoords='offset points', ha='right', va='bottom',
           bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5),
           arrowprops=dict(arrowstyle = '->', connectionstyle='arc3,rad=0')) )
-        ax.figure.canvas.draw()
-      if self.morph_sign == 'T':
-        outpic = 'selected_polygons_for_morphology_analysis.png'
-        if os.path.isfile(outpic):
-          os.remove(outpic)
-      else:
-        outpic = 'selected_polygons_for_flux_density_analysis.png'
-        if os.path.isfile(outpic):
-          os.remove(outpic)
-#      print('system wrote out ',outpic)
-      plt.savefig(outpic)
+      ax.figure.canvas.draw()
+      self.outpic = self.image_title.replace(" ", "_") + '.png'
+      if os.path.isfile(self.outpic):
+        os.remove(self.outpic)
+      plt.savefig(self.outpic)
     if event.button == 3:
       ax = plt.gca()
       for i in range(len(self.qannotate)):
@@ -121,10 +115,18 @@ class make_polygon:
 
 # print('starting plot')
     fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(8, 4), sharex=True, sharey=True)
+    end_point = self.file_name.find('.fits')
     if self.morph_sign  == 'T':
-      plt.suptitle('Comparison of Diffuse and Compact Structures')
+      if end_point > -1:
+        self.image_title = self.file_name[:end_point] + ' Comparison of Diffuse and Compact Structures'
+      else:
+        self.image_title = self.file_name + ' Comparison of Diffuse and Compact Structures'
     else:
-      plt.suptitle('Define Polygons for Flux Density Analysis' )
+      if end_point > -1:
+        self.image_title = self.file_name[:end_point] + ' Polygons for Flux Density Analysis'
+      else:
+        self.image_title = self.file_name + ' Polygons for Flux Density Analysis'
+    plt.suptitle(self.image_title)
     interval = vis.PercentileInterval(99.9)
     vmin,vmax = interval.get_limits(self.hdu.data)
  # print('original intensities', vmin,vmax)
@@ -154,6 +156,7 @@ class make_polygon:
       ax2.set_title('Compact Mask')
     else:
       ax2.set_title('Radio Mask')
+
     cid = fig.canvas.mpl_connect('button_press_event', self.onclick)
 
 # Get one of the contours from the plot.
@@ -218,7 +221,6 @@ class make_polygon:
           y_coord = float(x[k])
           x_coord = float(y[k])
           poly_coord.append((x_coord,y_coord))
-
 # weird - to get the global variable stuff printed out I have to shut down the display
 # via the mpl_disconnect function
     mask_location = 1
@@ -238,12 +240,16 @@ class make_polygon:
       self.out_data['coords'] = self.coords
     else:
       self.out_data['coords'] = []
+    self.out_data['manual'] = False
 
     return self.out_data
 
 def main(argv ):
   print('args ', argv) 
-  polygon_gen = make_polygon(argv[1], argv[2], argv[3])
+  if len(args) == 5:
+    polygon_gen = make_polygon(argv[1], argv[2], argv[3], argv[4])
+  else:
+    polygon_gen = make_polygon(argv[1], argv[2], argv[3], ' ')
 if __name__ == '__main__':
-  print('generate_msk_polygons argv', sys.argv)
+  print('generate_mask_polygons argv', sys.argv)
   main(sys.argv)

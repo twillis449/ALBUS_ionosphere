@@ -1,112 +1,127 @@
 #!/usr/bin/env python
 
+# A script that examines an image and generates polygons (== contours) at 
+# locations where the signal in the image is above a specified level.
+# It outputs the contours for analysis in later acripts
+
 import sys
 import os
+import json
+import math
+import subprocess
 import numpy as np
 import matplotlib.pylab as plt
 import matplotlib.cm as cm
 import astropy.visualization as vis
+from astropy.utils.data import get_pkg_data_filename
 from shapely.geometry import Polygon, Point
 from astropy.io import fits
 from astropy.wcs import WCS
 from check_array import check_array
-import subprocess
 
-coords = []
+class make_manual_polygon:
+  def __init__(self,file_name):
+    self.coords = []
+    self.out_data = {}
+    self.file_name = file_name
+    hdu_list = fits.open(self.file_name)
+    self.hdu = hdu_list[0]
+    self.image = check_array(self.hdu.data)
+    self.compare_fields()
+
+# def __str__(self):
+#       print("polygons =", self.out_data)
+
+  def write(self, d=None):
+        print(self.__dict__)
+
 # Simple mouse click function to store coordinates
-def onclick(event):
+  def onclick(self,event):
     if event.button == 1:
-#     global ix, iy
       ix, iy = event.xdata, event.ydata
-      print('*** raw pos', ix, iy)
-      print('*** x = %d, y = %d'%(ix, iy))
+#     print('*** raw pos', ix, iy)
 
     # assign global variable to access outside of function
-      global coords
       loc = (ix, iy)
-      coords.append(loc)
-#     print('*** updated coords', coords)
-      if len(coords) > 1:
+#     print('even_loc', loc)
+      self.coords.append(loc)
+      if len(self.coords) > 1:
         x = []
         y = []
-        for i in range(len(coords)):
-          x.append(coords[i][0])
-          y.append(coords[i][1])
+        for i in range(len(self.coords)):
+          x.append(self.coords[i][0])
+          y.append(self.coords[i][1])
         x =  np.array(x)
         y =  np.array(y)
+#       print('x,y', x,y)
         ax = plt.gca()
-        if len(coords) > 1:
-          ax.lines = plt.plot(x, y, 'b')
+        ax.lines = plt.plot(x, y,'y')
         ax.figure.canvas.draw()
-        plt.savefig('selected_polygons.png')
-
+      self.title = self.file_name + ' Manual Polygon for Flux Density Analysis'
+      self.outpic = self.title.replace(" ", "_") + '.png'
+      if os.path.isfile(self.outpic):
+        os.remove(self.outpic)
+      plt.savefig(self.outpic)
     if event.button == 3:
-      print('resetting coords to zero')
-      coords = []
       ax = plt.gca()
+      self.coords = []
       ax.lines = []
       ax.figure.canvas.draw()
-      plt.savefig('selected_polygons.png')
+      if os.path.isfile(self.outpic):
+        os.remove(self.outpic)
     return
 
+  def compare_fields(self):
+    cen_x = self.hdu.header['CRPIX1']
+    cen_y = self.hdu.header['CRPIX2']
 
-def create_polygon(filename):
-    # Download the image
+#We can examine the two images (this makes use of the wcsaxes package behind the scenes):
+
+    wcs = WCS(self.hdu.header)
+    print('orginal wcs', wcs)
+# print('wcs', wcs)
     fig = plt.figure(1)
 
-    # Load the image and the WCS
-    hdu_list = fits.open(filename)
-    print ('info',hdu_list.info())
-    hdu = hdu_list[0]
-    data = check_array(hdu.data)
+# print('starting plot')
+    cid = fig.canvas.mpl_connect('button_press_event', self.onclick)
 
 # set NaNs to zero
-    data = np.nan_to_num(data)
-# set all negative numbers to zero
-    print('data type ', data.dtype.name)
-    print('data shape', data.shape)
-    shape = data.shape
-    print(type(data))
-    wcs = WCS(hdu.header)
-    print('orginal wcs', wcs)
-  
+    self.image = np.nan_to_num(self.image)
     plt.subplot(projection=wcs.celestial)
     interval = vis.PercentileInterval(99.9)
-    vmin,vmax = interval.get_limits(data)
+    vmin,vmax = interval.get_limits(self.image)
     vmin = 0.0
     norm = vis.ImageNormalize(vmin=vmin, vmax=vmax, stretch=vis.LogStretch(1000))
 #   plt.grid(color='white', ls='solid')
     plt.xlabel('RA')
     plt.ylabel('DEC')
-    plt.title(filename)
+    plt.title(self.file_name)
     
-    plt.imshow(data, cmap =plt.cm.gray, norm = norm, origin = 'lower')
-    cid = fig.canvas.mpl_connect('button_press_event', onclick)
+    plt.imshow(self.image, cmap =plt.cm.gray, norm = norm, origin = 'lower')
     plt.show()
     fig.canvas.mpl_disconnect(cid)
-    if len(coords) > 2:
-        location =  filename.find('.fits')
-        outfile = filename[:location] + '.simple_polygon'
-        if os.path.isfile(outfile):
-          os.remove(outfile)
-        f = open(outfile, 'w')
-        output = 'polygon outer boundary \n'
-        f.write(output)
-        print('number of bounds coord', len(coords) )
-        for i in range(len(coords)):
-          a = round(coords[i][0])
-          b = round(coords[i][1])
-          output = str(a) + ' ' +  str(b)  + '\n'
-          print(output)
-          f.write(output)
-        f.close()
-    print('***************** interior exit')
-    return
+    length = len(self.coords) 
+    if length > 2:
+      locations = []
+      for i in range(length):
+         print('initial', self.coords[i])
+         x = self.coords[i][0]
+         y = self.coords[i][1]
+         loc = (y,x)
+         locations.append(loc)
+      print('************* coords to be dumped', locations)
+      num_contours = 1
+      self.out_data['num_contours'] = num_contours
+      self.out_data['0'] = locations
+      p = Polygon(locations)
+      self.out_data['manual'] = True
+    print('returning ', self.out_data)
+    return self.out_data
 
-def main( argv ):
-  filename = argv[1]
-  create_polygon(filename)
-
+def main(argv):
+  print('args ', argv) 
+  polygon_gen = make_manual_polygon(argv[1])
+# print('polygon generated ', polygon_gen.out_data)
 if __name__ == '__main__':
-    main(sys.argv)
-
+  print('generate_manual_polygons argv', sys.argv)
+  main(sys.argv)

@@ -24,19 +24,17 @@ def maxDist1(p,scale):
 
 def simple_distance(p1,p2,scale):
     x0 = (p1[0] - p2[0]) * scale
+    y0 = math.fabs((p1[1] - p2[1]) * scale)
     y0 = (p1[1] - p2[1]) * scale
-    try:
-      tan = math.degrees(math.atan2(x0,y0)) 
-    except:
-      tan = 0.0
+    tan = math.degrees(math.atan2(x0,y0)) 
     dist = math.sqrt(x0 * x0 + y0 * y0)
-#   print('delta x y, dist, tan angle', x0, y0, dist, tan)
     return x0 * x0 + y0 * y0 , tan
 
 # Function to find the maximum
 # distance between any two points
 def maxDist(p,scale):
     n = len(p)
+#   print ('length of p ', n)
     maxm = 0
     tan = 0
     p_0 = p[0]
@@ -51,19 +49,22 @@ def maxDist(p,scale):
               tan = tan1
               p_0 = p[i]
               p_1 = p[j]
-#             print('updated tan angle', tan)
-    if tan < 0:
-      tan = abs(tan)
-    else:
-      tan = 180 - tan
+    tan = 90.0 + tan
+    if tan < 0.0:
+      tan = tan + 180.0
+    if tan > 180.0:
+      tan = tan - 180.0
     return (math.sqrt(maxm), tan, p_0, p_1)
 
 def process_json_file(in_data, pixel_size=0.0):
 
   num_contours = in_data['num_contours']
 # print('num_contours', num_contours)
-  coords = in_data['coords']
-  if len(coords) == 0:
+  try:
+    coords = in_data['coords']
+  except:
+    coords = []
+  if len(coords) == 0 and in_data['manual'] == False:
     polygon_list = []
     return polygon_list, coords
 # print('number of separate contours', num_contours)
@@ -83,7 +84,10 @@ def process_json_file(in_data, pixel_size=0.0):
       
 #   find n largest values
 #   print('**** coords', coords)
-    n = len(coords)
+    if in_data['manual']:
+      n = 1
+    else:
+      n = len(coords)
     polygon_list = []
     las = []
     las_pa = []
@@ -92,7 +96,9 @@ def process_json_file(in_data, pixel_size=0.0):
 #     print('outer iteration', i)
       found = False 
 #     print('coordinate ', coords[i])
-      Pt = Point(coords[i])
+      if not in_data['manual']:
+        Pt = Point(coords[i])
+      else: Pt = Point([0.0,0.0])
       for l in range(length):
 #       print('inner iteration', l)
         rslt = sortedArr[l] 
@@ -105,10 +111,13 @@ def process_json_file(in_data, pixel_size=0.0):
           new = len(p.exterior.coords)
           if new < old:
             in_data[str(contour_number)] = list(p.exterior.coords)
-        if p.contains(Pt):
+        if p.contains(Pt) or in_data['manual'] :
 #         print('********* containing contour', l)
           polygon_list.append(p)
           if pixel_size > 0.0:
+#           result = maxDist1(poly_coord,pixel_size)
+#           print('maxDist1 gives ', result)
+#           las.append(result)
             result = maxDist(poly_coord,pixel_size)
             las.append(result[0])
             las_pa.append(result[1])
