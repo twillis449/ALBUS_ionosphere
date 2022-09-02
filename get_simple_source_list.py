@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# scripe to generate galaxy polygons and then use polygons
+# scripe to generate polygons from contours and then use polygons
 # to get source positions and flux densities
 
 import sys
@@ -24,19 +24,21 @@ from process_polygon_data import maxDist, simple_distance
 from operator import itemgetter, attrgetter
 from multiprocessing import Process, Queue
 
+# 'boiler plate' function for handling Queue-based 
+# parallel processing
 def contour_worker(input, output):
   for func, args in iter(input.get, 'STOP'):
     result = func(*args)
     output.put(result)
 
+# function for processing individual polygons / contours to 
+# get contained flux densities  as well as determine if a source is
+# resolved or extended
 def Process_contour(x,y):
    source_pos = (-10000.0, 0) # return something even if our result is garbage
    rr, cc = skimage_polygon(x,y)
-#  print('shapes', rr.shape, cc.shape)
    data_result = orig_image[rr,cc]
-#  print('data_result.shape', data_result.shape)
    sum =  data_result.sum() / pixels_beam
-#  print('sum is ', sum)
    contained_points = len(rr) # needed if we want a flux density error
    point_source = False
    try:
@@ -135,6 +137,8 @@ def Process_contour(x,y):
       source_pos = (lon, output, use_max) # we will sort on the lon (ra)
    return source_pos
 
+# function that uses input parameters to set up things for distributed
+# and parallel data processing
 def generate_source_list(filename, threshold_value, noise):
     global orig_image, pixels_beam , w, pixel_size, mean_beam, noise_out , limiting_flux
     lowercase_fits = filename.lower()
@@ -155,6 +159,9 @@ def generate_source_list(filename, threshold_value, noise):
     orig_image[nans] = 0
     print('original image max signal', orig_image.max())
 
+# the 'orig_image' can be defined as a global variable as it is only
+# used in read-only mode. So it can be shared over separate cores / threads
+# without worrying that something can get over-written during processing
     incoming_dimensions = hdu.header['NAXIS']
     pixel_size = hdu.header['CDELT2'] * 3600.0
     bmaj = hdu.header['BMAJ'] * 3600.0
@@ -201,7 +208,7 @@ def generate_source_list(filename, threshold_value, noise):
       except:
         pass
 
-#   num_processors = 1
+# set up tasks and queues
     TASKS = []
     for i in range(len(contours)):
        contour = contours[i]
@@ -232,6 +239,7 @@ def generate_source_list(filename, threshold_value, noise):
        if source_pos[0] > -10000.0:
          source_list.append(source_pos)
          num_max =  num_max + source_pos[2]
+
  # Tell child processes to stop
     for i in range(num_processors):
       task_queue.put('STOP')
@@ -272,6 +280,8 @@ def main( argv ):
    elapsed = timeit.default_timer() - start_time
    print("Run Time:",elapsed,"seconds")
 #=============================
+#
 # example: run as 'get_simple_source_list.py -f xyz.fits -t 6.5'
+#
 if __name__ == "__main__":
   main(sys.argv)
