@@ -7,7 +7,6 @@ import sys
 import numpy
 import math
 import timeit
-import subprocess
 from astropy.coordinates import SkyCoord
 from read_input_table import process_input_file
 from make_morphology_mask import make_mask
@@ -58,7 +57,6 @@ def main( argv ):
    parser.add_option('--use_batch', dest = 'use_batch', help = 'Run in batch mode (no interactive response) (default = F)', default = False)
    parser.add_option('--use_double_e', dest = 'use_double', help = 'Use second erode (no interactive response) (default = T)', default = True)
    (options,args) = parser.parse_args()
-   (options,args) = parser.parse_args()
    print('options', options)
    filename = options.filename
    filter_size = int(options.filter_size)
@@ -74,17 +72,15 @@ def main( argv ):
    if use_double_erode != True:
      use_double_erode = False
 
-# e.g. sample run as 'get_morphology_images.py 3C236.csv 3 D 6 F T 
-
    start_time = timeit.default_timer()
    process_images(filename, filter_size, filter_type, offset_flux, use_conv, use_double_erode, use_batch)
    elapsed = timeit.default_timer() - start_time
    print("Run Time:",elapsed,"seconds")
 
-
-
 #=============================
-# argv[1]  incoming positions file
+#
+# e.g. example: run as 'get_morphology_images.py -f abellsouth.csv -t D --th 6'
+# 
 if __name__ == "__main__":
   main(sys.argv)
 

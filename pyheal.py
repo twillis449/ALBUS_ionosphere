@@ -1,8 +1,12 @@
 # gratefully modified from https://github.com/olvb/pyheal
 # to handle FITS floating point images rather than RGB images
+#
+# this script is a pure python implementation of the Fast Marching
+# Method inpainting algorithm, but unlike the OpenCV method, does not seem
+# to occasionally fill in with Speckles. 
 
 from math import sqrt as sqrt
-import heapq
+import heapq      # see https://docs.python.org/3/library/heapq.html
 import numpy as np
 
 # flags
