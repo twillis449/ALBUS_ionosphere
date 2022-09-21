@@ -7,7 +7,7 @@
 
 LIBRARY_NAME = mim
 INCLUDES += -I$(PYTHONINCLUDEDIR) -I$(INSTALLDIR)/C++/vex_to_sky2
-CFLAGS += -I$(PYTHONINCLUDEDIR)
+CFLAGS += -I$(PYTHONINCLUDEDIR) -I$(INSTALLDIR)/include
 
 #LIBRARIES = -L$(INSTALLDIR)/lib -lpim -liri -ljmavex -lvexplus -lvex -lsofa -lfl -l$(F77_COMPILER_LIB) -lm -larmadillo
 

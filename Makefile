@@ -12,11 +12,11 @@
 # note that we make no use of the real parseltongue - its just a place
 # holder for python - this will be cleaned up 
 export SHELL=/bin/bash
-export INSTALLDIR = /home/twillis/albus
+export INSTALLDIR = /home/bhugo/Documents/ALBUS
 
 
 # ancient legacy stuff
-export CURRENT_PYTHON = python
+export CURRENT_PYTHON = python3.8
 
 # modify the following line to point to where Python include files are kept
 export PYTHONINCLUDEDIR = /usr/include/python3.8
@@ -46,7 +46,7 @@ export C++ = g++
 
 export CPP = cpp -P
 
-export INCLUDES = -I. -I$(INSTALLDIR)/include
+export INCLUDES = -I. -I$(INSTALLDIR)/include -I./include -I/home/bhugo/Documents/ALBUS_ionosphere/include
 export DEFINES = -DINSTALLDIR=\"$(INSTALLDIR)\"
 ifeq ($(HAVE_G2C_H_FILE),1)
   DEFINES += -DHAVE_G2C_H_FILE=$(HAVE_G2C_H_FILE)
