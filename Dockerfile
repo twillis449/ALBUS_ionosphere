@@ -94,13 +94,13 @@ RUN sed -i '40s/.*/export F77 = gfortran-'"${GNUCOMPILER}"' --std=legacy/' $ALBU
 RUN sed -i '43s/.*/export F77_RECL_UNIT = bytes/' $ALBUSPATH/Makefile
 RUN sed -i '45s/.*/export C++ = g++-'"${GNUCOMPILER}"'/' $ALBUSPATH/Makefile
 RUN sed -i '47s/.*/export CPP = cpp-'"${GNUCOMPILER}"' -P/' $ALBUSPATH/Makefile
-RUN sed -i '10s/.*/CFLAGS += -I$(PYTHONINCLUDEDIR) -I$(INSTALLDIR)\/include -DINSTALLDIR=''$(INSTALLDIR)''/' $ALBUSPATH/C++/mim/test/PIMrunner/Makefile
+RUN sed -i '10s/.*/CFLAGS += -I$(PYTHONINCLUDEDIR) -I$(INSTALLDIR)\/include -DINSTALLDIR=\\"$(INSTALLDIR)\\"/' $ALBUSPATH/C++/mim/test/PIMrunner/Makefile
 
 # Step 3 Fingers crossed -- build
 WORKDIR $ALBUSPATH
-RUN make
-RUN make install
-
+RUN make -j8
+#RUN make install
+# TODO other stuffs prob -- tests???
 # crack the bubbly: this hog is airborne!
 
 
