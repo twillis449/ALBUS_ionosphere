@@ -32,7 +32,7 @@ namespace MIM_PIM {
 
 
 
-extern const char IRI_DATA_PATH_DEFAULT[] MIMSTR(INSTALLDIR"/libdata/IRI/");    
+extern const char IRI_DATA_PATH_DEFAULT[] MIMSTR(INSTALLDIR##"/libdata/IRI/");    
 
 
 //_CLASS  name one line description
