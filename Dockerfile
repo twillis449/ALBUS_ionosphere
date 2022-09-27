@@ -23,7 +23,8 @@ RUN docker-apt-install build-essential\
                        f2c \                                                               
                        libf2c2-dev \                                                       
                        bison \                                                             
-                       flex  
+                       flex \
+                       python3-urllib3 
 
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-$GNUCOMPILER 100 && \
     update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-$GNUCOMPILER 100 && \
@@ -122,7 +123,6 @@ ENV PYTHONPATH "$ALBUSINSTALL/share/python:$ALBUSINSTALL/lib:$PYTHONPATH"
 
 # Step 4 Fingers crossed -- build
 WORKDIR $ALBUSPATH
-RUN docker-apt-install python3-urllib3
 RUN make install
 # TODO other stuffs prob -- unit tests -- integration tests???
 RUN python -c "import AlbusIonosphere" && echo "Crack the bubbly - this hog is airborne!!!"
