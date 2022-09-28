@@ -7,9 +7,11 @@ RUN docker-apt-install build-essential\
                        g++-$GNUCOMPILER \
                        gcc-$GNUCOMPILER \
                        gfortran-$GNUCOMPILER \
-		       python3-dev \
+		               python3-dev \
                        python3-all \
-		       wcslib-dev \
+                       ipython3 \
+                       python3-ipdb \
+		               wcslib-dev \
                        python3-astropy \
                        python3-casacore \
                        casacore-data \
@@ -24,7 +26,9 @@ RUN docker-apt-install build-essential\
                        libf2c2-dev \                                                       
                        bison \                                                             
                        flex \
-                       python3-urllib3 
+                       python3-urllib3 \
+                       unzip \
+                       python3-nose
 
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-$GNUCOMPILER 100 && \
     update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-$GNUCOMPILER 100 && \
@@ -52,7 +56,10 @@ RUN mkdir /src
 ADD RNXCMP_4.0.5_src.tar.gz /src/
 WORKDIR /src/RNXCMP_4.0.5_src/source
 RUN gcc-$GNUCOMPILER -ansi -O2 -static rnx2crx.c -o /optsoft/bin/RNX2CRX && \
-    gcc-$GNUCOMPILER -ansi -O2 -static crx2rnx.c -o /optsoft/bin/CRX2RNX
+    gcc-$GNUCOMPILER -ansi -O2 -static crx2rnx.c -o /optsoft/bin/CRX2RNX && \
+    ln -s /optsoft/bin/CRX2RNX /optsoft/bin/crx2rnx && \
+    ln -s /optsoft/bin/RNX2CRX /optsoft/bin/rnx2crx
+
 
 # ---------- COMPILE ALBUS ----------
 # Step 1 setup directory structure and move source code into container
@@ -124,8 +131,28 @@ ENV PYTHONPATH "$ALBUSINSTALL/share/python:$ALBUSINSTALL/lib:$PYTHONPATH"
 # Step 4 Fingers crossed -- build
 WORKDIR $ALBUSPATH
 RUN make install
-# TODO other stuffs prob -- unit tests -- integration tests???
 RUN python -c "import AlbusIonosphere" && echo "Crack the bubbly - this hog is airborne!!!"
+
+# can run any script mounted inside the container py calling (assuming you run Bash or equiv.)
+# docker run -v <absolute path to gfzrnx>:/optsoft/bin/gfzrnx \
+#            -v <absolute path to your waterhole with scripts>:/albus_waterhole \
+#            --workdir /albus_waterhole \
+#            --rm \
+#            --user $(id -u <your user>):$(id -g <your user>) \
+#            albus:latest <path to script mounted inside the waterhole>
+# if you used 'albus as a tag when building the image'
+# you must download and accept the license for gfzrnx separately 
+# see https://dataservices.gfz-potsdam.de/panmetaworks/showshort.php?id=escidoc:1577894
+# Note: adding -it in the flags above should give you an interactive python session
+ENTRYPOINT [ "/usr/bin/python3.6" ]
+# print some default stuffs
+ENV HELPSTRING "docker run -v <absolute path to gfzrnx>:/optsoft/bin/gfzrnx "\
+"-v <absolute path to your waterhole with scripts>:/albus_waterhole "\
+"--workdir /albus_waterhole "\
+"--rm "\
+"--user $(id -u <your user>):$(id -g <your user>) "\
+"albus:latest <path to script mounted inside the waterhole>"
+CMD [ "-c", "import AlbusIonosphere; import os; import pkg_resources; print('ALBUS\\n====='); print(AlbusIonosphere.__doc__); version = pkg_resources.require('AlbusIonosphere')[0].version; print('Version {}'.format(version)); print('Usage: ' + os.environ['HELPSTRING'])" ]
 # crack the bubbly: this hog is airborne!
 
 
