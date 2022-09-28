@@ -33,7 +33,7 @@ docker run \
     -v $TEST_DATA_DIR/gfzrnx_2.0-8219_lx64:/optsoft/bin/gfzrnx \
     -v $PROJECTS_DIR/ALBUS_ionosphere/acceptance_tests:/albus_waterhole \
     --workdir /albus_waterhole \
-    -v $TEST_OUTPUT_DIR:/test_output \ 
+    -v $TEST_OUTPUT_DIR:/test_output \
     --env ALBUS_TESTCASE_OUTPUT=/test_output \
     --rm \
     --user $(id -u hugo):$(id -g hugo) \
