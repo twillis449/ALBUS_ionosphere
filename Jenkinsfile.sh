@@ -36,5 +36,5 @@ docker run \
     -v $TEST_OUTPUT_DIR:/test_output \
     --env ALBUS_TESTCASE_OUTPUT=/test_output \
     --rm \
-    --user $(id -u hugo):$(id -g hugo) \
+    --user $(id -u jenkins):$(id -g jenkins) \
     "$IMAGENAME:$BUILD_NUMBER" -m nose /albus_waterhole
