@@ -27,3 +27,5 @@ FORTRAN/PIM/PIM_1.7/usudb/utils/usutounf
 
 albus_report*
 acceptance_tests/.output
+*.pyc
+__pycache__
