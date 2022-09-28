@@ -16,7 +16,7 @@ matplotlib.use("agg") # display should not be set
 import MS_Iono_functions as iono 
 import math
 
-def __run_rinex_predict(LONG, LAT, HEIGHT, OBJECT, DATA_DIR, MAX_DIST):
+def __run_rinex_predict(LONG, LAT, HEIGHT, OBJECT, DATA_DIR, MAX_DIST, START_TIME, END_TIME):
     os.system('date')
     process_start = time.time()
     startime = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
@@ -25,9 +25,6 @@ def __run_rinex_predict(LONG, LAT, HEIGHT, OBJECT, DATA_DIR, MAX_DIST):
     # 3C286 experiment
     RA = "13:31:08.28811"  
     DEC = "30:30:32.9600"
-
-    START_TIME="2022/08/14 11:43:33.4"
-    END_TIME="2022/08/14 16:55:20.9"
 
     RED_TYPE = 'RI_G01'
     TIME_STEP = 300
@@ -68,17 +65,19 @@ def __checkmake_outputdir():
     else:
         raise RuntimeError("'/albus_waterhole' must be a valid directory -- are you running inside Docker?")
 
-# def test_sutherland():
-#     # Sutherland ZA GPS SUTM receiver coordinates
-#     LONG="20:48:39.3"
-#     LAT = "-32:22:53.2"
-#     HEIGHT=1797.6
-#     OBJECT="Sutherland_3C286_Aug_14_2022"
-#     __checkmake_outputdir()
-#     DATA_DIR = '/albus_waterhole/.output/Sutherland_3C286_test_Aug_14_2022'
-#     # for Sutherland
-#     MAX_DIST = 100E3
-#     __run_rinex_predict(LONG, LAT, HEIGHT, OBJECT, DATA_DIR, MAX_DIST)
+def test_sutherland():
+    # Sutherland ZA GPS SUTM receiver coordinates
+    LONG="20:48:39.3"
+    LAT = "-32:22:53.2"
+    HEIGHT=1797.6
+    OBJECT="Sutherland_3C286_Aug_14_2022"
+    START_TIME="2022/08/14 14:43:33.4"
+    END_TIME="2022/08/14 15:55:20.9"
+    __checkmake_outputdir()
+    DATA_DIR = '/albus_waterhole/.output/Sutherland_3C286_test_Aug_14_2022'
+
+    MAX_DIST = 350E3
+    __run_rinex_predict(LONG, LAT, HEIGHT, OBJECT, DATA_DIR, MAX_DIST, START_TIME, END_TIME)
 
 def test_meerkat():
     # MEEREKAT telescope location
@@ -87,12 +86,13 @@ def test_meerkat():
     LAT="-30:42:44.838"
     HEIGHT=1059.662443
     OBJECT="MeerKat_3C286_Aug_14_2022"
+    START_TIME="2022/08/14 14:43:33.4"
+    END_TIME="2022/08/14 15:55:20.9"
     __checkmake_outputdir()
     DATA_DIR = '/albus_waterhole/.output/MeerKat_3C286_test_Aug_14_2022'
 
-    # for VLA and Meerkat
     MAX_DIST = 350E3
-    __run_rinex_predict(LONG, LAT, HEIGHT, OBJECT, DATA_DIR, MAX_DIST)
+    __run_rinex_predict(LONG, LAT, HEIGHT, OBJECT, DATA_DIR, MAX_DIST, START_TIME, END_TIME)
 
 # def test_vla():
 #     # VLA position
@@ -103,8 +103,9 @@ def test_meerkat():
 #     OBJECT="VLA_3C286_Aug_14_2022"
 #     __checkmake_outputdir()
 #     DATA_DIR = '/albus_waterhole/.output/VLA_3C286_test_Aug_14_2022'
-
-#     # for VLA and Meerkat
-#     MAX_DIST = 350E3
-#     __run_rinex_predict(LONG, LAT, HEIGHT, OBJECT, DATA_DIR, MAX_DIST)
+#     START_TIME="2022/08/14 11:43:33.4"
+#     END_TIME="2022/08/14 16:55:20.9"
+    
+#     MAX_DIST = 850E3
+#     __run_rinex_predict(LONG, LAT, HEIGHT, OBJECT, DATA_DIR, MAX_DIST, START_TIME, END_TIME)
 
