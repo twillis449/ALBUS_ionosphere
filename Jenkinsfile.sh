@@ -1,4 +1,5 @@
 set -e
+set -x
 echo "----------------------------------------------"
 echo "$JOB_NAME build $BUILD_NUMBER"
 WORKSPACE_ROOT="$WORKSPACE/$BUILD_NUMBER"
