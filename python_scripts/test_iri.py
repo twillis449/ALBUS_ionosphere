@@ -45,13 +45,13 @@ def process_ionosphere(MSname="",MSdir=".", Ra=0, Dec=0, Az=180.0, El=-90.0, Lat
     os.system('date')
     process_start = time.time()
     startime = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
-    print "process_ionosphere Start at %s" % startime
+    print( "process_ionosphere Start at %s" % startime)
 
     if len(MSname) == 0:
-        print '*************'
-        print ' No measurement set specified - assuming that specifications'
-        print ' can be obtained from command line'
-        print '*************'
+        print( '*************')
+        print( ' No measurement set specified - assuming that specifications')
+        print( ' can be obtained from command line')
+        print( '*************')
 
     if do_serial:
       if len(MSname) > 0:
@@ -88,7 +88,7 @@ def process_ionosphere(MSname="",MSdir=".", Ra=0, Dec=0, Az=180.0, El=-90.0, Lat
         processors =  multiprocessing.cpu_count()
         if processors > num_processors:
           num_processors = processors
-          print '*** setting number of processors to',num_processors 
+          print( '*** setting number of processors to',num_processors )
       except:
         pass
 
@@ -99,38 +99,39 @@ def process_ionosphere(MSname="",MSdir=".", Ra=0, Dec=0, Az=180.0, El=-90.0, Lat
       Lat = Lat1
       Long = Long1
       Height = Ht1
-      print 'setting Latitude, Longitude, Height to ', Lat, Long, Height
+      print( 'setting Latitude, Longitude, Height to ', Lat, Long, Height)
       print>>log, 'setting Latitude, Longitude, Height to ', Lat, Long, Height
+ 
     if Ra == 0 and Dec == 0 and len(MS) > 0: 
       direction = get_observing_position(MS)
-      print 'observation direction ', direction
-      print>>log, 'observation direction ', direction
+      print( 'observation direction ', direction)
+      print(>>log, 'observation direction ', direction)
       retval = Iono_agw.set_source_position(direction[0],direction[1])
     else:
       try:
         (Ra,Dec)=ac.radec_str_to_rad2(Ra,Dec)
         if El < 0.0:
-          print>>log, 'observation direction ', Ra, Dec
+          print(>>log, 'observation direction ', Ra, Dec)
         else:
-          print>>log, 'observation in fixed Az El direction ', Az, El
+          print(>>log, 'observation in fixed Az El direction ', Az, El)
       except:
         if El < 0.0:
-          print>>log, 'observation direction ', Ra, Dec
+          print(>>log, 'observation direction ', Ra, Dec)
         else:
-          print>>log, 'observation in fixed Az El direction ', Az, El
+          print(>>log, 'observation in fixed Az El direction ', Az, El)
       retval = Iono_agw.set_source_position(Ra, Dec)
 
-    print "source",retval
+    print( "source",retval)
 
     location_ra = []
     location_dec = []
     numi=Iono_agw.get_Num_Ionospheric_Predictions()
-    print '*** number of predictions: ', numi
+    print( '*** number of predictions: ', numi)
     # make sure global location lists are reset to empty
     if El >= 0.0:
-      print 'time step ', time_step
-      print 'fixed azimuth and elevation are ', Az, El
-      print 'at location Lat, Long, height ', Lat, Long, Height
+      print( 'time step ', time_step)
+      print( 'fixed azimuth and elevation are ', Az, El)
+      print( 'at location Lat, Long, height ', Lat, Long, Height)
 #     HAS_PYRAP = False
       if HAS_PYRAP:
         me=measures();
@@ -139,7 +140,7 @@ def process_ionosphere(MSname="",MSdir=".", Ra=0, Dec=0, Az=180.0, El=-90.0, Lat
         if type(El)!=str:
             el=str(El)+'deg';
         obsdir=me.direction('AZELGEO',az,el)
-        print Long, Lat, Height
+        print( Long, Lat, Height)
         try:
           p = me.position('WGS84',str(Long)+'rad', str(Lat)+'rad', str(Height) +'m')
         except:
@@ -149,9 +150,9 @@ def process_ionosphere(MSname="",MSdir=".", Ra=0, Dec=0, Az=180.0, El=-90.0, Lat
         me.do_frame(p);
         loc_time = start_time * 86400.0 - time_step
         location_time =  str(loc_time) + 's'
-        print 'starting location_time ', location_time 
+        print( 'starting location_time ', location_time )
         t=me.epoch("UTC",qu.quantity(location_time));
-        print 'pyrap time ', t
+        print( 'pyrap time ', t)
 #  myme.doframe(myme.epoch('mjd', qa.quantity(mjd, 'd')))
 #   myme.doframe(myme.observatory(observatory))
 #   myradec = myme.measure(mydir,'J2000')
@@ -162,7 +163,7 @@ def process_ionosphere(MSname="",MSdir=".", Ra=0, Dec=0, Az=180.0, El=-90.0, Lat
           radec = me.measure(obsdir,'J2000');
           ra=radec['m0']['value'];
           dec=radec['m1']['value'];
-#         print 'i pyrap ra, dec ', i, math.degrees(ra),math.degrees(dec)
+#         print( 'i pyrap ra, dec ', i, math.degrees(ra),math.degrees(dec))
           location_ra.append(ra)
           location_dec.append(dec)
           loc_time = loc_time + time_step
@@ -175,38 +176,38 @@ def process_ionosphere(MSname="",MSdir=".", Ra=0, Dec=0, Az=180.0, El=-90.0, Lat
         observer.lon = Long
         observer.elevation = Height
         observer.pressure = 0.0
-#       print 'observer contents', observer
+#       print( 'observer contents', observer)
         # convert to Dublin Julian Date for PyEphem and 
         # subtract 300 sec for first integration because of offset 
         # in data_calibrator.cxx code
-#       print 'start_time dublin time ', start_time, start_time - 15019.5 
+#       print( 'start_time dublin time ', start_time, start_time - 15019.5 )
         observer.date =  start_time - 15019.5 - time_step/86400.0
         az = str(Az)
         el = str(El)
-#       print 'az el ', az, el
+#       print( 'az el ', az, el)
         ra,dec = observer.radec_of(az, el)
-        print>>log, 'observing at a fixed azimuth and elevation (deg) of', Az,El
-        print>>log, 'starting observation direction ', ra, dec
-        print 'observing at a fixed azimuth and elevation (deg) of', Az,El
-        print 'starting observation direction ', ra, dec
+        print(>>log, 'observing at a fixed azimuth and elevation (deg) of', Az,El)
+        print(>>log, 'starting observation direction ', ra, dec)
+        print( 'observing at a fixed azimuth and elevation (deg) of', Az,El)
+        print( 'starting observation direction ', ra, dec)
         
         for i in range(numi):
           ra,dec = observer.radec_of(az, el)
 #         dec = dec + math.radians(0.15)
-#         print 'i ephem ra, dec ', i, math.degrees(ra),math.degrees(dec)
+#         print( 'i ephem ra, dec ', i, math.degrees(ra),math.degrees(dec))
           ra_float = float(ra)
           dec_float = float(dec)
           location_ra.append(ra_float)
           location_dec.append(dec_float)
           observer.date = observer.date + time_step / 86400.0
       else:
-        print>>log,'pyephem not installed - cannot compute Ra and Dec'
-        print 'pyephem not installed - cannot compute Ra and Dec'
+        print(>>log,'pyephem not installed - cannot compute Ra and Dec')
+        print( 'pyephem not installed - cannot compute Ra and Dec')
         sys.exit(-1)
     # do ionosphere predictions in parallel
     NUMBER_OF_PROCESSES = num_processors
 #   NUMBER_OF_PROCESSES = 1
-    print 'for report using NUMBER_OF_PROCESSES', NUMBER_OF_PROCESSES
+    print( 'for report using NUMBER_OF_PROCESSES', NUMBER_OF_PROCESSES)
     increment = numi / NUMBER_OF_PROCESSES
     times = []
     end_pos = 0
@@ -218,9 +219,9 @@ def process_ionosphere(MSname="",MSdir=".", Ra=0, Dec=0, Az=180.0, El=-90.0, Lat
        else:
          end_pos = end_pos + increment
        times.append((start_pos,end_pos))
-    print 'using times in tasks ', times
+    print( 'using times in tasks ', times)
     TASKS = [(predict_iono_corrections, (i,times,location_ra,location_dec)) for i in range(NUMBER_OF_PROCESSES)]
-    print 'number of prediction tasks ', len(TASKS)
+    print( 'number of prediction tasks ', len(TASKS))
 
    # Create queues
     task_queue = Queue()
@@ -235,7 +236,7 @@ def process_ionosphere(MSname="",MSdir=".", Ra=0, Dec=0, Az=180.0, El=-90.0, Lat
       Process(target=iono_worker, args=(task_queue, done_queue)).start()
 
     report_list = {}
-    # Get and print results
+    # Get and print( results
     for i in range(len(TASKS)):
       result = done_queue.get()
       report_list[result[0]] = result
@@ -243,42 +244,41 @@ def process_ionosphere(MSname="",MSdir=".", Ra=0, Dec=0, Az=180.0, El=-90.0, Lat
     # Tell child processes to stop
     for i in range(NUMBER_OF_PROCESSES):
       task_queue.put('STOP')
-    print '*********** finished ionosphere predictions ***************'
+    print( '*********** finished ionosphere predictions ***************')
 
-    print >> log, '     '
-    print >> log, 'ALBUS report column explanation (zero relative):'
-    print >> log, '0 - sequence number (zero relative)'
-    print >> log, '1 - separator colon'
-    print >> log, '2 - value of 0 - valid data/calculation'
-    print >> log, '    value of 1 - invalid data/calculation (usually, but not always, because elevation < 0 )'
-    print >> log, '3 - relative time in seconds relative to reference time'
-    print >> log, '4 - time step between sequence calculations (default is 300 sec)'
-    print >> log, '5 - elevation in radians'
-    print >> log, '6 - azimuth in radians'
-    print >> log, '7 - TEC (in tec units) in the current azimuth/elevation direction'
-    print >> log, '8 - Rotation Measure (radians/m^2) in the current azimuth/elevation direction'
-    print >> log, '9 - correction factor to convert STEC to value at the zenith'
-    print >> log, '10 - formal error in STEC fit (personally I find this error to be too '
-    print >> log, '     large but I am not sure how to adjust it)'
-    print >> log, '     '
+    print( >> log, '     ')
+    print( >> log, 'ALBUS report column explanation (zero relative):')
+    print( >> log, '0 - sequence number (zero relative)')
+    print( >> log, '1 - separator colon')
+    print( >> log, '2 - value of 0 - valid data/calculation')
+    print( >> log, '    value of 1 - invalid data/calculation (usually, but not always, because elevation < 0 )')
+    print( >> log, '3 - relative time in seconds relative to reference time')
+    print( >> log, '4 - time step between sequence calculations (default is 300 sec)')
+    print( >> log, '5 - elevation in radians')
+    print( >> log, '6 - azimuth in radians')
+    print( >> log, '7 - TEC (in tec units) in the current azimuth/elevation direction')
+    print( >> log, '8 - Rotation Measure (radians/m^2) in the current azimuth/elevation direction')
+    print( >> log, '9 - correction factor to convert STEC to value at the zenith')
+    print( >> log, '10 - formal error in STEC fit')
+    print( >> log, '     ')
 
     # report results
-    print >> log, 'seq  rel_time time_width El         Az         STEC           RM (rad/m2)   VTEC factor   STEC_error'
+    print( >> log, 'seq  rel_time time_width El         Az         STEC           RM (rad/m2)   VTEC factor   STEC_error')
     for i in range(NUMBER_OF_PROCESSES):
       data_list = report_list[i]
       num_to_report = len(data_list)
       for j in range(1,num_to_report):
         data = data_list[j]
-        print>>log,  data[0],':',data[1],data[2], data[3], data[4], data[5],data[6], data[7], data[8], data[9]
+        print(>>log,  data[0],':',data[1],data[2], data[3], data[4], data[5],data[6], data[7], data[8], data[9])
 
-    print ' '
-    print '*********** finished task!! ***************'
+    print( ' ')
+    print( '*********** finished task!! ***************')
 
     stoptime = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
-    print "Stop at %s" % stoptime
+    print( "Stop at %s" % stoptime)
     process_end = time.time()
     duration = (process_end - process_start)/3600.0
-    print "process_ionosphere: total run time: %7.2f hours" % duration
+    print( "process_ionosphere: total run time: %7.2f hours" % duration)
 
 if __name__ == "__main__":
 
@@ -311,7 +311,7 @@ if __name__ == "__main__":
   END_TIME="2013/12/21 23:59:59"
 
 # process_ionosphere(Ra=RA,Dec=DEC,station_pos_x=STN_POS_X,station_pos_y=STN_POS_Y,station_pos_z=STN_POS_Z,start_time=START_TIME,end_time=END_TIME,processing_option="RI_G03",do_serial=1,num_processors=15, gps_data_directory="GPS_data_for_LOFAR_test",object=OBJECT)
-# print ' ******* STARTING UP ********'
+# print( ' ******* STARTING UP ********'
 # process_ionosphere(Lat=LAT,Long=LONG,Height=HEIGHT,start_time=START_TIME,end_time=END_TIME,El=EL,processing_option="RI_G03",do_serial=0,num_processors=8, gps_data_directory="LOFAR_GPS_data_Dec_2013",time_step=TIME_STEP,object=OBJECT)
 
 ##########################################
