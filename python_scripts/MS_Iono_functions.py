@@ -846,13 +846,13 @@ def setup_AlbusIonosphere_for_ref_date(log, MSname="",MSdir=".",Lat=0, Long=0, H
           Lat = ac.deg_str_to_rad(Lat)
           WGS84=1
           x,y,z = GPS_stations.cartesian_coord(Long, Lat, Height, WGS84)
-          station_pos= numpy.zeros((1,3), dtype='Float64')
+          station_pos= numpy.zeros((1,3), dtype='float64')
           station_pos[0,0] = x
           station_pos[0,1] = y
           station_pos[0,2] = z
       else:
         station_length = len(station_pos_x)
-        station_pos= numpy.zeros((station_length,3), dtype='Float64')
+        station_pos= numpy.zeros((station_length,3), dtype='float64')
         for i in range(station_length):
           station_pos[i,0] = station_pos_x[i]
           station_pos[i,1] = station_pos_y[i]
