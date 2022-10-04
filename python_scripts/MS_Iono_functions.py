@@ -1216,8 +1216,7 @@ def process_chime_ionosphere(Az=180.0, El=90.0, Lat=0, Long=0, Height=0,start_ti
     print ('7 - TEC (in tec units) in the current azimuth/elevation direction',file=log)
     print ('8 - Rotation Measure (radians/m^2) in the current azimuth/elevation direction',file=log)
     print ('9 - correction factor to convert STEC to value at the zenith',file=log)
-    print ('10 - formal error in STEC fit (personally I find this error to be too ',file=log)
-    print ('     large but I am not sure how to adjust it)',file=log)
+    print ('10 - formal error in STEC',file=log)
     print ('     ',file=log)
 
     # report results
@@ -1646,8 +1645,7 @@ def process_ionosphere(MSname="",MSdir=".", Ra=0, Dec=0, Az=180.0, El=-90.0, Lat
     print ('7 - TEC (in tec units) in the current azimuth/elevation direction',file=log)
     print ('8 - Rotation Measure (radians/m^2) in the current azimuth/elevation direction',file=log)
     print ('9 - correction factor to convert STEC to value at the zenith',file=log)
-    print ('10 - formal error in STEC fit (personally I find this error to be too ',file=log)
-    print ('     large but I am not sure how to adjust it)',file=log)
+    print ('10 - formal error in STEC',file=log)
     print ('     ',file=log)
 
 
@@ -1821,8 +1819,7 @@ def process_ionosphere_multi_dir(MSname="",MSdir=".", Ra=0, Dec=0, Az=180.0, El=
     print ('7 - TEC (in tec units) in the current azimuth/elevation direction',file=log)
     print ('8 - Rotation Measure (radians/m^2) in the current azimuth/elevation direction',file=log)
     print ('9 - correction factor to convert STEC to value at the zenith',file=log)
-    print ('10 - formal error in STEC fit (personally I find this error to be too ',file=log)
-    print ('     large but I am not sure how to adjust it)',file=log)
+    print ('10 - formal error in STEC fit ',file=log)
     print ('     ',file=log)
 
 
