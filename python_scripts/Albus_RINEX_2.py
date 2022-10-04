@@ -301,7 +301,7 @@ XYZ        O  Cartesian station position in Earth centered coodriantes, in m
             if(line[60:73] == "END OF HEADER"):
                 break
             elif(line[60:79] == "APPROX POSITION XYZ"):
-                XYZ = np.zeros((6), dtype='Float64')
+                XYZ = np.zeros((6), dtype='float64')
                 XYZ[0:3] = list(map(float,line.strip().split(None,3)[0:3]))
                 XYZ[3] = math.sqrt(XYZ[0]*XYZ[0] + XYZ[1]*XYZ[1] + XYZ[2]*XYZ[2])
                 XYZ_set = True
@@ -429,11 +429,11 @@ XYZ        O  Cartesian station position in Earth centered coodriantes, in m
                 raise Albus_RINEX.RINEX_Data_Barf("Unsupported Time system in file '%s'"%filename)
         # Read in the data
         if(num_times > 0):
-            MJD = np.zeros((num_times), dtype='Float64')
+            MJD = np.zeros((num_times), dtype='float64')
             Sat_array = np.zeros((num_times,MAX_POSSIBLE_SATELLITES),
-                                       dtype='Int16')
+                                       dtype='int16')
             obs_data = np.zeros((num_times, max_sat, _DATA_POS_SIZE),
-                                      dtype='Float64')
+                                      dtype='float64')
             Sat_array -= 1
             obs_data += BAD_DATA_CODE
             MJD_start = MJD_start + time_offset * DAYS_PER_SECOND
@@ -979,9 +979,9 @@ obs_data   O  The output data array, as
         if version == 'd':   # read an extra line
             line = fp.readline()
         # Now to the data
-        MJD = np.zeros((Num_Data), dtype='Float64')
+        MJD = np.zeros((Num_Data), dtype='float64')
         obs_data = np.zeros((Num_Data, MAX_POSSIBLE_SATELLITES, 6),
-                                  dtype='Float64')
+                                  dtype='float64')
         time_count = -1
         while(1):
             line = fp.readline()
@@ -1083,7 +1083,7 @@ XYZ         O  numpy array of the satellite position
 """
     assert(work_c.shape[0] >= num_terms)
     assert(work_d.shape[0] >= num_terms)
-    XYZ = np.zeros((6), dtype='Float64')
+    XYZ = np.zeros((6), dtype='float64')
     for p in range(3,6):
         dif = math.fabs(MJD_need-MJD[index_start])
         ns = 0
@@ -1200,9 +1200,9 @@ XYZ         O  numpy array of the satellite positions
     assert(NUM_OBS == MJD.shape[0])
     NUM_NEED = MJD_need.shape[0]
     assert(NUM_NEED>0)
-    XYZ = np.zeros((NUM_NEED,NUM_SAT,6), dtype='Float64')
-    work_c = np.zeros((NUM_TERMS), dtype='Float64')
-    work_d = np.zeros((NUM_TERMS), dtype='Float64')
+    XYZ = np.zeros((NUM_NEED,NUM_SAT,6), dtype='float64')
+    work_c = np.zeros((NUM_TERMS), dtype='float64')
+    work_d = np.zeros((NUM_TERMS), dtype='float64')
     for s in range(NUM_SAT):
         if((sat_pos[0,s,0] == 0.0)and(sat_pos[0,s,0] == 0.0)
            and(sat_pos[0,s,0] == 0.0)):
@@ -1280,9 +1280,9 @@ XYZ         O  numpy array of the satellite positions
     assert(NUM_OBS == MJD.shape[0])
     NUM_NEED = MJD_need.shape[0]
     assert(NUM_NEED>0)
-    XYZ = np.zeros((NUM_NEED,NUM_SAT,6), dtype='Float64')
-    work_c = np.zeros((NUM_TERMS_MAX), dtype='Float64')
-    work_d = np.zeros((NUM_TERMS_MAX), dtype='Float64')
+    XYZ = np.zeros((NUM_NEED,NUM_SAT,6), dtype='float64')
+    work_c = np.zeros((NUM_TERMS_MAX), dtype='float64')
+    work_d = np.zeros((NUM_TERMS_MAX), dtype='float64')
     for s in range(NUM_SAT):
         if((sat_pos[0,s,0] == 0.0)and(sat_pos[0,s,0] == 0.0)
            and(sat_pos[0,s,0] == 0.0)):
@@ -1889,7 +1889,7 @@ raise_bias_error           I  reject data with no bias correction 0 No, else yes
                     obs_data[i,s, C1_pos] += SPEED_OF_LIGHT \
                         * (total_C1_bias + slope_C1 *(MJD[i] - MJD_MID_TIME))
     # Now, figure out whether station bias information was present or not
-    sta_bias_valid = np.zeros((MAX_POSSIBLE_SATELLITES//100),dtype='Int32')+1
+    sta_bias_valid = np.zeros((MAX_POSSIBLE_SATELLITES//100),dtype='int32')+1
     if (bias_in_dicts(station_code, bias_IONEX[MJD_MID][1],bias_CODE_monthly[MJD_MID][1]) is None):
         sta_bias_valid[0] = 0
         warnings.warn("Station '%s' has no bias correction"%station_code)
@@ -2453,7 +2453,7 @@ sat_block_pos O  An array of continguous block position ranges, as 3 element
     TL_pos = _DATA_POS['STECL']
     PL_pos = _DATA_POS['STECPL']
     NUM_OBS = obs_data.shape[0]
-    work = np.zeros((NUM_OBS), dtype='Float64')
+    work = np.zeros((NUM_OBS), dtype='float64')
     sat_avg_arr = [None]*MAX_POSSIBLE_SATELLITES
     sat_block_pos = [None]*MAX_POSSIBLE_SATELLITES
     total_sat_count = 0
@@ -2476,7 +2476,7 @@ sat_block_pos O  An array of continguous block position ranges, as 3 element
                     obs_data[i,s, SIG_pos] += 10.0 # rough guess for TECU uncert
                     sum += obs_data[i,s, PL_pos]
                     count += 1
-            average = np.zeros((1), dtype='Float64')
+            average = np.zeros((1), dtype='float64')
             if(count):
                 average[0] = sum/count
                 total_sat_count += 1
@@ -2484,7 +2484,7 @@ sat_block_pos O  An array of continguous block position ranges, as 3 element
                 average[0] = BAD_DATA_CODE
             sat_avg_arr[sat] = average
             continue
-        average = np.zeros((len(block_pos)), dtype='Float64')
+        average = np.zeros((len(block_pos)), dtype='float64')
         average += BAD_DATA_CODE
         for pos in range(len(block_pos)):
             start_pos = block_pos[pos][0]
@@ -2549,7 +2549,7 @@ sat_block_pos O  An array of continguous block position ranges, as 3 element
     # Now check that the average satellite values are reasonable
     if(total_sat_count < 3):
         return sat_block_pos
-    average_arr = np.zeros((total_sat_count), dtype='Float64')
+    average_arr = np.zeros((total_sat_count), dtype='float64')
     count = 0
     for sat in range(MAX_POSSIBLE_SATELLITES):
         if((sat_avg_arr[sat] is not None) and (sat_block_pos[sat] is not None)):
@@ -2617,7 +2617,7 @@ MJD_OUT   O  the whole numpy array of MJD values
     NUM_TOTAL = 0
     for M in MJDs:
         NUM_TOTAL += len(M)
-    MJD_OUT = np.zeros((NUM_TOTAL), dtype='Float64')
+    MJD_OUT = np.zeros((NUM_TOTAL), dtype='float64')
     last_val = MJDs[0][0]
     gap = 0
     hour = 1.0 / 24.0
@@ -2675,7 +2675,7 @@ Sat_Arr_OUT   O  the whole numpy array of satellite stuff
         NUM_TOTAL += sh[0]
         assert(sh[1] == MAX_POSSIBLE_SATELLITES)
     Sat_Arr_OUT = np.zeros((NUM_TOTAL, MAX_POSSIBLE_SATELLITES),
-                                 dtype='Int16')
+                                 dtype='int16')
     pos = 0
     for S in Sat_Arrs:
         l = S.shape[0]
@@ -2725,7 +2725,7 @@ Obs_Data_OUT O  the whole numpy array of observation stuff
             NUM_MAX = sh[1]
         assert(sh[2] == _DATA_POS_SIZE)
     Obs_Data_OUT = np.zeros((NUM_TOTAL, NUM_MAX, _DATA_POS_SIZE),
-                                  dtype='Float64')
+                                  dtype='float64')
     Obs_Data_OUT += BAD_DATA_CODE
     pos = 0
     for o in Obs_Datas:
@@ -2781,7 +2781,7 @@ Sat_Obss_OUT O  the whole numpy array of satellite observation stuff
         assert(sh[1] == MAX_POSSIBLE_SATELLITES)
         assert(sh[2] == 6)
     Sat_Obss_OUT = np.zeros((NUM_TOTAL, MAX_POSSIBLE_SATELLITES, 6),
-                                  dtype='Float64')
+                                  dtype='float64')
     pos = 0
     for S in Sat_Obss:
         l = S.shape[0]
@@ -2913,7 +2913,7 @@ Sat_small    O  numpy array of satellite data positions, as
     osh = obs_data.shape
     ssh = Sat_array.shape
     assert(osh[0] == ssh[0])
-    Sat_small = np.zeros((osh[0],osh[1]), dtype='Int16')
+    Sat_small = np.zeros((osh[0],osh[1]), dtype='int16')
     Sat_small -= 1
     for t in range(osh[0]):
         for s in range(ssh[1]):
@@ -2966,7 +2966,7 @@ block_small  O  numpy array of satellite track positions, as
     ssh = Sat_array.shape
     assert(osh[0] == ssh[0])
     assert(ssh[1] == len(sat_block_pos))
-    block_small = np.zeros((osh[0],osh[1]), dtype='Int16')
+    block_small = np.zeros((osh[0],osh[1]), dtype='int16')
     block_small -= 1
     for s in range(ssh[1]):
         if(sat_block_pos[s] is None):
@@ -3274,7 +3274,7 @@ sat_block_pos  O  An array of continguous block position ranges, as 3 element
     Sat_array_list = []
     obs_data_list = []
     sta_XYZ_list = []
-    sta_bias_valid = np.zeros((MAX_POSSIBLE_SATELLITES//100),dtype='Int32')+1
+    sta_bias_valid = np.zeros((MAX_POSSIBLE_SATELLITES//100),dtype='int32')+1
     for m in range(MJD_start, MJD_end):
         year, month, day, frac = jma_tools.get_ymdf_from_JD(jma_tools.get_JD_from_MJD(m))
         doy = jma_tools.get_day_of_year(year, month, day)
@@ -3550,7 +3550,7 @@ Sat_array    O  numpy array of satellite data positions, as
     assert(Num_El[1] == MAX_POSSIBLE_SATELLITES)
     del m_fp;
     m_fp = np.memmap(filename,mode="r",shape=(Num_El[0],Num_El[1]),
-                          dtype='Int16',offset=8)
+                          dtype='int16',offset=8)
     # read the data
     Sat_array = m_fp.copy()
     del m_fp
@@ -4339,7 +4339,7 @@ OUTPUTS: None
     sat_out = np.memmap(filename,mode="w+", shape=(NUM_TIMES,
                                                     MAX_POSSIBLE_MEQTREE_SATELLITES,
                                                     3),
-                             dtype='Float64')
+                             dtype='float64')
     sat_out[:,:,:] = 0.0  # place blank satellites at the center of the Earth
     for s in range(MAX_POSSIBLE_MEQTREE_SATELLITES):
         s_r = RINEX_Sat_Number_from_MeqTree(s)
