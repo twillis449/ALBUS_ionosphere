@@ -44,7 +44,7 @@ and matplotlib for the system to work. A number of support programs to handle
 RINEX files are also needed. These programs are specified in the INSTALL 
 file.
 
-More sites (especiallg Geosciences Australia) are now producing only RINEX3 files. 
+More sites (especially Geosciences Australia) are now producing only RINEX3 files. 
 For analysis, we use RINEX2 files. To convert RINEX3 to RINEX2 you need to get 
 and install gfzrnx, available from https://gnss.gfz-potsdam.de/services/gfzrnx
 and RX3name (see http://acc.igs.org/software.html) Unfortunately these programs 
