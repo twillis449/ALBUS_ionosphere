@@ -48,4 +48,4 @@ More sites (especially Geosciences Australia) are now producing only RINEX3 file
 For analysis, we use RINEX2 files. To convert RINEX3 to RINEX2 you need to get 
 and install gfzrnx, available from https://gnss.gfz-potsdam.de/services/gfzrnx
 and RX3name (see http://acc.igs.org/software.html) Unfortunately these programs 
-see to be available only in binary format.
+seem to be available only in binary format.
