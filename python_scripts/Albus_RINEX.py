@@ -564,7 +564,7 @@ OUTPUTS:  None
         if(RINEX_filename[0:4] in _RINEX_SITE_LIST_NZ):
             print('nz RINEX file name ', RINEX_filename)
             if RINEX_filename[11] == 'o':
-              site_str = "ftp://ftp.geonet.org.nz/gnss/rinex/%4.4d/%3.3d/%s.gz"%(year, doy, RINEX_filename)
+              site_str = "https://data.geonet.org.nz/gnss/rinex/%4.4d/%3.3d/%s.gz"%(year, doy, RINEX_filename)
         else:
             pass # site_str = "" from above, which will generate an IOError
     else:
