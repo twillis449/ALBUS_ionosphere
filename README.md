@@ -49,3 +49,9 @@ For analysis, we use RINEX2 files. To convert RINEX3 to RINEX2 you need to get
 and install gfzrnx, available from https://gnss.gfz-potsdam.de/services/gfzrnx
 and RX3name (see http://acc.igs.org/software.html) Unfortunately these programs 
 seem to be available only in binary format.
+
+Unfortunately, due to security concerns, sites are also changing access methods 
+from simple anonymous ftp to more secure procedures such as sftp etc and we are
+currently working on modifying our access procedures to reach such sites.
+secure access procedures 
+
