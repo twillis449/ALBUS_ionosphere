@@ -29,22 +29,21 @@ DEC="-45:16:57.10"
 # file containing pointing positions of ASKAP FPA beams
 positions_file = './NGC7232_beams'
 
-START_TIME="2012/12/12 04:14:35.0"
-END_TIME="2012/12/13  04:11:35.0"
+START_TIME="2021/12/12 04:14:35.0"
+END_TIME="2021/12/13  04:11:35.0"
 OBJECT="NGC7232-12-multi_test_1"
 
 # Data storage location for GPS files 
-gps_data_directory="/home/twillis/twillis1/ASKAP_test_data_2012"
+gps_data_directory="/home/twillis/ASKAP_test_data_2021"
 
 
 # the way to process the GPS data if the data has already been collected
 do_serial = 1
 num_processors = 8      
 
-# the way to get and process the data if data has to be obtained from 
-# GPS servers
+# the way to get and process the data if data has to be obtained from GPS servers
 do_serial = 0
-NUM_PROCESSORS = 1      # using a single processor to start with seems                                  # necessary for # Geosciences Australia
+NUM_PROCESSORS = 8  
 
 iono.process_ionosphere_multi_dir(Lat=LAT,Long=LONG,Height=HEIGHT,start_time=START_TIME,end_time=END_TIME,do_serial=do_serial,num_processors=NUM_PROCESSORS,gps_data_directory=gps_data_directory,object=OBJECT,positions_file =positions_file)
 
