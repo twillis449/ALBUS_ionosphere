@@ -11,10 +11,39 @@ import sys
 import pycurl
 
 def main():
-    print('in Albus_RINEX_download')
+    print('**** in Albus_RINEX_download')
     if(len(sys.argv) != 4):
         print("Error: correct usage is %s inURL, outfilename timeout"%sys.argv[0])
         sys.exit(-2)
+    print('Albus_RINEX_download system parameters', sys.argv)
+    if sys.argv[1].find('sftp')> -1:
+      use_pysftp = True
+      try:
+        import pysftp
+      except:
+        use_pysftp = False
+      if not use_pysftp:
+        print('Cannot use sftp protocol; exiting')
+        sys.exit(-3)
+      else:
+         try:
+           split_location = sys.argv[1].find('/')
+           host_name =  sys.argv[1][:split_location]
+           print('sftp host name', host_name)
+           localFilePath = sys.argv[2]
+           print('localFilePath',localFilePath)
+           with pysftp.Connection(host=host_name, username='anonymous', password='ALBUS_ionosphere') as sftp:
+              print("Connection successfully established ... ")
+              remoteFilePath  = sys.argv[1][split_location+1:]
+              print('*** sftp trying to get file', remoteFilePath )
+              sftp.get(remoteFilePath, localFilePath)
+              print('*** obtained remote file')
+              return
+         except:
+            print('**** sftp failed to get file: ', remoteFilePath )
+            sys.exit(-3)
+            
+
     HAS_PYCURL = True
     if HAS_PYCURL:  #  currently the system used for retrieving ftp data
       print ('using PyCurl')

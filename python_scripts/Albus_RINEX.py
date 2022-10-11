@@ -214,6 +214,7 @@ a Command_Timeout_Error
     print(' in get_url to get ', infile, outfile)
     try:
         computer = infile.split('/')
+        print('*** computer is ', computer)
         if(len(computer) < 2):
             raise IOError("Bad computer name '%s'"%infile)
         computer = computer[2]
@@ -246,12 +247,14 @@ a Command_Timeout_Error
         if(os.path.isfile(outfile)):
           try:
             command = '/bin/rm -rf ' + outfile
+            print('get_url commanf timeout error')
+            print('get_url executing command',command)
             os.system(command)
           except:
             os.remove(outfile)
         raise
     test_downloaded_RINEX(outfile, min_size)
-    sys.stdout.write("           Done\n")
+    print('get_url successfully completed')
     return
 get_url.computer_dict = {}
 #get_url.computer_dict["jop30"] = [None,None]
@@ -316,8 +319,11 @@ def gunzip_some_file(compressed_file,
                                     delete_file,RX3_flag)
         raise RINEX_Data_Barf("No such file '%s' to uncompress"%compressed_file)
     if compressed_file[-3:] != 'zip' and compressed_file[-1] != 'Z':
+        try:
+          command = "gunzip -dc %s > %s"%(compressed_file,uncompressed_file)
+        except:
         # file is most likely uncompressed ...
-        command = "mv  %s %s"%(compressed_file, uncompressed_file)
+          command = "mv  %s %s"%(compressed_file, uncompressed_file)
     elif (compressed_file[-3:] == 'zip'): # we have a trignet file
       command = "unzip -np %s '*d' > %s"%(compressed_file,uncompressed_file)
     else:   
@@ -513,14 +519,18 @@ OUTPUTS:  None
           output = subprocess.Popen(['RX3name', RINEX_filename],
                           stdout=subprocess.PIPE).communicate()[0]
           RINEX3_filename = output.decode('utf-8')[:-2]
-#         our_Z_file = output_directory + '/' + RINEX_filename + '.gz'
-#         our_file = output_directory + '/' + RINEX_filename
-          print('trying to get ', RINEX3_filename )
-          print ( '*********** accessing Australian FTP site!')
-          site_str = "ftp.data.gnss.ga.gov.au/daily/%4.4d/%3.3d/%s.gz"%(year, doy, RINEX3_filename)
+          our_file = output_directory + '/' + RINEX_filename 
+          our_Z_file = output_directory + '/' + RINEX3_filename + '.gz'
+          site_str = "sftp.data.gnss.ga.gov.au/rinex/daily/%4.4d/%3.3d/%s.gz"%(year, doy, RINEX3_filename)
         else:
-          site_str = "ftp.data.gnss.ga.gov.au/daily/%4.4d/%3.3d/%s.gz"%(year, doy, RINEX_filename)
-        print('aussie site:', site_str)
+          our_file = output_directory + '/' + RINEX_filename 
+          our_Z_file = output_directory + '/' + RINEX_filename + '.gz'
+          print('trying to get ',  our_file )
+          RX3_flag = False
+          site_str = "sftp.data.gnss.ga.gov.au/rinex/daily/%4.4d/%3.3d/%s.gz"%(year, doy, RINEX_filename)
+        print('trying to get ',  our_file )
+        print ( '*********** accessing Australian FTP site!')
+        print('site string', site_str)
     elif(FTP_site == 13):
         # Dutch National GPS Network (requires login)
         if(RINEX_filename[0:4] in _RINEX_SITE_LIST_Ned_0):
