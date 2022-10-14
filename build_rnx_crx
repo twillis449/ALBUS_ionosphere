@@ -1,5 +1,6 @@
-cd RNXCMP_4.0.5_src/source
+# this code is provided by https://terras.gsi.go.jp/ja/crx2rnx.html
+cd RNXCMP_4.1.0_src/source
 gcc -ansi -O2 -static rnx2crx.c -o rnx2crx
 gcc -ansi -O2 -static crx2rnx.c -o crx2rnx
-mv rnx2crx crx2rnx ~/albus/bin
+sudo mv rnx2crx crx2rnx /usr/local/bin
 
