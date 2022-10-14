@@ -46,8 +46,8 @@ if __name__ == "__main__":
   START_TIME="2022/08/14 11:43:33.4"
   END_TIME="2022/08/14 16:55:20.9"
 
-  DATA_DIR = '/home/twillis/Downloads/VLA_3C286_test_Sept_2018'
-  DATA_DIR = '/home/twillis/Downloads/MeerKat_3C286_test_Aug_14_2022'
+  DATA_DIR = '~/Downloads/VLA_3C286_test_Sept_2022'
+  DATA_DIR = '~/Downloads/MeerKat_3C286_test_Aug_14_2022'
   RED_TYPE = 'RI_G01'
   TIME_STEP = 300
   MAX_DIST = 250E3
