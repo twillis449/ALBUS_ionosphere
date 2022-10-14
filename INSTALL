@@ -75,11 +75,11 @@ This seems to happen if you install flex on an ubuntu linux system, but may not 
 To build, just run 'make' followed by 'make install'. That should work.
 
 IMPORTANT: You will also need to install the conversion software programs 
-contained in the file RNXCMP_4.0.8_src.tar.gz.  See the file 
-RNXCMP_4.0.8_src/docs/RNXCMP.txt for instructions on compilation. Put the 
-compiled binarys in some directory (e.g. /usr/local/bin) which will be in 
+contained in the file RNXCMP_4.1.0_src.tar.gz.  See the file 
+RNXCMP_4.1.0_src/docs/RNXCMP.txt for instructions on compilation. Put the 
+compiled binaries in some directory (e.g. /usr/local/bin) which will be in 
 your search path for executable files. The script build_rnx_crx will install the
-binaries in your albus/bin area in your home directory
+binaries in your /usr/local/bin directory
 
 If you need to want to retrieve and use RINEX 3 files (at present, as far as
 I know only needed for Australia since 2020) you need to a) obtain the program 
