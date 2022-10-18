@@ -1387,7 +1387,34 @@ def process_chime_ionosphere(Az=180.0, El=90.0, Lat=0, Long=0, Height=0,start_ti
 # The following function should be the only one which needs changes that depend
 # on the type of observation that one is doing
 
-def process_ionosphere(MSname="",MSdir=".", Ra=0, Dec=0, Az=180.0, El=-90.0, Lat=0, Long=0, Height=0,start_time="",end_time="", object="iono",time_step=300.0,telescope_pos=None,station_pos_x=0,station_pos_y=0,station_pos_z=0,max_dist=700E3,processing_option="RI_G03",tolerance=0.1,overwrite=0,do_serial=0,raise_bias_error=0, num_processors=4,use_pim=1,use_global_data=0,gps_data_directory="."):
+def process_ionosphere(MSname="",
+                       MSdir=".",
+                       Ra=0,
+                       Dec=0,
+                       Az=180.0,
+                       El=-90.0,
+                       Lat=0,
+                       Long=0,
+                       Height=0,
+                       start_time="",
+                       end_time="",
+                       object="iono",
+                       time_step=300.0,
+                       telescope_pos=None,
+                       station_pos_x=0,
+                       station_pos_y=0,
+                       station_pos_z=0,
+                       max_dist=700E3,
+                       processing_option="RI_G03",
+                       tolerance=0.1,
+                       overwrite=0,
+                       do_serial=0,
+                       raise_bias_error=0,
+                       num_processors=4,
+                       use_pim=1,
+                       use_global_data=0,
+                       gps_data_directory=".",
+                       special_body=None):
 
 # Inputs:
 # MSname - name of Measurement Set (MS) to use
@@ -1396,6 +1423,9 @@ def process_ionosphere(MSname="",MSdir=".", Ra=0, Dec=0, Az=180.0, El=-90.0, Lat
 # Dec    - Declination of field centre. Default = get it from MS
 # Az     - azimuth, north through east. Default = derive from Ra and Dec for tracking interferometer 
 # El     - elevation, Default = derive from Ra and Dec for tracking interferometer 
+# special_body - Name of special body to override ra dec ephemeris of database.
+#                This should be a body as specified by PyEphem.
+#                If specified none of Ra, Dec, Az or El will have any effect
 # station_pos - XYZ location of antenna. Default = get mean position of array from MS
 # processing_option - type of solution. Default = MO_PIM
 # tolerance - not sure what changing this will actually do. Default = 0.1
@@ -1476,7 +1506,28 @@ def process_ionosphere(MSname="",MSdir=".", Ra=0, Dec=0, Az=180.0, El=-90.0, Lat
       Height = Ht1
       print ('setting Latitude, Longitude, Height to ', Lat, Long, Height)
       print ('setting Latitude, Longitude, Height to ', Lat, Long, Height, file=log)
-    if Ra == 0 and Dec == 0 and len(MS) > 0: 
+    if special_body is not None:
+      if HAS_EPHEM:
+        observer = ephem.Observer()
+        observer.lat = Lat 
+        observer.lon = Long
+        observer.elevation = Height
+        observer.pressure = 0.0
+        print ('observer contents', observer)
+        print ('start_time dublin time ', start_time, start_time - 15019.5) 
+        observer.date =  start_time - 15019.5 - time_step/86400.0
+        fieldEphem = getattr(ephem, special_body, None)()
+        if not fieldEphem:
+          raise RuntimeError("Body {} not defined by PyEphem".format(special_body))
+        print ('computing for special body', special_body)
+        fieldEphem.compute(observer)
+        direction = (fieldEphem.a_ra, fieldEphem.a_dec)
+        retval = Iono_agw.set_source_position(direction[0],direction[1])
+      else: # only provide this for ephem for now
+        print ('pyephem not installed - cannot compute Ra and Dec', file=log)
+        print ('pyephem not installed - cannot compute Ra and Dec')
+        sys.exit(-1)
+    elif Ra == 0 and Dec == 0 and len(MS) > 0:
       direction = get_observing_position(MS)
       print ('observation direction ', direction)
       if direction[0] < 0.0:
@@ -1507,7 +1558,38 @@ def process_ionosphere(MSname="",MSdir=".", Ra=0, Dec=0, Az=180.0, El=-90.0, Lat
     numi=Iono_agw.get_Num_Ionospheric_Predictions()
     print ('*** number of predictions: ', numi)
     # make sure global location lists are reset to empty
-    if El >= 0.0:
+    if special_body:
+      if HAS_EPHEM:
+        observer = ephem.Observer()
+        observer.lat = Lat 
+        observer.lon = Long
+        observer.elevation = Height
+        observer.pressure = 0.0
+        print ('observer contents', observer)
+        print ('start_time dublin time ', start_time, start_time - 15019.5) 
+        observer.date =  start_time - 15019.5 - time_step/86400.0
+        fieldEphem = getattr(ephem, special_body, None)()
+        if not fieldEphem:
+          raise RuntimeError("Body {} not defined by PyEphem".format(special_body))
+        print ('computing for special body', special_body)
+        print ('computing for special body', special_body, file=log)
+        fieldEphem.compute(observer)
+        ra, dec = (fieldEphem.a_ra, fieldEphem.a_dec)
+        print ('starting observation direction ', float(ra), float(dec))
+        print ('starting observation direction ', float(ra), float(dec), file=log)
+        for i in range(numi):
+          fieldEphem.compute(observer)
+          ra, dec = (fieldEphem.a_ra, fieldEphem.a_dec)
+          location_ra.append(float(ra))
+          location_dec.append(float(dec))
+          observer.date = observer.date + time_step / 86400.0
+        print ('ending observation direction ', float(ra), float(dec))
+        print ('ending observation direction ', float(ra), float(dec), file=log)
+      else: # only provide this for ephem for now
+        print ('pyephem not installed - cannot compute Ra and Dec', file=log)
+        print ('pyephem not installed - cannot compute Ra and Dec')
+        sys.exit(-1)
+    elif El >= 0.0:
       print ('time step ', time_step)
       print ('fixed azimuth and elevation are ', Az, El)
       print ('at location Lat, Long, height ', Lat, Long, Height)
@@ -1583,6 +1665,8 @@ def process_ionosphere(MSname="",MSdir=".", Ra=0, Dec=0, Az=180.0, El=-90.0, Lat
         print ('pyephem not installed - cannot compute Ra and Dec', file=log)
         print ('pyephem not installed - cannot compute Ra and Dec')
         sys.exit(-1)
+    else: # ordinary radec body
+      pass
     # do ionosphere predictions in parallel
     NUMBER_OF_PROCESSES = num_processors
 #   NUMBER_OF_PROCESSES = 1

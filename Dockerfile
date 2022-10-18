@@ -53,8 +53,8 @@ ENV CPLUS_INCLUDE_PATH $C_INCLUDE_PATH:/optsoft/include
 
 # ---------- Build RNXCMP from source into /optsoft ---------- 
 RUN mkdir /src
-ADD RNXCMP_4.0.5_src.tar.gz /src/
-WORKDIR /src/RNXCMP_4.0.5_src/source
+ADD RNXCMP_4.1.0_src.tar.gz /src/
+WORKDIR /src/RNXCMP_4.1.0_src/source
 RUN gcc-$GNUCOMPILER -ansi -O2 -static rnx2crx.c -o /optsoft/bin/RNX2CRX && \
     gcc-$GNUCOMPILER -ansi -O2 -static crx2rnx.c -o /optsoft/bin/CRX2RNX && \
     ln -s /optsoft/bin/CRX2RNX /optsoft/bin/crx2rnx && \
