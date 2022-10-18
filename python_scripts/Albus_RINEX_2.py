@@ -71,6 +71,7 @@ IONOSPHERE_KB = 2.79924925E10   # s^{-1} T^{-1}
 # which checks for C, P, L, and S data, and makes C2 a pass
 _DATA_POS_LIST = ['C1','P1','P2','L1','L2','L3','L4','L5','L6','L7','L8','S1','S2','SF1','SF2','LL',
                   'STECP', 'SIGMA', 'STECL', 'EL', 'AZ', 'STECPL']
+
 _DATA_POS = {}
 _DATA_POS_SIZE = len(_DATA_POS_LIST)
 for i in range(_DATA_POS_SIZE): _DATA_POS[_DATA_POS_LIST[i]] = i
@@ -408,8 +409,9 @@ XYZ        O  Cartesian station position in Earth centered coodriantes, in m
                     if(code in list(_DATA_POS.keys())):
                         obs_info[count] = _DATA_POS[code]
                     elif((code[0] == 'P') or (code[0] == 'L') or (code[0] == 'S')
-                         or ((code[0] == 'C') and(code[1] != '2'))):
-                        raise Albus_RINEX.No_RINEX_File_Error("*** Error: RINEX file '%s' contains unsupported data.  Ask provider to update code to support %s"%(filename, code))
+                         or ((code[0] == 'C') and(code[1] >= '5'))):
+                        warnings.warn("The system does not handle observation frequency codes greater than C2")
+                        pass
                     else:
                         pass
                     count += 1
@@ -610,7 +612,8 @@ XYZ        O  Cartesian station position in Earth centered coodriantes, in m
                                     obs_data[time_index,sat,STRENGTH_2] = \
                                         signal_strength_flag
                                 else:
-                                    raise Albus_RINEX.RINEX_Data_Barf("Unsupported Frequency code in '%s'"%obs_info_code[count])
+                                    # remember - we only handle C1 and C2 Frequency codes
+                                    pass
                         obs_count += 1
                     if(obs_data[time_index,sat,LOSS_OF_LOCK] != BAD_DATA_CODE):
                         obs_data[time_index,sat,:] = BAD_DATA_CODE
