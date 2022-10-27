@@ -55,3 +55,6 @@ from simple anonymous ftp to more secure procedures such as sftp etc and we are
 currently working on modifying our access procedures to reach such sites.
 secure access procedures 
 
+A somewhat more detained description of the software is given in 
+the, as yet, unpublished paper twillis_ALBUS_paper.pdf available in 
+this directory.
