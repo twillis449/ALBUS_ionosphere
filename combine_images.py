@@ -47,8 +47,9 @@ def combine_images(filename, json_polygons, original_noise=0.0):
 
     
     if num_polygons > 0:
-      diffuse_fits_file = filename + '_diffuse_structure_dilated.fits'
-      compact_fits_file = filename + '_compact_structure_dilated.fits'
+      diffuse_fits_file = filename + '_diffuse_structure.fits'
+      compact_fits_file = filename + '.masked_compact_structure.fits'
+
       print('original compact image data  in file ', compact_fits_file)
       print('original diffuse image data  in file ', diffuse_fits_file)
 
@@ -74,6 +75,17 @@ def combine_images(filename, json_polygons, original_noise=0.0):
       compact_data_masked = compact_data * img 
       diffuse_data = diffuse_data + compact_data_masked 
 
+# update compact data image as some compact data moved to diffuse image
+      compact_data = compact_data - compact_data_masked
+      compact_data = update_dimensions(compact_data,incoming_dimensions)
+      hdu.data = compact_data
+      hdu.header['DATAMIN'] = hdu.data.min()
+      hdu.header['DATAMAX'] = hdu.data.max()
+      hdu.writeto(compact_fits_file, overwrite=True)
+
+      fits_file_out = filename + '_final_image.fits'
+      print('sending output to ', fits_file_out)
+      hdu.writeto(fits_file_out, overwrite=True)
 
       diffuse_data = update_dimensions(diffuse_data,incoming_dimensions)
       hdu.data = diffuse_data
@@ -87,7 +99,6 @@ def combine_images(filename, json_polygons, original_noise=0.0):
       # we need to update the mask file as some masked components have now been 
       # moved into the combined final output file
       mask_file = filename + '-dilated_tophat.mask.fits'
-      mask_file_out = 'updated_' + mask_file
       print('mask file to be updated ', mask_file)
       hdu_list = fits.open(mask_file)
       hdu = hdu_list[0]
@@ -95,11 +106,27 @@ def combine_images(filename, json_polygons, original_noise=0.0):
       mask_array = check_array(hdu.data) 
       mask_array = mask_array * mask_update
       hdu.data = mask_array
-      hdu.writeto(mask_file_out, overwrite=True)
+      hdu.writeto(mask_file, overwrite=True)
+
+# update original masked diffuse file for later potential use
+# in filling in image holes
+      masked_dilated_fits_file = filename + '.masked_dilated_image.fits'
+      hdu_list = fits.open(masked_dilated_fits_file)
+      hdu = hdu_list[0]
+      incoming_dimensions = hdu.header['NAXIS']
+      hdu = hdu_list[0]
+      masked_dilated_data = check_array(hdu.data)
+      masked_dilated_data = masked_dilated_data * mask_update
+      masked_dilated_data = update_dimensions(masked_dilated_data,incoming_dimensions)
+      hdu.data = masked_dilated_data
+      hdu.header['DATAMIN'] = hdu.data.min()
+      hdu.header['DATAMAX'] = hdu.data.max()
+      hdu.writeto(masked_dilated_fits_file, overwrite=True)
+
 
     else:
 # just link the diffuse file to final processed file
-      diffuse_fits_file = filename + '_diffuse_structure_dilated.fits'
+      diffuse_fits_file = filename + '_diffuse_structure.fits'
       fits_file_out = filename + '_final_image.fits'
       print('making a symbolic link')
       if os.path.isfile(fits_file_out):
