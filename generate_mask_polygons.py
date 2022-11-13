@@ -59,7 +59,7 @@ class make_polygon:
         y =  np.array(y)
 #       print('x,y', x,y)
         ax = plt.gca()
-        ax.lines = plt.plot(x, y)
+        ax.plot(x, y)
         labels = ['lobe {0}'.format(i+1) for i in range(len(self.coords))]
         for i in range(len(self.qannotate)):
           self.qannotate[i].remove()
@@ -90,16 +90,16 @@ class make_polygon:
       ax = plt.gca()
       for i in range(len(self.qannotate)):
          self.qannotate[i].remove()
+      for line in ax.get_lines(): # ax.lines:
+         line.remove()
 #     print('resetting coords to zero')
       self.qannotate = []
       self.coords = []
-      ax.lines = []
+      axlines = []
       ax.figure.canvas.draw()
     return
 
   def compare_fields(self):
-# print('compare_fields: mask file', mask)
-# print('compare_fields: radio file', radio)
 # print ('info',hdu_list.info())
     cen_x = self.hdu.header['CRPIX1']
     cen_y = self.hdu.header['CRPIX2']

@@ -10,6 +10,7 @@ import json
 import math
 import subprocess
 import numpy as np
+import weakref
 import matplotlib.pylab as plt
 import matplotlib.cm as cm
 import astropy.visualization as vis
@@ -55,7 +56,7 @@ class make_manual_polygon:
         y =  np.array(y)
 #       print('x,y', x,y)
         ax = plt.gca()
-        ax.lines = plt.plot(x, y,'y')
+        ax.plot(x, y,'y')
         ax.figure.canvas.draw()
       self.title = self.file_name + ' Manual Polygon for Flux Density Analysis'
       self.outpic = self.title.replace(" ", "_") + '.png'
@@ -65,7 +66,8 @@ class make_manual_polygon:
     if event.button == 3:
       ax = plt.gca()
       self.coords = []
-      ax.lines = []
+      for line in ax.get_lines(): # ax.lines:
+         line.remove()
       ax.figure.canvas.draw()
       if os.path.isfile(self.outpic):
         os.remove(self.outpic)
