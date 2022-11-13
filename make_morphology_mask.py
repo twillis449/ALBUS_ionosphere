@@ -67,6 +67,16 @@ def make_mask(argv):
     print('make_mask: double_erode ', double_erode)
     print('make_mask: batch_processing', do_batch)
 
+# concert letters to True or False
+    if do_batch == 'T' or do_batch == 't':
+       do_batch = True
+    else:
+       do_batch = False
+    if double_erode == 'T' or double_erode == 't':
+       double_erode = True
+    else:
+       double_erode = False
+
 #   print('make_mask: processing original file', filename+'.fits')
     hdu_list = fits.open(filename+'.fits')
 #   print ('info',hdu_list.info())
@@ -202,12 +212,13 @@ def make_mask(argv):
 # we may want to add some 'compact' features back into the diffuse image ...
 # get locations of the features we want to add to the diffuse image 
 # with the polygon selection tool - to obtaim mask m_c
+    print('calling make_polygon with file', filename)
     if not do_batch:
       polygon_gen = gen_p.make_polygon(hdu, mask, 'T',  filename)   # gives m_c
       polygons = polygon_gen.out_data
       coords = polygons['coords']
       if len(coords) > 0:
-        print('calling combine_images')
+        print('calling combine_images with filename', filename)
         combine_images(filename, polygons, original_noise=median_noise)  # gives a modified image o* = o_d + m_c * o_c
         return
 
