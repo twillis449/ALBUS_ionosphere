@@ -20,6 +20,8 @@ from beam_to_pixels import calculate_area
 from skimage import measure
 from skimage.draw import polygon as skimage_polygon
 from shapely.geometry import Polygon
+from shapely.geometry import  LineString
+from shapely.ops import polylabel
 from process_polygon_data import maxDist, simple_distance
 from operator import itemgetter, attrgetter
 from multiprocessing import Process, Queue
@@ -38,7 +40,9 @@ def Process_contour(x,y):
    source_pos = (-10000.0, 0) # return something even if our result is garbage
    rr, cc = skimage_polygon(x,y)
    data_result = orig_image[rr,cc]
+#  print('raw sum', data_result.sum())
    sum =  data_result.sum() / pixels_beam
+#  print('normalized  sum', sum)
    contained_points = len(rr) # needed if we want a flux density error
    point_source = False
    try:
@@ -61,6 +65,14 @@ def Process_contour(x,y):
 # as usual, stupid x and y cordinate switching problem 
          lon, lat = w.all_pix2world(centroid.y, centroid.x,0)
       else:
+         print(' ')
+         polylabel_location = polylabel(p, tolerance=1)
+#        print('polylabel_location', polylabel_location.x, polylabel_location.y)
+         x_pos =  int(polylabel_location.x)
+         y_pos =  int(polylabel_location.y)
+         data_max = orig_image[x_pos,y_pos]
+#        print('polylabel modified x_pos,y_pos, data_max', x_pos, y_pos, data_max)
+
          use_max = 1
 #        print('centroid is ', centroid)
 #        print('centroid lies outside polygon - looking for maximum')
@@ -69,7 +81,7 @@ def Process_contour(x,y):
          x_pos = rr[location]
          y_pos = cc[location]
          data_max = orig_image[x_pos,y_pos]
-#        print('modified x_pos,y_pos, data_max', x_pos, y_pos, data_max)
+#        print('agw modified x_pos,y_pos, data_max', x_pos, y_pos, data_max)
          lon, lat = w.all_pix2world(y_pos, x_pos, 0)
 
 # do some formatting
@@ -119,21 +131,40 @@ def Process_contour(x,y):
       result = maxDist(contour,pixel_size)
       ang_size = result[0]
       pos_angle = result[1]
-      ang_size = ang_size - mean_beam
+       
+#     print('raw angular size is ', ang_size)
+#     print('raw position angle is ', pos_angle)
+#     print('mean beam size is ', mean_beam)
+      sigma = mean_beam / 2.355 # 2.355 = 2 * sqrt(2 * ln 2)
+      ang_size = ang_size - 4 * sigma # 2 signa level ~ 10 % level of beam
+      if ang_size < 0.0:
+        ang_size = 0.0
+#     diff = ang_size*ang_size - mean_beam*mean_beam
+#     if diff > 0.0:
+#        ang_size = math.sqrt(ang_size*ang_size - mean_beam*mean_beam)
+#     else:
+#        ang_size = 0.0
+#     print('sum max_signal', sum, max_signal)
       ratio = np.abs((sum - max_signal) / sum)
+#     print('ratio is ', ratio)
+#     print('corrected angular size is ', ang_size)
 # test for point source
-      if (ratio <= 0.2) or (ang_size < 0.0):
+#     if (ratio <= 0.2) or (ang_size < 0.0):
+      if (ratio <= 0.2) or (ang_size < 0.5 * mean_beam):
+#     if ang_size <= 0.5 * mean_beam:
         point_source = True
 # also test for point source
-      if contained_points < pixels_beam:
+      if (contained_points < pixels_beam):
         point_source = True
         sum = max_signal
       if point_source:
-         output = source + ',  ' + str(round(sum*1000,3)) + ',   ' + str(round(flux_density_error*1000,4)) + ', ' +str(0.0) + ',   ' +str(0.0)
+#        output = source + ',  ' + str(round(sum*1000,3)) + ',   ' + str(round(flux_density_error*1000,4)) + ', ' +str(0.0) + ',   ' +str(0.0)
+         output = source + ',' + str(sum) + ',' + str(flux_density_error) + ',' +str(0.0) + ',' +str(0.0)
       else:
          ang = round(ang_size,2)
          pa = round(pos_angle,2)
-         output = source + ', ' + str(round(sum*1000,3)) + ', ' + str(round(flux_density_error*1000,4))  + ', ' + str(ang) + ', ' + str(pa)
+#        output = source + ', ' + str(round(sum*1000,3)) + ', ' + str(round(flux_density_error*1000,4))  + ', ' + str(ang) + ', ' + str(pa)
+         output = source + ',' + str(sum) + ',' + str(flux_density_error)  + ',' + str(ang) + ',' + str(pa)
       source_pos = (lon, output, use_max) # we will sort on the lon (ra)
    return source_pos
 
@@ -152,6 +183,7 @@ def generate_source_list(filename, threshold_value, noise):
     print('default noise (Jy)', noise)
     hdu_list = fits.open(filename)
     hdu = hdu_list[0]
+#   print('original fits header', hdu.header)
     w = WCS(hdu.header)
     w = w.celestial
     orig_image = check_array(hdu.data)
@@ -163,7 +195,8 @@ def generate_source_list(filename, threshold_value, noise):
 # used in read-only mode. So it can be shared over separate cores / threads
 # without worrying that something can get over-written during processing
     incoming_dimensions = hdu.header['NAXIS']
-    pixel_size = hdu.header['CDELT2'] * 3600.0
+    pixel_size = hdu.header['CDELT2'] * 3600.0 
+    print('pixel size arcsec = ', pixel_size)
     bmaj = hdu.header['BMAJ'] * 3600.0
     bmin = hdu.header['BMIN'] * 3600.0
     mean_beam = 0.5 * (bmaj + bmin)
@@ -187,6 +220,7 @@ def generate_source_list(filename, threshold_value, noise):
     f.write(output)
     mask = np.where(orig_image>limiting_flux,1.0,0.0)
     mask = mask.astype('float32')
+#   print('image mask hdu_header', hdu.header)
     hdu.data = mask
     hdu.header['DATAMIN'] = 0.0
     hdu.header['DATAMAX'] = 1.0
@@ -254,6 +288,7 @@ def generate_source_list(filename, threshold_value, noise):
     f.write(output)
     f.write('#\n')
     output = '#  source    ra_hms  dec_dms ra(deg)  dec(deg)    flux(mJy)  error ang_size_(arcsec)  pos_angle_(deg)\n'
+    output = 'source,ra_hms,dec_dms,ra(deg),dec(deg),flux(Jy),error,ang_size_(arcsec),pos_angle_(deg)\n'
     f.write(output)
     for i in range(len(ra_sorted_list)):
        output = str(i) + ', ' + ra_sorted_list[i][1] + '\n'
