@@ -9,6 +9,7 @@ from astropy.io import fits
 from check_array import check_array, update_dimensions
 from astropy.io import fits
 from astropy.wcs import WCS
+from optparse import OptionParser
 from breizorro_extract import make_noise_map
 from generate_morphology_image import make_morphology_image
 from larrys_script import generate_morphology_images
@@ -52,9 +53,10 @@ def make_mask(argv):
 
     """
     print('make_mask received argv', argv)
+    loc = argv[1].find('.fits')
     filename = argv[1] # fits file name without '.fits' extension
     limiting_sigma = argv[2]
-    filter_size = argv[3] # integer number
+    filter_size = int(argv[3]) # integer number
     filter_type = argv[4] # 'D' or 'R'
     do_batch = argv[5]
     double_erode = argv[6]
@@ -67,18 +69,8 @@ def make_mask(argv):
     print('make_mask: double_erode ', double_erode)
     print('make_mask: batch_processing', do_batch)
 
-# concert letters to True or False
-    if do_batch == 'T' or do_batch == 't':
-       do_batch = True
-    else:
-       do_batch = False
-    if double_erode == 'T' or double_erode == 't':
-       double_erode = True
-    else:
-       double_erode = False
-
-#   print('make_mask: processing original file', filename+'.fits')
-    hdu_list = fits.open(filename+'.fits')
+#   print('make_mask: processing original file', filename)
+    hdu_list = fits.open(filename)
 #   print ('info',hdu_list.info())
     hdu = hdu_list[0]
 #   print('original image type =', hdu.data.dtype)
@@ -89,18 +81,19 @@ def make_mask(argv):
     bmin = hdu.header['BMIN'] * 3600.0
     pixels_beam = calculate_area(bmaj, bmin, pixel_size)
     print('calculated pixels per beam', pixels_beam)
-#  calculate structure function disk radius
+#  calculate structure element disk radius
     if filter_size == 0:
+      print('calculating filter size')
       if filter_type == 'D':
         radius_squared = pixels_beam / math.pi 
         radius = math.sqrt(radius_squared)
 # assign a value for disk radius 2 greater than rounded area radius
         filter_size = round(radius+0.5) + 1
-        print('**************** setting filter size to ', filter_size)
+        print('**************** setting disk filter radius to ', filter_size)
       else:
         side = math.sqrt(pixels_beam)
         filter_size = round(side+0.5) + 1
-        print('**************** setting filter size to ', filter_size)
+        print('**************** setting rectangular filter edge size to ', filter_size)
       
     
 
@@ -119,6 +112,7 @@ def make_mask(argv):
 
 #   o = original image
     morphology_image = make_morphology_image(filename, filter_size, filter_type, double_erode = double_erode)
+
 #   d - output from erosion-> erosion-> dilation
 
 #   print('morphology image data max and min', morphology_image.max(), morphology_image.min())
@@ -132,6 +126,8 @@ def make_mask(argv):
     hdu.header['DATAMIN'] = hdu.data.min()
     hdu.header['DATAMAX'] = hdu.data.max()
 #   print('tophat image  data max and min', hdu.data.max(), hdu.data.min())
+    loc = filename.find('.fits')
+    filename = filename[:loc]
     out_tophat = filename +'-dilated_tophat.fits'
 #   print('make_mask: tophat output to ', out_tophat )
     hdu.writeto(out_tophat, overwrite=True)
@@ -243,17 +239,53 @@ def main( argv ):
    double_erode =  argv[5] do double_erode? T = Yes, F = don't
 
   """
-  if len(argv) > 4 :
+  parser = OptionParser(usage = '%prog [options] ')
+  parser.add_option('-f', '--file', dest = 'filename', help = 'FITS file with radio image  (default = None)', default = None)
+  parser.add_option('-t', '--threshold', dest = 'threshold', help = 'Threshold value for mask in units of noise (default = 6)', default = 6)
+  parser.add_option('-e', '--element', dest = 'element', help = 'type of morphology structure element, Disk (D) or Rectangle (R) (default = D)', default = 'D')
+  parser.add_option('-s', '--size', dest = 'size', help = 'size of structure element (default = 0)', default = 0.0)
+  parser.add_option('-b', '--batch', dest = 'batch' , help = 'do batch processing, T or F (default = F (False)', default = 'F')
+  parser.add_option('-d', '--double', dest = 'double' , help = 'do double erode with structure element, T or F (default = T (True)', default = 'T')
+
+
+  command_list = []
+  command_list.append(' ')
+  (options,args) = parser.parse_args()
+  print('options', options)
+  filename = options.filename
+  command_list.append(filename)
+  threshold = float(options.threshold)
+  command_list.append(threshold)
+  size = int(options.size)
+  command_list.append(size)
+  element = options.element.upper()
+  command_list.append(element)
+  do_batch = options.batch
+  do_batch = options.batch.lower()
+  if do_batch == 't':
+    do_batch = True
+  else:
+    do_batch = False
+  command_list.append(do_batch)
+  double_erode = options.double.lower()
+  if double_erode == 'f':
+    double_erode = False
+  else:
+    double_erode = True
+  command_list.append(double_erode)
+
+  if len(command_list) > 4 :
     print(' in main', argv)
 # run AGW's code
-    make_mask(argv)     # e.g. make_morphology_mask.py 3C236 6 5 D T F
-  else:
+    print('command_list', command_list)
+    make_mask(command_list)     # e.g. make_morphology_mask.py 3C236 6 5 D T F
+# else:
 # otherwise run larry's code # eg make_orphology_mask.py XXX 5 5
 # for the function call
 # argv[1] = input file name
 # argv[2] = X size of rectangle
 # argv[3] = Y size of rectangle
-    generate_morphology_images(argv)
+#   generate_morphology_images(ommand_list)
 
 if __name__ == '__main__':
     main(sys.argv)
