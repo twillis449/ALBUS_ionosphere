@@ -30,6 +30,7 @@ class make_polygon:
     self.hdu.data = check_array(self.hdu.data)
     self.mask = check_array(mask)
     self.file_name = file_name
+    print('self.file_name is', self.file_name)
 
     self.compare_fields()
 
@@ -104,7 +105,8 @@ class make_polygon:
     cen_x = self.hdu.header['CRPIX1']
     cen_y = self.hdu.header['CRPIX2']
 
-#We can examine the two images (this makes use of the wcsaxes package behind the scenes):
+# We can examine the two images 
+# (this makes use of the wcsaxes package behind the scenes):
 
     image = check_array(self.hdu.data)
     nans = np.isnan(image)
