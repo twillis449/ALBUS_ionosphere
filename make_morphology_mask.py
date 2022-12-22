@@ -12,7 +12,6 @@ from astropy.wcs import WCS
 from optparse import OptionParser
 from breizorro_extract import make_noise_map
 from generate_morphology_image import make_morphology_image
-from larrys_script import generate_morphology_images
 from combine_images import combine_images
 from beam_to_pixels import calculate_area
 from process_polygon_data import *
@@ -279,13 +278,6 @@ def main( argv ):
 # run AGW's code
     print('command_list', command_list)
     make_mask(command_list)     # e.g. make_morphology_mask.py 3C236 6 5 D T F
-# else:
-# otherwise run larry's code # eg make_orphology_mask.py XXX 5 5
-# for the function call
-# argv[1] = input file name
-# argv[2] = X size of rectangle
-# argv[3] = Y size of rectangle
-#   generate_morphology_images(ommand_list)
 
 if __name__ == '__main__':
     main(sys.argv)
