@@ -34,7 +34,8 @@ def make_morphology_image(filename, filter_size, filter_type, double_erode):
     print('*** double_erode =', double_erode)
     # Download the image
     # Load the image and the WCS
-    file_name = filename+'.fits'
+#   file_name = filename+'.fits'
+    file_name = filename
     hdu_list = fits.open(file_name)
     hdu = hdu_list[0]
     data = check_array(hdu.data)
@@ -71,7 +72,8 @@ def make_morphology_image(filename, filter_size, filter_type, double_erode):
     hdu.data = filter_image
     hdu.header['DATAMAX'] =  filter_image.max()
     hdu.header['DATAMIN'] =  filter_image.min()
-    outfile = filename + '_dilated.fits'
+    loc = filename.find('.fits')
+    outfile = filename[:loc] + '-dilated.fits'
     hdu.writeto(outfile, overwrite=True)
     return filter_image
 
