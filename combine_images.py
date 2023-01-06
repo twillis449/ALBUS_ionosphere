@@ -82,10 +82,11 @@ def combine_images(filename, json_polygons, original_noise=0.0):
       hdu.header['DATAMIN'] = hdu.data.min()
       hdu.header['DATAMAX'] = hdu.data.max()
       hdu.writeto(compact_fits_file, overwrite=True)
+      print('sending final compact data output to ', compact_fits_file)
 
-      fits_file_out = filename + '_final_image.fits'
-      print('sending output to ', fits_file_out)
-      hdu.writeto(fits_file_out, overwrite=True)
+#     fits_file_out = filename + '_final_image.fits'
+#     print('sending output to ', fits_file_out)
+#     hdu.writeto(fits_file_out, overwrite=True)
 
       diffuse_data = update_dimensions(diffuse_data,incoming_dimensions)
       hdu.data = diffuse_data
@@ -93,7 +94,7 @@ def combine_images(filename, json_polygons, original_noise=0.0):
       hdu.header['DATAMAX'] = hdu.data.max()
 
       fits_file_out = filename + '_final_image.fits'
-      print('sending output to ', fits_file_out)
+      print('sending final diffuse data output to ', fits_file_out)
       hdu.writeto(fits_file_out, overwrite=True)
       
       # we need to update the mask file as some masked components have now been 
@@ -106,6 +107,7 @@ def combine_images(filename, json_polygons, original_noise=0.0):
       mask_array = check_array(hdu.data) 
       mask_array = mask_array * mask_update
       hdu.data = mask_array
+      print('sending final tophat mask output to ', mask_file)
       hdu.writeto(mask_file, overwrite=True)
 
 # update original masked diffuse file for later potential use
@@ -121,6 +123,7 @@ def combine_images(filename, json_polygons, original_noise=0.0):
       hdu.data = masked_dilated_data
       hdu.header['DATAMIN'] = hdu.data.min()
       hdu.header['DATAMAX'] = hdu.data.max()
+      print('sending final masked dilated data  to ', masked_dilated_fits_file)
       hdu.writeto(masked_dilated_fits_file, overwrite=True)
 
 
@@ -128,14 +131,10 @@ def combine_images(filename, json_polygons, original_noise=0.0):
 # just link the diffuse file to final processed file
       diffuse_fits_file = filename + '_diffuse_structure.fits'
       fits_file_out = filename + '_final_image.fits'
-      print('making a symbolic link')
       if os.path.isfile(fits_file_out):
         os.remove(fits_file_out)
+      print('no polygons selected so just making a symbolic link ',fits_file_out, ' to ', diffuse_fits_file)
       os.symlink(diffuse_fits_file , fits_file_out)
-
-# following is not worth the effort
-#   make_simulated_noise(diffuse_fits_file, std_dev=original_noise)
-
 
 def main( argv ):
   print('combine_images: doing image addition')
