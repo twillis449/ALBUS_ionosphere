@@ -46,7 +46,7 @@ def process_simple_polygon_file(points):
   return poly_coord
 
 
-def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,do_subt, threshold_value, noise):
+def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,do_subt=False, threshold_value=6, noise=0):
 # note - no '.fits' extension expected ... but
     if filename.find('conv'):
       use_conv = True
@@ -504,6 +504,7 @@ def main( argv ):
 
 # note - the input parameters should be given in the sequemce shown in
 # the ASCII file ending in .csv
+# e.g. can test with 'calculate_source_parms.py 1.28 xyz.fits 0.5 -0.8 5 True'
 
   freq = argv[1]        # frequency in GHz
   filename = argv[2]    # name of data file 
