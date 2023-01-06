@@ -15,8 +15,8 @@ def check_array(data):
 def update_dimensions(newimage, supplied_dimensions):
 # supplied dimensions = hdu.header['NAXIS']
     shape = newimage.shape
-    print('newimage has shape', shape)
-    print('supplied dimensions', supplied_dimensions)
+#   print('newimage has shape', shape)
+#   print('supplied dimensions', supplied_dimensions)
     if len(shape) == supplied_dimensions:
         out_image = newimage
     elif supplied_dimensions == 3:
@@ -26,7 +26,7 @@ def update_dimensions(newimage, supplied_dimensions):
         out_image = np.zeros((1,1,shape[0], shape[1]), dtype = np.float32)
         out_image[0, 0, :, :] = newimage
 
-    print('updated image has shape', out_image.shape)
+#   print('updated image has shape', out_image.shape)
     return out_image
 
 
