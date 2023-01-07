@@ -24,9 +24,6 @@ from astropy.io import fits
 from astropy.wcs import WCS
 from check_array import check_array
 
-fig, (ax1, ax2) = plt.subplots(1, 2,  sharex=True, sharey=True)
-
-
 class make_polygon:
   def __init__(self,hdu,mask,morph_signal, file_name) :
     self.out_data = {}
@@ -38,20 +35,13 @@ class make_polygon:
     self.file_name = file_name
     self.press=False
     self.move = False
-    self.ax = ax2
     self.button = 1  # left button
     self.coords = []
     self.qannotate = []
     self.pic = 1
     
-
-    self.c1=self.ax.figure.canvas.mpl_connect('button_press_event', self.onpress)
-    self.c2=self.ax.figure.canvas.mpl_connect('button_release_event', self.onrelease)
-    self.c3=self.ax.figure.canvas.mpl_connect('motion_notify_event', self.onmove)
-
 # finally load images
     self.compare_fields()
-
 
   def __str__(self):
         print("polygons =", self.out_data)
@@ -81,7 +71,6 @@ class make_polygon:
 
   def onrelease(self,event):
         if self.press and not self.move:
-#           print('calling self.onclick')
             self.onclick(event)
         self.press=False; self.move=False
 
@@ -149,6 +138,11 @@ class make_polygon:
 
     wcs = WCS(self.hdu.header)
 # print('wcs', wcs)
+    fig, (ax1, ax2) = plt.subplots(ncols=2, figsize=(8, 4), sharex=True, sharey=True)
+    self.ax = ax2
+    self.c1=self.ax.figure.canvas.mpl_connect('button_press_event', self.onpress)
+    self.c2=self.ax.figure.canvas.mpl_connect('button_release_event', self.onrelease)
+    self.c3=self.ax.figure.canvas.mpl_connect('motion_notify_event', self.onmove)
 
 # print('starting plot')
     end_point = self.file_name.find('.fits')
