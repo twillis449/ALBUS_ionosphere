@@ -42,6 +42,7 @@ class make_polygon:
     self.button = 1  # left button
     self.coords = []
     self.qannotate = []
+    self.pic = 1
     
 
     self.c1=self.ax.figure.canvas.mpl_connect('button_press_event', self.onpress)
@@ -86,10 +87,12 @@ class make_polygon:
 
   def take_a_pic(self):
      print('taking a pic')
-     self.outpic = self.image_title.replace(" ", "_") + '.png'
+     self.outpic = self.image_title.replace(" ", "_") + '_' + str(self.pic) + '.png'
      if os.path.isfile(self.outpic):
         os.remove(self.outpic)
      plt.savefig(self.outpic)
+     self.pic = self.pic + 1
+ 
      return
 
   def delete_event_data(self):
