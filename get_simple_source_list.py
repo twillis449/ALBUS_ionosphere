@@ -65,7 +65,6 @@ def Process_contour(x,y):
 # as usual, stupid x and y cordinate switching problem 
          lon, lat = w.all_pix2world(centroid.y, centroid.x,0)
       else:
-         print(' ')
          polylabel_location = polylabel(p, tolerance=1)
 #        print('polylabel_location', polylabel_location.x, polylabel_location.y)
          x_pos =  int(polylabel_location.x)
@@ -85,9 +84,6 @@ def Process_contour(x,y):
          lon, lat = w.all_pix2world(y_pos, x_pos, 0)
 
 # do some formatting
-#     lon = Angle(lon, unit = u.deg)
-#     lat = Angle(lat, unit = u.deg)
-#     print('lat ', lat)
       h,m,s = rad_to_hms(math.radians(lon))
       if h < 10:
          h = '0' + str(h)
@@ -125,7 +121,6 @@ def Process_contour(x,y):
          s = s + '0'
       d_m_s = d + ':' + m + ':' + s
       source = h_m_s + ', ' + d_m_s  + ', ' +str(lon) + ', ' + str(lat)
-#     source = str(lon) + ', ' + str(lat)
 
 # get source size
       result = maxDist(contour,pixel_size)
