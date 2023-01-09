@@ -17,10 +17,11 @@ from astropy.convolution import convolve, convolve_fft,Gaussian2DKernel, Tophat2
 from astropy.modeling.models import Gaussian2D
 import astropy.visualization as vis
 from check_array import check_array, update_dimensions
+from optparse import OptionParser
 import timeit
 
 
-def convolve_image(fits_input_image, conv_factor, use_fft='F', do_downsize = 'F'):
+def convolve_image(fits_input_image, conv_factor, use_fft=False, do_downsize = False):
 # Load the image to be convolved
   print('loading input_image', fits_input_image)
   hdu_list = fits.open(fits_input_image)
@@ -76,7 +77,7 @@ def convolve_image(fits_input_image, conv_factor, use_fft='F', do_downsize = 'F'
   img_source = check_array(hdu.data)
 # set NaNs to zero
   img_source = np.nan_to_num(img_source)
-  if use_fft == 'T':
+  if use_fft:
     print('**** using FFT for convolution')
     astropy_conv = convolve_fft(img_source, kernel, allow_huge=True)
   else:
@@ -120,7 +121,7 @@ def convolve_image(fits_input_image, conv_factor, use_fft='F', do_downsize = 'F'
       outfile = fits_input_image[:end_point] + '_conv.fits'
     else:
       outfile = fits_input_image +  '_conv.fits'
-    if do_downsize == 'T':
+    if do_downsize:
       print('shrinking convolved image')
       smaller_astropy_conv = astropy_conv[::conv_factor_int, ::conv_factor_int] 
     else:
@@ -139,7 +140,7 @@ def convolve_image(fits_input_image, conv_factor, use_fft='F', do_downsize = 'F'
   hdu.header['BPA']  = bpa
   hdu.header['DATAMAX'] =  hdu.data.max()
   hdu.header['DATAMIN'] =  hdu.data.min()
-  if do_downsize == 'T':
+  if do_downsize:
     hdu.header['CDELT1'] = hdu.header['CDELT1']  * conv_factor_int
     hdu.header['CDELT2'] = hdu.header['CDELT2']  * conv_factor_int
 # need to flip array references vs what's seen on the display
@@ -164,24 +165,29 @@ def convolve_image(fits_input_image, conv_factor, use_fft='F', do_downsize = 'F'
 # plt.show()
 
 def main( argv ):
-  start_time = timeit.default_timer()
-# argv[1] = incoming fits image
-# argv[2] convolution factor
-  print('convolving image ', argv[1])
-  conv_factor = float(argv[2])
-  try:
-   use_fft = argv[3]
-  except:
-   use_fft = 'F'
-  try:
-   do_downsize = argv[4]
-  except:
-   do_downsize = 'T'
-  print('conv_image incoming image', argv[1])
-  print('calling convolve with do_downsize', do_downsize)
-  convolve_image(argv[1], conv_factor, use_fft,do_downsize)
-  elapsed = timeit.default_timer() - start_time
-  print("Run Time:",elapsed,"seconds")
+   start_time = timeit.default_timer()
+   parser = OptionParser(usage = '%prog [options] ')
+   parser.add_option('-f', '--file', dest = 'filename', help = 'input FITS file radio image  (default = None)', default = None)
+   parser.add_option('-c', '--conv', dest = 'conv_factor', help = 'convolution factor (default = 2)', default = 2)
+   parser.add_option('--ft', '--fft', dest = 'use_fft', help = 'do convolution with fft (default = False)', default = False)
+   parser.add_option('-d', '--downsize', dest = 'do_downsize', help = 'downsize image isampling interval (default = False)', default = False)
+   (options,args) = parser.parse_args()
+   print('options', options)
+   filename = options.filename
+   conv_factor = float(options.conv_factor)
+   use_fft = options.use_fft
+   do_downsize = options.do_downsize
+   print('do_downsize', do_downsize)
+   if use_fft != False:
+     use_fft = True
+   if do_downsize != False:
+     do_downsize = True
+
+   print('conv_image incoming image', filename)
+   print('calling convolve with do_downsize', do_downsize)
+   convolve_image(filename, conv_factor, use_fft,do_downsize)
+   elapsed = timeit.default_timer() - start_time
+   print("Run Time:",elapsed,"seconds")
 
 
 if __name__ == '__main__':
