@@ -39,6 +39,10 @@ class make_polygon:
     self.coords = []
     self.qannotate = []
     self.pic = 1
+    self.press_x = 0.0
+    self.press_y = 0.0
+    self.release_x = 0.0
+    self.release_y = 0.0
     
 # finally load images
     self.compare_fields()
@@ -50,19 +54,22 @@ class make_polygon:
         print(self.__dict__)
 
   def onclick(self,event):
-        print('\n onclick: event location', event.xdata, event.ydata)
-        if event.inaxes == self.ax:
-            if event.button == self.button:
-                self.add_event_data(event)
-            if event.button == 3: # right button
-                self.delete_event_data()
-                print('data has been deleted')
+#       print('\n onclick: event location', event.xdata, event.ydata)
+        if event.button == 3: # right button
+#          print('calling delete_event_data')
+           self.delete_event_data()
+#          print('data has been deleted')
+           self.ax.figure.canvas.draw()
+        if event.inaxes == self.ax and event.button == self.button:
+            self.add_event_data(event)
             self.ax.figure.canvas.draw()
 
   def onpress(self,event):
         if event.button == 2: # middle button
            self.take_a_pic()
            return
+        self.press_x = event.xdata 
+        self.press_y = event.ydata
         self.press=True
 
   def onmove(self,event):
@@ -70,12 +77,15 @@ class make_polygon:
             self.move=True
 
   def onrelease(self,event):
-        if self.press and not self.move:
+        self.release_x = event.xdata 
+        self.release_y = event.ydata
+        if abs(self.release_x - self.press_x) < 1.0 and  abs(self.release_y - self.press_y) < 1.0:
+#        if self.press and not self.move:
             self.onclick(event)
         self.press=False; self.move=False
 
   def take_a_pic(self):
-     print('taking a pic')
+#    print('taking a pic')
      self.outpic = self.image_title.replace(" ", "_") + '_' + str(self.pic) + '.png'
      if os.path.isfile(self.outpic):
         os.remove(self.outpic)
@@ -97,7 +107,7 @@ class make_polygon:
   def add_event_data(self,event):
       ix =event.xdata 
       iy = event.ydata
-      print('*** event raw pos', ix, iy)
+#     print('*** event raw pos', ix, iy)
 
       loc = (ix, iy)
       self.coords.append(loc)
@@ -123,7 +133,7 @@ class make_polygon:
 
 
   def compare_fields(self):
-    print('in compare_fields')
+#   print('in compare_fields')
 # print ('info',hdu_list.info())
     cen_x = self.hdu.header['CRPIX1']
     cen_y = self.hdu.header['CRPIX2']
