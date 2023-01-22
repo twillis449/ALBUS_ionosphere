@@ -8,6 +8,7 @@ from astropy import wcs
 from astropy.wcs import WCS
 from astropy.time import Time
 from coords import *
+from optparse import OptionParser
 import astropy.visualization as vis
 from astropy.io import fits
 from shapely.geometry import Polygon, MultiPolygon, Point
@@ -46,13 +47,18 @@ def process_simple_polygon_file(points):
   return poly_coord
 
 
-def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,do_subt=False, threshold_value=6, noise=0):
+def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,do_subt=False, threshold_value=3, noise=0):
+    print('analyze_image parameters:', filename, freq, z_str, alpha_str, specified_las, use_mask_l, do_subt, threshold_value, noise)
 # note - no '.fits' extension expected ... but
     if filename.find('conv'):
       use_conv = True
     else :
       use_conv = False
-    use_mask = use_mask_l
+    use_mask = True
+    print('use_mask_l', use_mask_l)
+    if not use_mask_l==True:
+      use_mask = False
+    print('mask set to ', use_mask)
     multi = False
     location =  filename.find('.fits')
     if location > 0:
@@ -67,14 +73,11 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,do
     w =w.celestial
     ref_ra = hdu.header['CRVAL1']
     ref_dec = hdu.header['CRVAL2']
-#   print('ref_ra, ref_dec', ref_ra, ref_dec)
     pixel_size = hdu.header['CDELT2'] * 3600.0
-#   print('pixel size (arcsec)', pixel_size)
     freq = float(freq)
     bmaj = hdu.header['BMAJ'] * 3600.0
     bmin = hdu.header['BMIN'] * 3600.0
     pixels_beam = calculate_area(bmaj, bmin, pixel_size)
-#   print('calculated pixels per beam', pixels_beam)
     mean_beam = 0.5 * (bmaj + bmin)
 
     # Download the polygon points
@@ -86,6 +89,7 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,do
       print('looking for a breizorro mask file')
       print('calling make_polygon from calc')
       data = check_array(hdu.data)
+      print('noise is ', noise)
       if noise == 0:
         noise = make_noise_map(data)
       print('calculate_parameters:  noise ', noise)
@@ -183,8 +187,6 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,do
        relative_area = p.area / total_area
        centroid = p.centroid
        print('centroid location', centroid.x,centroid.y)
-#      lon, lat = w.all_pix2world(centroid.x,centroid.y,0)
-# as usual stupid x and y cordinate switching problem
        lon, lat = w.all_pix2world(centroid.y, centroid.x,0)
        print('*********  lon, lat ',  lon, lat )
        print('centroid ra, dec', lon, lat)
@@ -196,11 +198,7 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,do
        d_m_s = str(d) + 'd'+str(m)+'m'+ str(round(s,2))+'s'
        source = h_m_s + ' ' + d_m_s
 
-#     print('polygon iteration', i)
-#     print('p area ', p.area)
-#     print('p length ', p.length)
       (minx, miny, maxx, maxy) = p.bounds
-#     print('poly minx, miny, maxx, maxy', minx, miny, maxx, maxy)
 
       if i == 0:
         print('loading WCS etc')
@@ -278,7 +276,7 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,do
 #     print('x range fast  = ', int(minx-1), int(maxx+1))
 #     print('y range slow  = ', int(miny-1), int(maxy+1))
 #     print('data shape', data.shape)
-      img_mask = np.zeros(data.shape, dtype=np.float)
+      img_mask = np.zeros(data.shape, dtype=float)
 #     print('len polygon list', len(polygon_list))
       if i == 0:
         for ii in range(len(polygon_list)):
@@ -295,7 +293,9 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,do
           rr, cc = skimage_polygon(x,y, data.shape)
           img_mask[rr, cc] = 1
         hdu.data = img_mask
-        hdu.writeto('simple_polygon_mask.fits',overwrite=True)
+        hdu.header['DATAMIN'] = img_mask.min()
+        hdu.header['DATAMAX'] = img_mask.max()
+        hdu.writeto(filename +'_source_parameter_polygon_mask.fits',overwrite=True)
         data_result = data *img_mask 
         sum =  data_result.sum()
         max_signal = data_result.max()
@@ -498,29 +498,58 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,do
 
 def main( argv ):
 
+  parser = OptionParser(usage = '%prog [options] ')
+  parser.add_option('-f', '--file', dest = 'filename', help = 'FITS file with radio image  (default = None)', default = None)
+  parser.add_option( '--freq', dest = 'frequency', help = 'frequency of observation in GHz (default = None)', default = None)
+  parser.add_option('-z', '--redshift', dest = 'redshift', help = 'redslift of object (default = None)', default = None)
+  parser.add_option('--spect', dest = 'spect', help = 'spectral index of object(default = -0.75)', default = -0.75)
+  parser.add_option('-s', '--size', dest = 'size' , help = 'guestimate for object size (default = 40.0)', default = 40.0)
+  parser.add_option('-t', '--threshold', dest = 'threshold' , help = 'threshold for polygon detection in units of noise (default = 6.0)', default = 6.0)
+  parser.add_option('-n', '--noise', dest = 'noise' , help = 'specified noise in mJy (default = 0.0)', default = 0.0)
+  parser.add_option('-m', '--mask', dest = 'mask' , help = 'use mask or manual specification for polygonnt, T or F (default = (True)', default = True)
+
+
+
   os.system('date')
   startime = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
-  print("calc_source_parameters Start at %s" % startime)
-
-# note - the input parameters should be given in the sequemce shown in
-# the ASCII file ending in .csv
-# e.g. can test with 'calculate_source_parms.py 1.28 xyz.fits 0.5 -0.8 5 True'
-
-  freq = argv[1]        # frequency in GHz
-  filename = argv[2]    # name of data file 
-  z = argv[3]           # redshift
-  alpha = argv[4]       # spectral index
-  specified_las = argv[5] # initial angular size estimate for data  retrieval
-  use_mask_l = argv[6]  # use mask or simple polygon
-  length = len(argv)
-# print ('length of parameters', length)
+  command_list = []
+  command_list.append(' ')
+  (options,args) = parser.parse_args()
+  print('options', options)
+  filename = options.filename           # name of fits data file 
+  command_list.append(filename)
+  freq = options.frequency              # frequency in GHz 
+  command_list.append(freq)
+  alpha = str(options.spect)            # spectral index
+  command_list.append(alpha)
+  redshift = options.redshift           # redshift
+  if redshift is None:
+    print('You must specify a redshift, even if its zero')
+    return
+  command_list.append(redshift)
+  size = str(options.size)              # initial angular size estimate for data  retrieval
+  command_list.append(size)
+  threshold = float(options.threshold)  # threshold for detectable signal
+  command_list.append(threshold)
+  mask = options.mask                   # use mask or manual specification ?
+  if not mask==True:
+    mask = False
+  command_list.append(mask)
+  noise = float(options.noise)      # specified noise level in Jy, if = 0.0, system will calculate noise; noise is only
+                                    # used to determine a mask level
+  command_list.append(noise)
+  print('command list', command_list)
+  length = len(command_list)
+  print ('length of parameters', length)
 # print('******************')
-  print('**** incoming parameters', freq, filename, z, alpha, specified_las, use_mask_l)
-  analyze_image(filename, freq, z, alpha, specified_las, use_mask_l)
+  print('**** incoming parameters', freq, filename, redshift, alpha, size, mask,threshold)
+  analyze_image(filename, freq, redshift, alpha, size, mask,threshold_value=threshold, noise=noise)
   os.system('date')
   endtime = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
   print("calc_source_parameters End at %s" % endtime)
   return
 if __name__ == '__main__':
+# exampla: 'calculate_source_parms.py -f J0225.9-4154_4_small.fits --freq 1.2 --spect -0.9 -s 10.0 -m F -z 0.5 -t 3.0'
+
     main(sys.argv)
 

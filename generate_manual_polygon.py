@@ -28,6 +28,12 @@ class make_manual_polygon:
     hdu_list = fits.open(self.file_name)
     self.hdu = hdu_list[0]
     self.image = check_array(self.hdu.data)
+    self.press_x = 0.0
+    self.press_y = 0.0
+    self.release_x = 0.0
+    self.release_y = 0.0
+    self.pic = 1
+
     self.compare_fields()
 
 # def __str__(self):
@@ -36,15 +42,47 @@ class make_manual_polygon:
   def write(self, d=None):
         print(self.__dict__)
 
+  def take_a_pic(self):
+#    print('taking a pic')
+     self.title = self.file_name + ' Manual Polygon for Flux Density Analysis'
+     self.outpic = self.title.replace(" ", "_") + str(self.pic) + '.png'
+     if os.path.isfile(self.outpic):
+        os.remove(self.outpic)
+     plt.savefig(self.outpic)
+     self.pic = self.pic + 1
+     return
+
+
+  def onpress(self,event):
+     if event.button == 2: # middle button
+       print('taking a pic')
+       self.take_a_pic()
+       return
+
+     self.press_x = event.xdata
+     self.press_y = event.ydata
+     self.press=True
+
+  def onrelease(self,event):
+     self.release_x = event.xdata
+     self.release_y = event.ydata
+     if abs(self.release_x - self.press_x) < 5.0 and  abs(self.release_y - self.press_y) < 5.0:
+         self.onclick(event)
+
+
 # Simple mouse click function to store coordinates
   def onclick(self,event):
+    if event.button == 3:
+      ax = plt.gca()
+      self.coords = []
+      for line in ax.get_lines(): # ax.lines:
+         line.remove()
+      ax.figure.canvas.draw()
     if event.button == 1:
       ix, iy = event.xdata, event.ydata
-#     print('*** raw pos', ix, iy)
 
     # assign global variable to access outside of function
       loc = (ix, iy)
-#     print('even_loc', loc)
       self.coords.append(loc)
       if len(self.coords) > 1:
         x = []
@@ -54,23 +92,9 @@ class make_manual_polygon:
           y.append(self.coords[i][1])
         x =  np.array(x)
         y =  np.array(y)
-#       print('x,y', x,y)
         ax = plt.gca()
         ax.plot(x, y,'y')
         ax.figure.canvas.draw()
-      self.title = self.file_name + ' Manual Polygon for Flux Density Analysis'
-      self.outpic = self.title.replace(" ", "_") + '.png'
-      if os.path.isfile(self.outpic):
-        os.remove(self.outpic)
-      plt.savefig(self.outpic)
-    if event.button == 3:
-      ax = plt.gca()
-      self.coords = []
-      for line in ax.get_lines(): # ax.lines:
-         line.remove()
-      ax.figure.canvas.draw()
-      if os.path.isfile(self.outpic):
-        os.remove(self.outpic)
     return
 
   def compare_fields(self):
@@ -81,11 +105,10 @@ class make_manual_polygon:
 
     wcs = WCS(self.hdu.header)
     print('orginal wcs', wcs)
-# print('wcs', wcs)
     fig = plt.figure(1)
-
-# print('starting plot')
-    cid = fig.canvas.mpl_connect('button_press_event', self.onclick)
+    self.c1=fig.canvas.mpl_connect('button_press_event', self.onpress)
+    self.c2=fig.canvas.mpl_connect('button_release_event', self.onrelease)
+#   self.c3=fig.canvas.mpl_connect('motion_notify_event', self.onmove)
 
 # set NaNs to zero
     self.image = np.nan_to_num(self.image)
@@ -101,12 +124,11 @@ class make_manual_polygon:
     
     plt.imshow(self.image, cmap =plt.cm.gray, norm = norm, origin = 'lower')
     plt.show()
-    fig.canvas.mpl_disconnect(cid)
+    fig.canvas.mpl_disconnect(self.c1)
     length = len(self.coords) 
     if length > 2:
       locations = []
       for i in range(length):
-         print('initial', self.coords[i])
          x = self.coords[i][0]
          y = self.coords[i][1]
          loc = (y,x)
@@ -117,7 +139,6 @@ class make_manual_polygon:
       self.out_data['0'] = locations
       p = Polygon(locations)
       self.out_data['manual'] = True
-    print('returning ', self.out_data)
     return self.out_data
 
 def main(argv):

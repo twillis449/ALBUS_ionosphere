@@ -83,7 +83,7 @@ def main( argv ):
    parser.add_option('-m', '--use_m', dest = 'use_mask', help = 'use mask (default = T)', default = True)
    parser.add_option('-c','--use_conv', dest = 'use_conv', help = 'use convolved image (default = F)', default = False)
    parser.add_option('-s','--subt', dest = 'do_subt', help = 'subtract central pixel flux density for equipartition (default = T)', default = True)
-   parser.add_option('--th', '--threshold', dest = 'threshold', help = 'Threshold value forsoure detection in units of noise (default = 6)', default = 6)
+   parser.add_option('-t', '--threshold', dest = 'threshold', help = 'Threshold value forsoure detection in units of noise (default = 6)', default = 6)
    parser.add_option('-n', '--noise', dest = 'noise', help = 'noise specification in mJy, where noise cannot be found from image (default = 0)', default = 0)
    (options,args) = parser.parse_args()
    print('options', options)
