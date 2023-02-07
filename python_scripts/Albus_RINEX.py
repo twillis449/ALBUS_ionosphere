@@ -449,14 +449,35 @@ OUTPUTS:  None
     if(year >= 2000): yy = year - 2000
     site_str = ""
     if(FTP_site == 0 or FTP_site == 1 ):
+        print('calling SOPAC')
         # SOPAC California
-        if(RINEX_filename[-1] == 'd'):
+        if FTP_site == 0:
+          if(RINEX_filename[-1] == 'd'):
             site_str = "ftp://garner.ucsd.edu/pub/rinex/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
-        elif(RINEX_filename[-1] == 'n'):
+          elif(RINEX_filename[-1] == 'n'):
             site_str = "ftp://garner.ucsd.edu/pub/nav/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
-        else:
+          else:
             # guess and pray
             site_str = "ftp://garner.ucsd.edu/pub/data/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
+        else:
+          if year >= 2020:   # need RINEX3
+            RX3_flag = True
+            print('converting to RINEX3 file name from RINEX2 name: ', RINEX_filename)
+            output = subprocess.Popen(['RX3name', RINEX_filename],
+                            stdout=subprocess.PIPE).communicate()[0]
+            RINEX3_filename = output.decode('utf-8')[:-2]
+            print('SOPAC RINEX3_filename', RINEX3_filename)
+            our_file = output_directory + '/' + RINEX_filename 
+            our_Z_file = output_directory + '/' + RINEX3_filename + '.gz'
+            site_str = "ftp://garner.ucsd.edu/pub/rinex/%4.4d/%3.3d/%s.gz"%(year, doy, RINEX3_filename)
+          else:
+            if(RINEX_filename[-1] == 'd'):
+              site_str = "ftp://garner.ucsd.edu/pub/rinex/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
+            elif(RINEX_filename[-1] == 'n'):
+              site_str = "ftp://garner.ucsd.edu/pub/nav/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
+            else:
+              # guess and pray
+              site_str = "ftp://garner.ucsd.edu/pub/data/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
     elif(FTP_site == 2):
         # IGS in Germany
         #site_str = "http://igs.ifag.de/root_ftp/IGS/obs/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
