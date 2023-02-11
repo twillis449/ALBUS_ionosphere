@@ -943,7 +943,7 @@ obs_data   O  The output data array, as
             # things are ok
             pass
         else:
-            warnigns.warn("Unknown SP3 version '%s' in file '%s', trying anyway ...."%(version, filename))
+            warnings.warn("Unknown SP3 version '%s' in file '%s', trying anyway ...."%(version, filename))
         if(line[2] != 'P'):
             warnings.warn("Not a position file for '%s', trying anyway ...."%filename)
         year = int(line[3:7])
