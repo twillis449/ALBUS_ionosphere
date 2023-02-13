@@ -73,7 +73,7 @@ This seems to happen if you install flex on an ubuntu linux system, but may not 
 
 To build, just run 'make' followed by 'make install'. That should work.
 
-IMPORTANT: You will also need to install the conversion software programs 
+IMPORTANT: You also NEED to install the conversion software programs 
 contained in the file RNXCMP_4.0.5_src.tar.gz.  See the file 
 RNXCMP_4.0.5_src/docs/RNXCMP.txt for instructions on compilation. Put the 
 compiled binarys in some directory (e.g. /usr/local/bin) which will be in 

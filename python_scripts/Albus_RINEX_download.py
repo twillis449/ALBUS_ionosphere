@@ -6,6 +6,8 @@
 # 2007 Jan 19  James M Anderson  --JIVE  start
 # 2020 Using pycurl with python3
 
+import os
+SKIP_CACHED_DOWNLOAD = "ALBUS_NOCACHED_DOWNLOAD" in os.environ
 
 import sys
 import pycurl
@@ -15,6 +17,11 @@ def main():
     if(len(sys.argv) != 4):
         print("Error: correct usage is %s inURL, outfilename timeout"%sys.argv[0])
         sys.exit(-2)
+
+    if not SKIP_CACHED_DOWNLOAD and os.path.exists(sys.argv[2]):
+      print("Skipping %s -- already cached")
+      sys.exit(0)
+    
     HAS_PYCURL = True
     if HAS_PYCURL:  #  currently the system used for retrieving ftp data
       print ('using PyCurl')

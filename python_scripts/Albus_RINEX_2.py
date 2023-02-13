@@ -941,7 +941,7 @@ obs_data   O  The output data array, as
             # things are ok
             pass
         else:
-            warnigns.warn("Unknown SP3 version '%s' in file '%s', trying anyway ...."%(version, filename))
+            warnings.warn("Unknown SP3 version '%s' in file '%s', trying anyway ...."%(version, filename))
         if(line[2] != 'P'):
             warnings.warn("Not a position file for '%s', trying anyway ...."%filename)
         year = int(line[3:7])
@@ -1041,6 +1041,8 @@ obs_data   O  The output data array, as
                 pass
             elif(line[0:3] == 'EOF'):
                 break # end of file
+            elif(line[0:2] == '/*'):  # looks like a comment
+                pass
             else:
                 raise Albus_RINEX.RINEX_Data_Barf("Unsupported data type in line '%s'"%line)
     finally:

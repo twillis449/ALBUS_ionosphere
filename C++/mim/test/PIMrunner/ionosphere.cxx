@@ -27,7 +27,7 @@
 
 // External Functions
 // Get the IGRF magnetic field around the Earth
-extern "C" int jma_igrf11syn(
+extern "C" int jma_igrf13syn(
     double date,  // I  time (years AD, in UT) valid 1900--2015                                 
     double radius,// I  the position radius, in meters                    
     double clatit,// I  the cos(latitude, in radians)                    
@@ -1338,7 +1338,7 @@ Space_Vector Ionosphere_Base::Magnetic_Field(
 //	wind, etc.
 
 //	This function calls the IGRF11-based magnetic field calculation function
-//	jma_igrf11syn, which is my C adaptation of the original FORTRAN
+//	jma_igrf13syn, which is my C adaptation of the original FORTRAN
 //	function approved by the IGRF.  This is a self-contained function,
 //	meaning that all data is held internally, with no file access.
 //	The original FORTRAN has been modified to accept the sines and cosines
@@ -1382,8 +1382,8 @@ Space_Vector Ionosphere_Base::Magnetic_Field(
     // I need a place to store the magnetic field components
     Real64 x,y,z;
 
-//    fprintf(stdout, "In Ionosphere_Base::Magnetic_Field - calling jma_igrf11syn\n");
-    jma_igrf11syn(year_fraction,
+//    fprintf(stdout, "In Ionosphere_Base::Magnetic_Field - calling jma_igrf13syn\n");
+    jma_igrf13syn(year_fraction,
                   position.Radius(),
                   position.cLat(),
                   position.sLat(),

@@ -433,7 +433,7 @@ OUTPUTS:  None
     yy = year - 1900
     if(year >= 2000): yy = year - 2000
     site_str = ""
-    if(FTP_site == 0):
+    if(FTP_site == 0 or FTP_site == 1):
         # SOPAC California
         if(RINEX_filename[-1] == 'd'):
             site_str = "ftp://garner.ucsd.edu/pub/rinex/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
@@ -442,9 +442,9 @@ OUTPUTS:  None
         else:
             # guess and pray
             site_str = "ftp://garner.ucsd.edu/pub/data/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
-    elif(FTP_site == 1):
+#   elif(FTP_site == 1):
         # CDDIS Goddard
-        site_str = "ftp://cddis.gsfc.nasa.gov/gps/data/daily/%4.4d/%3.3d/%2.2d%s/%s.Z"%(year, doy, yy, RINEX_filename[-1], RINEX_filename)
+#       site_str = "ftp://cddis.gsfc.nasa.gov/gps/data/daily/%4.4d/%3.3d/%2.2d%s/%s.Z"%(year, doy, yy, RINEX_filename[-1], RINEX_filename)
     elif(FTP_site == 2):
         # IGS in Germany
         #site_str = "http://igs.ifag.de/root_ftp/IGS/obs/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
@@ -774,12 +774,12 @@ return_code       O  Status of getting file from web
         warnings.warn("Warning: data %s is in the missing data list"%(ephemeris_filename))
         return -1
     # Where are we getting this from?
-    if(FTP_site == 0):
+    if(FTP_site == 0 or FTP_site == 1):
         # UCSD
         site_str = "ftp://garner.ucsd.edu/pub/products/%4.4d/%s.Z"%(gps_week, ephemeris_filename)
-    elif(FTP_site == 1):
+#   elif(FTP_site == 1):
         # CDDIS Goddard
-        site_str = "ftp://cddis.gsfc.nasa.gov/pub/gps/products/%4.4d/%s.Z"%(gps_week, ephemeris_filename)
+#       site_str = "ftp://cddis.gsfc.nasa.gov/pub/gps/products/%4.4d/%s.Z"%(gps_week, ephemeris_filename)
     elif(FTP_site == 2):
         # IFAG, Germany
         site_str = "http://igs.ifag.de/root_ftp/IGS/products/orbits/%4.4d/%s.Z"%(gps_week, ephemeris_filename)
@@ -892,10 +892,10 @@ return_code       O  Status of getting file from web
     assert(year < 2080)
     yy = year - 1900
     if(year >= 2000): yy = year - 2000
-    if(FTP_site == 0):
+    if(FTP_site == 0 or FTP_site ==1):
         # CDDIS Goddard
-        site_str = "ftp://cddis.gsfc.nasa.gov/pub/gps/products/ionex/%4.4d/%3.3d/%s.Z"%(year, doy, IONEX_filename)
-    elif(FTP_site == 1):
+#       site_str = "ftp://cddis.gsfc.nasa.gov/pub/gps/products/ionex/%4.4d/%3.3d/%s.Z"%(year, doy, IONEX_filename)
+#   elif(FTP_site == 1):
         # CODE, Switzerland
         data_file = IONEX_filename.upper()
         site_str = "ftp://ftp.aiub.unibe.ch/CODE/%4.4d/%s.Z"%(year, data_file)

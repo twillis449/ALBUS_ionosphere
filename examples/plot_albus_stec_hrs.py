@@ -42,8 +42,8 @@ def getdata( filename ):
         filtered = hampel.hampel(stec_arr, 5, 4)
         filtered_data= hampel.hampel(filtered, 10, 1)
         diff = filtered_data - stec_arr
-#       return rel_time, filtered_data, stec_err, latest
-        return rel_time, stec_arr, stec_err, latest
+        return rel_time, filtered_data, stec_err, latest
+#       return rel_time, stec_arr, stec_err, latest
 
 def main( argv ):
   STEC = True

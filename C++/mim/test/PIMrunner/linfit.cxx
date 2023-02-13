@@ -1841,7 +1841,7 @@ void calculate_multilayer_2D_linear_polynomials(
 //_END
 
     {
-        printf("in linfit:  calculate_multilayer_2D_linear_polynomials\n");
+//        printf("in linfit:  calculate_multilayer_2D_linear_polynomials\n");
         // if we aren't doing at least 1 poly, then why call this?
         if(NUM_PARAM <= 0) {
             fprintf(stderr, "Error: cannot do 0 polys here in %s:%d:%s\n",
@@ -2412,7 +2412,7 @@ void calculate_manylayer_2D_linear_polynomials(
 //_END
 
     {
-        printf("in linfit:  calculate_manylayer_2D_linear_polynomials\n");
+//        printf("in linfit:  calculate_manylayer_2D_linear_polynomials\n");
         if(NUM_PARAM == 0) {
             // nothing to do
             return;
