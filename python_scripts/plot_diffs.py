@@ -1,3 +1,4 @@
+from __future__ import (print_function)
 import matplotlib.pyplot as plt
 from astropy.visualization import astropy_mpl_style
 plt.style.use(astropy_mpl_style)

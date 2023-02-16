@@ -3,7 +3,7 @@
 # 2006 May 19  James M Anderson  --JIVE  start
 # 2007 Jul 25  JMA  --many enhancements before now.  Today, allow
 #                     self-calibration to just use point-source calib
-
+from __future__ import (print_function, division)
 
 
 
@@ -110,8 +110,8 @@ Taken from _Astronomical Algorithms_, Meeus, 1991
     if(mm<= 2):
         mm += 12
         yy -= 1
-    a = int(yy/100)
-    b = 2 - a + int(a/4)
+    a = int(yy/100.)
+    b = 2 - a + int(a//4)
     MJD = int(365.25*(yy+4716)) + int(30.6001*(mm+1)) + day + b - 1524.5
     MJD -= 2400000.5
     return MJD
@@ -173,7 +173,7 @@ Taken from _Astronomical Algorithms_, Meeus, 1991
     A = Z
     if(Z>= 2299161):
         alpha = int((Z-1867216.25)/36524.25)
-        A = Z + 1 + alpha - int(alpha/4)
+        A = Z + 1 + alpha - int(alpha//4)
     B = A + 1524
     C = int((B-122.1)/365.25)
     D = int(365.25*C)

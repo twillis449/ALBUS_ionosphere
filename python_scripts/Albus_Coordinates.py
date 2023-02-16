@@ -2,7 +2,7 @@
 # Python stuff for dealing with coordinate system conversions
 # 2006 Jun 22  James M Anderson  --JIVE  start
 # 2007 Jan 17  JMA  --add conversion from radians to degrees, min, sec
-
+from __future__ import (print_function, division)
 
 
 ################################################################################

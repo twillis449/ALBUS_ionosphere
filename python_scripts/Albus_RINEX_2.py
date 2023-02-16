@@ -4,7 +4,7 @@
 # 2007 Feb 14  JMA  --revise RINEX reader to accept MJD check
 # 2007 Apr 18  JMA  --updates for more satellite block position handling
 
-from __future__ import (print_function)
+from __future__ import (print_function, division)
 
 ################################################################################
 # some import commands  The User should not need to change this.
@@ -394,7 +394,7 @@ XYZ        O  Cartesian station position in Earth centered coodriantes, in m
                         interval_undersampled = int(data_interval/interval)-1
             elif(line[60:79] == "# / TYPES OF OBSERV"):
                 num_data = int(line[0:6])
-                lines_per_sat = int((num_data-1)/5) +1
+                lines_per_sat = int((num_data-1)/5.) +1
                 obs_info = [None]*num_data
                 obs_info_code = [None]*num_data
                 line_pos = 0
@@ -498,7 +498,7 @@ XYZ        O  Cartesian station position in Earth centered coodriantes, in m
                 second = second + time_offset
                 MJD_now = jma_tools.get_MJD_hms(year, month, day,
                                                hour, minute, second)
-                index_f = (MJD_now - MJD_start) / interval
+                index_f = (MJD_now - MJD_start) / float(interval)
                 time_index = int(index_f + 0.25)
                 if(math.fabs(index_f - time_index) > 0.1):
                     # Hey, this does not match the time interval!  Some
@@ -631,7 +631,7 @@ XYZ        O  Cartesian station position in Earth centered coodriantes, in m
                 MJD_end -= 1.0
         else:
             MJD_end = MJD_start + 1
-        num = int((MJD_end - MJD_start) / interval + 0.25)
+        num = int((MJD_end - MJD_start) / float(interval) + 0.25)
         return read_RINEX_obs_file(filename, MJD_check, num, max_sat)
     return MJD, Sat_array, obs_data, time_offset, XYZ
 
@@ -779,7 +779,7 @@ t_02           O  r phase offset
         d_sum = slope.sum()
         if(d_sum == 0.0):
             break
-        change = -chi_2 / d_sum
+        change = -chi_2 / float(d_sum)
         if(math.fabs(change) > 0.2 * T_day):
             if(change > 0.0):
                 change = 0.2 * T_day
@@ -791,7 +791,7 @@ t_02           O  r phase offset
             slope = -2.0 * diff * c_term
             d_sum = slope.sum()
             if(d_sum != 0.0):
-                c2 = -chi_2 / d_sum * (j-5) / j
+                c2 = -chi_2 / d_sum * (j-5) / float(j)
         a2 = c2 * 0.05 * factor
         #print ( "%2d %12.4E %10.4f %10.2E %10.4f %10.4f %12.3E %12.3E %12.3E %10.4f"%(j, i_0, t_00, chi_2, change, app, i, c2, a2,factor))
         last_i = i
@@ -868,14 +868,14 @@ t_02           O  r phase offset
         d_sum = slope.sum()
         if(d_sum == 0.0):
             break
-        change = -chi_2 / d_sum
+        change = -chi_2 / float(d_sum)
         app = change * factor
         c2 = 0.0
         if(j>5):
             slope = -2.0 * diff * c_term
             d_sum = slope.sum()
             if(d_sum != 0.0):
-                c2 = -chi_2 / d_sum * (j-5) / j
+                c2 = -chi_2 / float(d_sum) * (j-5) / float(j)
         a2 = c2 * 0.05 * factor
         #print ( "%2d %12.4E %10.4f %10.2E %10.4f %10.4f %12.3E %12.3E %12.3E %10.4f"%(j, r_0, t_02, chi_2, change, app, r_A, c2, a2,factor))
         last_t_02 = t_02
@@ -943,7 +943,7 @@ obs_data   O  The output data array, as
             # things are ok
             pass
         else:
-            warnigns.warn("Unknown SP3 version '%s' in file '%s', trying anyway ...."%(version, filename))
+            warnings.warn("Unknown SP3 version '%s' in file '%s', trying anyway ...."%(version, filename))
         if(line[2] != 'P'):
             warnings.warn("Not a position file for '%s', trying anyway ...."%filename)
         year = int(line[3:7])
@@ -1106,7 +1106,7 @@ XYZ         O  numpy array of the satellite position
                     ho = MJD[index_start+i]-MJD_need
                     hp = MJD[index_start+i+m]-MJD_need
                     w = work_c[i+1]-work_d[i]
-                    den = w / (ho-hp)
+                    den = w / float(ho-hp)
                     work_d[i] = hp*den
                     work_c[i] = ho*den
                 if(2*ns+2 < (num_terms-m)):
@@ -1157,7 +1157,7 @@ index_start O  The index to use for interpolation over many values
 """
     assert(width>0)
     assert(width <= MAX)
-    half = int(width/2)
+    half = int(width * 0.5)
     index_start = index-half
     if(index_start < 0):
         index_start = 0
@@ -1214,18 +1214,18 @@ XYZ         O  numpy array of the satellite positions
         # Get the residuals to the measured orbits
         pos_res = sat_pos[:,s,:].copy()
         pos_res = np.reshape(pos_res, (NUM_OBS,1,NUM_DIR))
-        inside = 2.0*math.pi * (MJD-orbital_param[9])/orbital_param[2]
+        inside = 2.0*math.pi * (MJD-orbital_param[9])/float(orbital_param[2])
         pos_res[:,0,3] += - orbital_param[5] - orbital_param[6] * np.cos(inside)
-        inside = 4.0*math.pi * (MJD-orbital_param[8])/orbital_param[2]
+        inside = 4.0*math.pi * (MJD-orbital_param[8])/float(orbital_param[2])
         pos_res[:,0,4] += - orbital_param[3] - 2.0 * math.pi * (1.0/orbital_param[2] - 1.0) * MJD - orbital_param[4] * np.cos(inside)
-        inside = 2.0*math.pi * (MJD-orbital_param[7])/orbital_param[2]
+        inside = 2.0*math.pi * (MJD-orbital_param[7])/float(orbital_param[2])
         pos_res[:,0,5] += - 0.5*math.pi - orbital_param[0] * np.cos(inside) - orbital_param[1]
         # Get the predicted orbit values
-        inside = 2.0*math.pi * (MJD_need-orbital_param[9])/orbital_param[2]
+        inside = 2.0*math.pi * (MJD_need-orbital_param[9])/float(orbital_param[2])
         XYZ[:,s,3] = orbital_param[5] + orbital_param[6] * np.cos(inside)
-        inside = 4.0*math.pi * (MJD_need-orbital_param[8])/orbital_param[2]
+        inside = 4.0*math.pi * (MJD_need-orbital_param[8])/float(orbital_param[2])
         XYZ[:,s,4] = orbital_param[3] + 2.0 * math.pi * (1.0/orbital_param[2] - 1.0) * MJD_need + orbital_param[4] * np.cos(inside)
-        inside = 2.0*math.pi * (MJD_need-orbital_param[7])/orbital_param[2]
+        inside = 2.0*math.pi * (MJD_need-orbital_param[7])/float(orbital_param[2])
         XYZ[:,s,5] = 0.5*math.pi + orbital_param[0] * np.cos(inside) + orbital_param[1]
         # Now form the interpolated corrections
         index = None
@@ -1333,7 +1333,7 @@ El         O  Elevation angle, in radians
     r_sat = sat_XYZ[3]
     dot_p = sat_XYZ[0]*sta_XYZ[0]+sat_XYZ[1]*sta_XYZ[1]+sat_XYZ[2]*sta_XYZ[2]
     try:
-        zenith_angle = math.acos(dot_p/(r_sta*r_sat))
+        zenith_angle = math.acos(dot_p/float(r_sta*r_sat))
     except ArithmeticError:
         if(dot_p > 0.0):
             zenith_angle = 0.0
@@ -1346,7 +1346,7 @@ El         O  Elevation angle, in radians
     dec = math.pi*0.5 - sat_XYZ[5]
     phi = math.pi*0.5 - sta_XYZ[5]
     h = sta_XYZ[4] - sat_XYZ[4]
-    x = sat_XYZ[2]/r_sat*math.cos(phi)-math.cos(dec)*math.cos(h)*sta_XYZ[2]/r_sat
+    x = sat_XYZ[2]/float(r_sat)*math.cos(phi)-math.cos(dec)*math.cos(h)*sta_XYZ[2]/float(r_sat)
     y = -math.cos(dec) * math.sin(h)
     try:
         Az = math.atan2(y,x)
@@ -1557,17 +1557,17 @@ OUTPUTS: None
                 # but since they are close to each other, the error in assuming
                 # they are the same for the sigma calculation is small.
                 if((sat >= 0)and(sat < 100)):
-                    STEC = (L1/nu_L1_GPS - L2/nu_L2_GPS)
+                    STEC = (L1/float(nu_L1_GPS) - L2/float(nu_L2_GPS))
                     STEC *= SPEED_OF_LIGHT*STEC_factor_GPS
-                    sigma *= SPEED_OF_LIGHT*STEC_factor_GPS/nu_L2_GPS
+                    sigma *= SPEED_OF_LIGHT*STEC_factor_GPS/float(nu_L2_GPS)
                 elif((sat >= 100)and(sat < 200)):
-                    STEC = (L1/nu_G1_GLONASS - L2/nu_G2_GLONASS)
+                    STEC = (L1/float(nu_G1_GLONASS) - L2/float(nu_G2_GLONASS))
                     STEC *= SPEED_OF_LIGHT*STEC_factor_GLONASS
-                    sigma *= SPEED_OF_LIGHT*STEC_factor_GLONASS/nu_G2_GLONASS
+                    sigma *= SPEED_OF_LIGHT*STEC_factor_GLONASS/float(nu_G2_GLONASS)
                 elif((sat >= 200)and(sat < 300)):
-                    STEC = (L1/nu_E1_Gal - L2/nu_E5_Gal)
+                    STEC = (L1/float(nu_E1_Gal) - L2/float(nu_E5_Gal))
                     STEC *= SPEED_OF_LIGHT*STEC_factor_Gal
-                    sigma *= SPEED_OF_LIGHT*STEC_factor_Gal/nu_E5_Gal
+                    sigma *= SPEED_OF_LIGHT*STEC_factor_Gal/float(nu_E5_Gal)
                 else:
                     raise Albus_RINEX.RINEX_Data_Barf("Unknown satellite type %d"%sat)
                 obs_data[i,s, TL_pos] = STEC
@@ -1943,8 +1943,8 @@ TL_pos     I  Position in obs_data array for L data
 
 OUTPUTS: None
     """
-    Num_1 = adiff / nu_1_slip
-    Num_2 = adiff / nu_2_slip
+    Num_1 = adiff / float(nu_1_slip)
+    Num_2 = adiff / float(nu_2_slip)
     # int truncates!
     diff_1 = int(Num_1*2.0 + 0.5)*0.5 - Num_1
     diff_2 = int(Num_2*2.0 + 0.5)*0.5 - Num_2
@@ -2029,11 +2029,11 @@ block_pos  O  An array of continguous block position ranges, as 2 element
     TP_pos = _DATA_POS['STECP']
     TL_pos = _DATA_POS['STECL']
     if(sat < 100):
-        nu_1_slip = SPEED_OF_LIGHT * STEC_factor_GPS / nu_L1_GPS
-        nu_2_slip = SPEED_OF_LIGHT * STEC_factor_GPS / nu_L2_GPS
+        nu_1_slip = SPEED_OF_LIGHT * STEC_factor_GPS / float(nu_L1_GPS)
+        nu_2_slip = SPEED_OF_LIGHT * STEC_factor_GPS / float(nu_L2_GPS)
     elif(sat < 200):
-        nu_1_slip = SPEED_OF_LIGHT * STEC_factor_GLONASS / nu_G1_GLONASS
-        nu_2_slip = SPEED_OF_LIGHT * STEC_factor_GLONASS / nu_G2_GLONASS
+        nu_1_slip = SPEED_OF_LIGHT * STEC_factor_GLONASS / float(nu_G1_GLONASS)
+        nu_2_slip = SPEED_OF_LIGHT * STEC_factor_GLONASS / float(nu_G2_GLONASS)
     else:
         nu_1_slip = None
         nu_2_slip = None
@@ -2169,8 +2169,8 @@ block_pos  O  An array of continguous block position ranges, as 2 element
                     lower_intercept = obs_data[this_end-1,Sat_array[this_end-1,sat], TL_pos]
                 diff = upper_intercept - lower_intercept
                 adiff = math.fabs(diff)
-                Num_1 = adiff / nu_1_slip
-                Num_2 = adiff / nu_2_slip
+                Num_1 = adiff / float(nu_1_slip)
+                Num_2 = adiff / float(nu_2_slip)
                 # int truncates!
                 diff_1 = int(Num_1*2.0 + 0.5)*0.5 - Num_1
                 diff_2 = int(Num_2*2.0 + 0.5)*0.5 - Num_2
@@ -2261,11 +2261,11 @@ block_pos  O  An array of continguous block position ranges, as 2 element
     TP_pos = _DATA_POS['STECP']
     TL_pos = _DATA_POS['STECL']
     if(sat < 100):
-        nu_1_slip = SPEED_OF_LIGHT * STEC_factor_GPS / nu_L1_GPS
-        nu_2_slip = SPEED_OF_LIGHT * STEC_factor_GPS / nu_L2_GPS
+        nu_1_slip = SPEED_OF_LIGHT * STEC_factor_GPS / float(nu_L1_GPS)
+        nu_2_slip = SPEED_OF_LIGHT * STEC_factor_GPS / float(nu_L2_GPS)
     elif(sat < 200):
-        nu_1_slip = SPEED_OF_LIGHT * STEC_factor_GLONASS / nu_G1_GLONASS
-        nu_2_slip = SPEED_OF_LIGHT * STEC_factor_GLONASS / nu_G2_GLONASS
+        nu_1_slip = SPEED_OF_LIGHT * STEC_factor_GLONASS / float(nu_G1_GLONASS)
+        nu_2_slip = SPEED_OF_LIGHT * STEC_factor_GLONASS / float(nu_G2_GLONASS)
     else:
         nu_1_slip = None
         nu_2_slip = None
@@ -2302,8 +2302,8 @@ block_pos  O  An array of continguous block position ranges, as 2 element
             last_L = L
     if(num < 2):
         return sat_found, block_pos
-    ave = sum / num
-    std_dev = (sum_sqr - sum*sum / num) / (num-1)
+    ave = sum / float(num)
+    std_dev = (sum_sqr - sum*sum / float(num)) / (num-1)
     if(std_dev > 0.0):
         std_dev = math.sqrt(std_dev)
     else:
@@ -2481,7 +2481,7 @@ sat_block_pos O  An array of continguous block position ranges, as 3 element
                     count += 1
             average = np.zeros((1), dtype='float64')
             if(count):
-                average[0] = sum/count
+                average[0] = sum/float(count)
                 total_sat_count += 1
             else:
                 average[0] = BAD_DATA_CODE
@@ -2511,7 +2511,7 @@ sat_block_pos O  An array of continguous block position ranges, as 3 element
             if(sum_weight == 0.0):
                 # no data here
                 continue
-            diff_ave = sum_diff / sum_weight
+            diff_ave = sum_diff / float(sum_weight)
             if(end_pos > start_pos+1):
                 diff_var = (sum_d2 - sum_diff*sum_diff / sum_weight) / sum_weight
                 if(diff_var < 0.0):
@@ -3742,7 +3742,7 @@ overwrite    I  May files be overwritten?  0 No, else yes
 OUTPUTS: None
     """
     assert(len(sta_XYZ) == 6)
-    BIAS_LENGTH = int(MAX_POSSIBLE_SATELLITES/100)
+    BIAS_LENGTH = int(MAX_POSSIBLE_SATELLITES/float(100))
     assert(len(sta_bias_valid) == BIAS_LENGTH)
     filename = "%s/%s.%d.%d.XYZ"%(output_directory,station_code,MJD_start,MJD_end)
     if(os.path.isfile(filename)):
@@ -4250,7 +4250,7 @@ get_multiple_station_base_observations.MJD_end_last    = 0.0
 ###########################
 ### MeqTree Area ##########
 
-MAX_POSSIBLE_MEQTREE_SATELLITES = MAX_POSSIBLE_SATELLITES / 2
+MAX_POSSIBLE_MEQTREE_SATELLITES = int(MAX_POSSIBLE_SATELLITES * 0.5)
 
 
 
@@ -4269,7 +4269,7 @@ M_s         O  The MeqTree satellite number.  Numbers >= 0 are valid.
                a value of -1 indicates that there is no valid MeqTree number
                corresponding to the RINEX number given.
     """
-    for mytype in range(MAX_POSSIBLE_SATELLITES/100):
+    for mytype in range(int(MAX_POSSIBLE_SATELLITES/float(100))):
         offset = sat_number - mytype*100
         if((offset >= 0) and (offset < 50)):
             M_s = mytype*50 + offset
@@ -4290,7 +4290,7 @@ R_s         O  The RINEX satellite number.  Numbers >= 0 are valid.
     """
     if(sat_number < 0):
         return -1
-    mytype = int(sat_number/50)
+    mytype = int(sat_number/50.)
     offset = sat_number - mytype*50
     R_s = offset + mytype*100
     if(R_s >= MAX_POSSIBLE_SATELLITES):

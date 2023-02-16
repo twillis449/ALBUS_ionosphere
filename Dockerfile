@@ -7,28 +7,28 @@ RUN docker-apt-install build-essential\
                        g++-$GNUCOMPILER \
                        gcc-$GNUCOMPILER \
                        gfortran-$GNUCOMPILER \
-		               python3-dev \
-                       python3-all \
-                       ipython3 \
-                       python3-ipdb \
+		               python-dev \
+                       python-all \
+                       ipython \
+                       python-ipdb \
 		               wcslib-dev \
-                       python3-astropy \
-                       python3-casacore \
+                       python-astropy \
+                       python-casacore \
                        casacore-data \
                        curl \
                        wget \
                        rsync \
-                       python3-pycurl \
-                       python3-matplotlib \
-                       python3-numpy \
-                       python3-ephem \
+                       python-pycurl \
+                       python-matplotlib \
+                       python-numpy \
+                       python-ephem \
                        f2c \                                                               
                        libf2c2-dev \                                                       
                        bison \                                                             
                        flex \
-                       python3-urllib3 \
+                       python-urllib3 \
                        unzip \
-                       python3-nose
+                       python-nose
 
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-$GNUCOMPILER 100 && \
     update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-$GNUCOMPILER 100 && \
@@ -38,8 +38,7 @@ RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-$GNUCOMPILER 100
     update-alternatives --install /usr/bin/cpp cpp /usr/bin/g++-$GNUCOMPILER 100 && \
     update-alternatives --install /usr/bin/x86_64-linux-gnu-cpp x86_64-linux-gnu-cpp /usr/bin/g++-$GNUCOMPILER 100 && \
     update-alternatives --install /usr/bin/gfortran gfortran /usr/bin/gfortran-$GNUCOMPILER 100 && \
-    update-alternatives --install /usr/bin/x86_64-linux-gnu-gfortran x86_64-linux-gnu-gfortran /usr/bin/gfortran-$GNUCOMPILER 100 && \
-    update-alternatives --install /usr/bin/python python /usr/bin/python3.6 100
+    update-alternatives --install /usr/bin/x86_64-linux-gnu-gfortran x86_64-linux-gnu-gfortran /usr/bin/gfortran-$GNUCOMPILER 100
 
 RUN mkdir -p /optsoft/bin && \
     mkdir -p /optsoft/lib && \
@@ -97,9 +96,8 @@ ENV ALBUSINSTALL /optsoft/ALBUS
 
 ## Configure Make custom paths .. should really convert this to cmake or something....
 RUN sed -i '15s/.*/export INSTALLDIR = '$(echo ${ALBUSINSTALL} | sed 's/\//\\\//g')'/' $ALBUSPATH/Makefile
-#### Ubuntu 18.04 ships Python 3.6 LTS not 3.8 as it is defined in the build system
-RUN sed -i '19s/.*/export CURRENT_PYTHON = python3.6/' $ALBUSPATH/Makefile
-RUN sed -i '22s/.*/export PYTHONINCLUDEDIR = \/usr\/include\/python3.6/' $ALBUSPATH/Makefile
+RUN sed -i '19s/.*/export CURRENT_PYTHON = python2.7/' $ALBUSPATH/Makefile
+RUN sed -i '22s/.*/export PYTHONINCLUDEDIR = \/usr\/include\/python2.7/' $ALBUSPATH/Makefile
 #### Build with specified GNU toolchain
 RUN sed -i '39s/.*/export CC = gcc-'"${GNUCOMPILER}"'/' $ALBUSPATH/Makefile
 RUN sed -i '40s/.*/export F77 = gfortran-'"${GNUCOMPILER}"' --std=legacy/' $ALBUSPATH/Makefile
@@ -131,7 +129,7 @@ ENV PYTHONPATH "$ALBUSINSTALL/share/python:$ALBUSINSTALL/lib:$PYTHONPATH"
 # Step 4 Fingers crossed -- build
 WORKDIR $ALBUSPATH
 RUN make install
-RUN python -c "import AlbusIonosphere" && echo "Crack the bubbly - this hog is airborne!!!"
+RUN python2.7 -c "import AlbusIonosphere" && echo "Crack the bubbly - this hog is airborne!!!"
 
 # can run any script mounted inside the container py calling (assuming you run Bash or equiv.)
 # docker run -v <absolute path to gfzrnx>:/optsoft/bin/gfzrnx \
@@ -144,7 +142,7 @@ RUN python -c "import AlbusIonosphere" && echo "Crack the bubbly - this hog is a
 # you must download and accept the license for gfzrnx separately 
 # see https://dataservices.gfz-potsdam.de/panmetaworks/showshort.php?id=escidoc:1577894
 # Note: adding -it in the flags above should give you an interactive python session
-ENTRYPOINT [ "/usr/bin/python3.6" ]
+ENTRYPOINT [ "/usr/bin/python2.7" ]
 # print some default stuffs
 ENV HELPSTRING "docker run -v <absolute path to gfzrnx>:/optsoft/bin/gfzrnx "\
 "-v <absolute path to your waterhole with scripts>:/albus_waterhole "\

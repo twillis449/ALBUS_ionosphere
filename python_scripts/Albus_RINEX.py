@@ -2,7 +2,7 @@
 # Python stuff for dealing with Ionosphere RINEX stuff
 # 2006 Jul 17  James M Anderson  --JIVE  start
 
-#from __future__ import (print_function)
+from __future__ import (print_function, division)
 
 ################################################################################
 # some import commands  The User should not need to change this.
@@ -1652,7 +1652,7 @@ station_bias_CODE_monthly  I  dictionary for station biases from CODE monthly
     TEC_scale_correct = 40.28 * 2.0 / IONOSPHERE_Kp_2
     nu_L1 = 1575.42E6          # GPS value, in Hz
     nu_L2 = nu_L1 * 60.0/77.0  # GPS value, in Hz
-    GPS_freq_factor = nu_L1*nu_L1*nu_L2*nu_L2 / (nu_L1*nu_L1 - nu_L2*nu_L2)
+    GPS_freq_factor = nu_L1*nu_L1*nu_L2*nu_L2 / float(nu_L1*nu_L1 - nu_L2*nu_L2)
 
     for sat in range(STEC.shape[1]):
         # satellite
@@ -1674,11 +1674,11 @@ station_bias_CODE_monthly  I  dictionary for station biases from CODE monthly
             nu_G1 = 1600.0E6
             nu_G2 = nu_G1 * 7.0/9.0
             GLONASS_freq_factor = nu_G1*nu_G1*nu_G2*nu_G2
-            GLONASS_freq_factor /= (nu_G1*nu_G1 - nu_G2*nu_G2)
+            GLONASS_freq_factor /= float(nu_G1*nu_G1 - nu_G2*nu_G2)
             STEC_factor = 2.0 / IONOSPHERE_Kp_2 * GLONASS_freq_factor * 1E-16
             ## The GPSTK software does not account for the
             ## frequency difference properly
-            freq_correction = GLONASS_freq_factor / GPS_freq_factor
+            freq_correction = GLONASS_freq_factor / float(GPS_freq_factor)
         elif(sat < 300):
             # Galileo
             this_station_code = station_code + '_e'
@@ -1689,7 +1689,7 @@ station_bias_CODE_monthly  I  dictionary for station biases from CODE monthly
             STEC_factor = 2.0 / IONOSPHERE_Kp_2 * Galileo_freq_factor * 1E-16
             ## The GPSTK software does not account for the
             ## frequency difference properly
-            freq_correction = Galileo_freq_factor / GPS_freq_factor
+            freq_correction = Galileo_freq_factor / float(GPS_freq_factor)
         else:
             raise KeyError("Unknown satellite type")
         if(this_station_code in station_bias_IONEX):
@@ -2047,7 +2047,7 @@ value       I  value to bracket
         return 0
     top = size-2
     bottom = 0
-    index = int(size/2)
+    index = int(size * 0.5)
     while(1):
         if(data[index] <= value):
             # index should be no lower
@@ -2057,7 +2057,7 @@ value       I  value to bracket
             top = index
         if((top == bottom) or ((top - bottom) == 1)):
             return bottom
-        index = int((top+bottom+1)/2)
+        index = int((top+bottom+1) * 0.5)
     # stop Xemacs bugginess
     return
 
@@ -2356,11 +2356,11 @@ target_STEC   O  The STEC in the direction of the target, using the mean_VTEC
         else:
             break
     if(sum_weight > 0.0):
-        mean_VTEC = sum / sum_weight
+        mean_VTEC = sum / float(sum_weight)
     else:
         warnings.warn("No points within max separation %E, using first point"%max_dist)
         mean_VTEC = get_VTEC_factor(L[0][2], iono_height, obs_height) * L[0][3]
-    target_STEC = mean_VTEC / get_VTEC_factor(El_target, iono_height, obs_height)
+    target_STEC = mean_VTEC / float(get_VTEC_factor(El_target, iono_height, obs_height))
     #print ( "I got mean_VTEC,target_STEC", mean_VTEC, target_STEC)
     return mean_VTEC, target_STEC
 
@@ -2451,10 +2451,10 @@ index         O  The index for the target MJD, to be used to feed the next
     if(math.fabs(MJD[index+1] - MJD_target) < 0.5*DAYS_PER_SECOND):
         return mean_VTEC_top, targ_STEC_top, index
     # Interpolate VTEC
-    slope = (mean_VTEC_top - mean_VTEC_bot) / (MJD[index+1] - MJD[index])
+    slope = (mean_VTEC_top - mean_VTEC_bot) / float(MJD[index+1] - MJD[index])
     mean_VTEC = mean_VTEC_bot + slope * (MJD_target - MJD[index])
     # convert to STEC
-    target_STEC = mean_VTEC / get_VTEC_factor(El_target, iono_height, obs_height)
+    target_STEC = mean_VTEC / float(get_VTEC_factor(El_target, iono_height, obs_height))
     #print ( "I got mean_VTEC,target_STEC, index", mean_VTEC, target_STEC, index)
     return mean_VTEC, target_STEC, index
 

@@ -5,8 +5,9 @@
 # I have made my own simple case
 # 2007 Jan 19  James M Anderson  --JIVE  start
 # 2020 Using pycurl with python3
-
-
+from __future__ import (print_function, division)
+import os
+SKIP_CACHED_DOWNLOAD = "ALBUS_NOCACHED_DOWNLOAD" in os.environ
 import sys
 import pycurl
 
@@ -16,6 +17,11 @@ def main():
         print("Error: correct usage is %s inURL, outfilename timeout"%sys.argv[0])
         sys.exit(-2)
     print('Albus_RINEX_download system parameters', sys.argv)
+    
+    if not SKIP_CACHED_DOWNLOAD and os.path.exists(sys.argv[2]):
+      print("Skipping %s -- already cached")
+      sys.exit(0)
+
     if sys.argv[1].find('sftp')> -1:
       use_pysftp = True
       try:

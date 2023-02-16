@@ -1,6 +1,6 @@
 # various fnctions for processing ionosphere data
 
-from __future__ import (print_function)
+from __future__ import (print_function,division)
 
 import math
 import numpy

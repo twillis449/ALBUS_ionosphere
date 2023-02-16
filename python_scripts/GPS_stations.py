@@ -8,7 +8,7 @@
 # http://igs.ifag.de/root_ftp/GREF/products/1378/bkg13787.snx.Z
 # Note that one should be available for each GPS week.
 
-
+from __future__ import (print_function,division)
 import os, os.path
 import math
 #from string import split, strip
@@ -743,6 +743,9 @@ A        O  List of 3 element arrays [station_name, station_position, dist],
     local_list = []
     global_list = [] 
     for s in stations:
+        if "dear" not in s:
+            print("Skipping %s station download" % s)
+            continue
 #       print s, stations[s]
         pos = stations[s]
         for XYZ in coord_list:
