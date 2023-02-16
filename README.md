@@ -36,13 +36,10 @@ taking into account modern understanding of ionospheric physics, and employs a
 model of the terrestrial magnetic field that accounts for change of intensity
 and direction with height.
 
-The software makes extensive use of python scripts and should work with both
-python2 and python3.
-
-You need to install pycurl, astropy, pyephem or python casacore, numpy 
-and matplotlib for the system to work. A number of support programs to handle 
-RINEX files are also needed. These programs are specified in the INSTALL 
-file.
+This software currently only gives expected results under Python 2.7. We have
+discovered yet-to-be-resolved numerical errors in deriving STEC values under
+Python 3.x. We highly recommend the user deploys an installation using the 
+provided Dockerfile.
 
 More sites (especially Geosciences Australia) are now producing only RINEX3 files. 
 For analysis, we use RINEX2 files. To convert RINEX3 to RINEX2 you need to get 
@@ -54,6 +51,35 @@ Unfortunately, due to security concerns, sites are also changing access methods
 from simple anonymous ftp to more secure procedures such as sftp etc and we are
 currently working on modifying our access procedures to reach such sites.
 secure access procedures 
+
+# Deployment using Docker
+We have provided a Docker file with the necessary install requirements for
+the software aside from the propriatary RINEXv3 utility gfzrnx, which have to be downloaded and mounted in 
+separately (see https://dataservices.gfz-potsdam.de/panmetaworks/showshort.php?id=escidoc:1577894
+for download and EULA agreement - this may not be distributed otherwise)
+```
+docker run -v <absolute path to gfzrnx>:/optsoft/bin/gfzrnx \
+           -v <absolute path to your waterhole with scripts>:/albus_waterhole \
+           --workdir /albus_waterhole \
+           --rm \
+           --user $(id -u <your user>):$(id -g <your user>) \
+           albus:latest <path to script mounted inside the waterhole>
+```
+if you used 'albus' as a tag when building the image, e.g. running
+```
+docker build -t albus -f Dockerfile . 
+```
+from inside the checked out albus folder
+
+Important note: If you have previously run a local build it will be wise to run Make clean
+to ensure that the right glibc and gfortran libraries are bound to your build inside
+the image.
+
+# Manual installation
+You need to install pycurl, astropy, pyephem or python casacore, numpy 
+and matplotlib for the system to work. A number of support programs to handle 
+RINEX files are also needed. These programs are specified in the INSTALL 
+file.
 
 A somewhat more detained description of the software is given in 
 the, as yet, unpublished paper twillis_ALBUS_paper.pdf available in 
