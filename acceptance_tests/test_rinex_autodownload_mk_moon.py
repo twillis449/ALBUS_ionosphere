@@ -7,7 +7,7 @@
 # ionosphere rotation measure (RM) as a function of time
 
 # Example by Tony Willis
-
+from __future__ import print_function
 import os
 import time
 import matplotlib
@@ -61,7 +61,7 @@ def __checkmake_outputdir():
         if not os.path.exists(outputhiddendir):
             os.mkdir(outputhiddendir)
     else:
-        raise RuntimeError(f"'{testoutdir}' must be a valid directory -- are you running inside Docker, check mount path?")
+        raise RuntimeError("'%s' must be a valid directory -- are you running inside Docker, check mount path?" % testoutdir)
     return outputhiddendir
 
 def test_meerkat():
