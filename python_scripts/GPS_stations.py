@@ -743,9 +743,6 @@ A        O  List of 3 element arrays [station_name, station_position, dist],
     local_list = []
     global_list = [] 
     for s in stations:
-        if "dear" not in s:
-            print("Skipping %s station download" % s)
-            continue
 #       print s, stations[s]
         pos = stations[s]
         for XYZ in coord_list:
