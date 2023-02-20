@@ -79,7 +79,7 @@ SRCS = \
 	ionosphere_iri.cxx \
 	ionosphere_iriplus.cxx \
 	ionosphere_pim.cxx \
-	jma_igrf13.c \
+	jma_igrf11.c \
 	latlon_cart.cxx \
 	linfit.cxx \
 	linfit_grad.cxx \
@@ -118,7 +118,7 @@ OBJS = \
 	ionosphere_iri.o \
 	ionosphere_iriplus.o \
 	ionosphere_pim.o \
-	jma_igrf13.o \
+	jma_igrf11.o \
 	latlon_cart.o \
 	linfit.o \
 	linfit_grad.o \

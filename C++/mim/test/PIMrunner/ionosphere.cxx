@@ -27,7 +27,7 @@
 
 // External Functions
 // Get the IGRF magnetic field around the Earth
-extern "C" int jma_igrf13syn(
+extern "C" int jma_igrf11syn(
     double date,  // I  time (years AD, in UT) valid 1900--2025                                 
     double radius,// I  the position radius, in meters                    
     double clatit,// I  the cos(latitude, in radians)                    
@@ -1386,7 +1386,7 @@ Space_Vector Ionosphere_Base::Magnetic_Field(
 //    fprintf(stderr,"Using Position year=%.3f r=%14E Lat=%.3f Lon=%.3f\n",
 //              year_fraction, position.Radius(),
 //              position.Lat()*M_RAD2DEG,position.Lon()*M_RAD2DEG);
-    jma_igrf13syn(year_fraction,
+    jma_igrf11syn(year_fraction,
                   position.Radius(),
                   position.cLat(),
                   position.sLat(),
