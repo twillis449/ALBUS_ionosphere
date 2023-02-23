@@ -1115,7 +1115,7 @@ stations        O  dict of the station biases.  GPS keys are 4 letter, lowercase
     stations = {}
     found_start = 0
     try:
-        fp = open(IONEX_filename, "rb")
+        fp = open(IONEX_filename, "r")
     except IOError:
         raise No_RINEX_File_Error("Error: IONEX file '%s' cannot be opened"%IONEX_filename)
     for row in fp:
@@ -1219,7 +1219,7 @@ stations        O  dict of the station biases.  GPS keys are 4 letter, lowercase
     stations = {}
     found_start = 0
     try:
-        fp = open(P1P2_filename, "rb")
+        fp = open(P1P2_filename, "r")
     except IOError:
         raise No_RINEX_File_Error("Error: P1P2 file '%s' cannot be opened"%filename)
     for row in fp:
@@ -1290,7 +1290,7 @@ stations        O  dict of the station biases.  GPS keys are 4 letter, lowercase
 def get_RINEX_station_XYZ(rinex_file, station_code = None):
     """read in the XYZ coordinates of a station from a RINEX obs file"""
     try:
-        fp = open(rinex_file, "rb")
+        fp = open(rinex_file, "r")
         try:
             for row in fp:
                 if(row[60:79] == "APPROX POSITION XYZ"):
