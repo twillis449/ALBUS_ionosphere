@@ -24,7 +24,7 @@ if(socket.getdefaulttimeout == None):
 import urllib3.request
 import Albus_RINEX_2
 import Albus_RINEX
-
+import string
 
 
 
@@ -235,12 +235,15 @@ OUTPUTS: GPS
 GPS         O  The filled dictionary
 """
     print('input file is ', filename)
-    fp = open(filename, "r")
+    # dunnon what encoding was used on this file but it is not UTF 8.
+    # strip whatever is not ASCII further down
+    fp = open(filename, "rb") 
     wide = True
     counter = 0
     try:
         site_id_found = 0
         for line in fp:
+            line = ''.join(map(chr, map(lambda x: x if x < 127 else ord(' '), line)))
             if(site_id_found == 0):
                 if(line[0:8] == "+SITE/ID"):
                     site_id_found = 1
@@ -263,9 +266,9 @@ GPS         O  The filled dictionary
 #               print('** name, long, lat, ht ', name,longitude, latitude, height)
                 GPS[name] = [x,y,z]
                 counter = counter +1
-    except:
+    except Exception as e:
       print('read failure at about line', counter)
-      pass
+      raise e
     return GPS
 
 
@@ -438,7 +441,7 @@ def fill_standard_stations():
         except:
             print('***** failed in read of GPS data from file ', test_file)
             print('***** check for invalid data (maybe non-ascii character) in file')
-            pass
+            raise
         return GPS_dict
     # then try 'standard'file
     test_file = os.environ['HOME'] + "/albus/libdata/JMA/gps_pos_default.snx"
@@ -451,7 +454,7 @@ def fill_standard_stations():
         except:
             print('***** failed in read of GPS data from file ', test_file)
             print('***** check for invalid data (maybe non-ascii character) in file')
-            pass
+            raise
         return GPS_dict
     print('we are looking for standard files')
     #Otherwise, get the standard files
@@ -527,11 +530,11 @@ def fill_standard_stations():
                 finally:
                     temp_file.close()
             except:
-                pass
+                raise
         if(write_user):
             _write_GPS_station_list(GPS_dict, user_file)
     except:
-        pass
+        raise
     return GPS_dict
 
 
@@ -900,3 +903,7 @@ OUTPUTS:
         ll = "%12.6f %12.6f %12.3f\n"%(lon*M_RAD2DEG,lat*M_RAD2DEG,height)
         fp.write(ll)
     return
+
+
+if __name__ == "__main__":
+    pass
