@@ -2638,7 +2638,7 @@ MJD_OUT   O  the whole numpy array of MJD values
                 gap = 1
             last_val = val
     if(gap):
-        warnigns.warn("Time gap of more than 1 hour in MJD concatenation")
+        warnings.warn("Time gap of more than 1 hour in MJD concatenation")
     if(reverse):
         warnings.warn("MJD times are not increasing in MJD concatenation")
     return MJD_OUT
