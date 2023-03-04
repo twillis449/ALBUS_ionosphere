@@ -464,7 +464,7 @@ void Ionosphere_GPS::Integrate_Electron_Faraday(
 
     // If we do not have a real Faraday rotation, fake one
     if(gps_integral.SRM == GPS_BAD_DATA_VALUE) {
-        fprintf(stderr, "Error: gps_integral.SRM == GPS_BAD_DATA_VALUEa\n");
+        fprintf(stderr, "Warning: gps_integral.SRM == GPS_BAD_DATA_VALUE\n");
         // Get the magnetic field at the default ionosphere height
         LatLon_Cart iono_pos =
             station.get_pierce_location(direction,
