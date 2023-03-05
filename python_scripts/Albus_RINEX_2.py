@@ -1,8 +1,9 @@
-# Albus_RINEX_2.py
 # Python stuff for dealing with Ionosphere RINEX stuff
 # 2006 Jul 28  James M Anderson  --JIVE  start
 # 2007 Feb 14  JMA  --revise RINEX reader to accept MJD check
 # 2007 Apr 18  JMA  --updates for more satellite block position handling
+# 2023 Mar  4  AGW  --updates for igs long product file names
+
 
 from __future__ import (print_function)
 
@@ -272,6 +273,7 @@ XYZ        O  Cartesian station position in Earth centered coodriantes, in m
     C1_POS = _DATA_POS['C1']
     S1_POS = _DATA_POS['S1']
     S2_POS = _DATA_POS['S2']
+
     try:
         num_data = None     # Number of data elements per sat
         lines_per_sat = None
@@ -894,12 +896,177 @@ t_02           O  r phase offset
 
 
 
-    
+def read_RINEX_sp3_file(filename, time_offset = None):
+    """read the satellite position information from an SP3 file
 
+See the RINEX manuals at ftp://igs.org/pub/data/format
+
+store satellite XYZ positions as X=0, Y=1, Z=2, r=3, phi=4, theta=5
+
+
+
+INPUTS:
+filename   I  The full path+file of the observation RINEX file to read
+time_offset I Offset, in s, to ADD to the times written in the file to get UTC.
+              The probably comes from reading a RINEX obs file.  If None, assume
+              GPS time, and calculate from the number of leap seconds according
+              to the start time in the file.  You should probably just leave
+              as None unless you know what you are doing.
+
+
+OUTPUTS: MJD, obs_data, time_offset
+MJD        O  numpy array of Modified Julian Dates for each observation time
+              as MJD[num_times]
+obs_data   O  The output data array, as
+              obs_data[num_times, MAX_POSSIBLE_SATELLITES, 6]
+              Assuming you have found the best index i in MJD for
+              a time you desire, and you want data for satellite s, then
+              you get data from
+              obs_data[i,s, x]
+              where x is the index of the XYZ value you want, X=0, Y=1, Z=2.
+              r=3, \phi=4,\theta=5
+              If X==Y==Z==0, then no data.
+"""
+    MAX_POSSIBLE_SATELLITES = 300
+    try:
+        try:
+            print ( 'read_RINEX_sp3_file: trying to open ', filename)
+            fp = open(filename, "r")
+        except IOError:
+            raise Albus_RINEX.No_RINEX_File_Error("Error: sp3 file '%s' cannot be opened"%filename)
+        line = fp.readline()    # Line 1
+        version = line[1]
+        print('****rinex SP3 version', version)
+        if((version == 'a') or (version == 'b') or (version == 'c') or (version == 'd')):
+            # things are ok
+            pass
+        else:
+            warnings.warn("Unknown SP3 version '%s' in file '%s', trying anyway ...."%(version, filename))
+        if(line[2] != 'P'):
+            warnings.warn("Not a position file for '%s', trying anyway ...."%filename)
+        year = int(line[3:7])
+        month = int(line[8:10])
+        day = int(line[11:13])
+        reference_day = day
+        hour = int(line[14:16])
+        minute = int(line[17:19])
+        second = float(line[20:31])
+        MJD_start = jma_tools.get_MJD_hms(year, month, day, hour, minute, second)
+        Num_Data = int(line[32:39])
+        if Num_Data > 100:
+          Num_Data = Num_Data - 1
+        if(Num_Data < 10):
+            raise Albus_RINEX.RINEX_Data_Barf("Too few data times in file '%s' to get accurate interpolation"%filename)
+        # skip to line 13
+        for i in range(2,14):
+            line = fp.readline()
+        time_system = line[9:12]
+        # int() truncates!
+        retval, TAI_UTC = AlbusIonosphere.get_TAI_UTC(year, month, day, 0.5)
+        if(time_offset == None):
+            if(time_system == 'GPS'):
+                time_offset = -(TAI_UTC - 19.0) # GPS time
+            elif(time_system == 'ccc'):
+                assert(version == 'a')
+                time_offset = -(TAI_UTC - 19.0) # GPS by default for version a
+            elif(time_system == 'UTC'):
+                time_offset = 0.0 
+            elif(time_system == 'GLO'):
+                time_offset = 0.0 # GLONASS works on UTC
+            elif(time_system == 'GAL'):
+                time_offset = -TAI_UTC # Galileo is on TAI
+            else:
+                raise Albus_RINEX.RINEX_Data_Barf("Unsupported Time system in file '%s'"%filename)
+        # read through line 22
+        for i in range(14,23):
+            line = fp.readline()
+        if version == 'd':   # read an extra line
+            line = fp.readline()
+        # Now to the data
+        MJD = np.zeros((Num_Data), dtype='float64')
+        obs_data = np.zeros((Num_Data, MAX_POSSIBLE_SATELLITES, 6))
+        time_count = -1
+        time_start = 0 
+        get_sat = False
+        while(1):
+            line = fp.readline()
+            if(len(line) <= 1):
+                break
+            if(line[0] == '*'):
+                year = int(line[3:7])
+                month = int(line[8:10])
+                day = int(line[11:13])
+                # check if we are starting a new day
+                if day != reference_day: # needed for new large SP3 files
+                  break 
+                hour = int(line[14:16])
+                minute = int(line[17:19])
+                second = float(line[20:31]) + time_offset
+                time_ref = hour * 3600 + minute * 60
+                time_count += 1
+                MJD[time_count] = jma_tools.get_MJD_hms(year, month, day,
+                                                       hour, minute, second)
+            elif(line[0] == 'P'):
+                code = line[1]
+                sat = int(line[2:4])
+                if((code == ' ') or (code == 'G')):
+                    # GPS satellite
+                    pass
+                elif(code == 'R'):
+                    # GLONASS
+                    sat += 100
+                elif(code == 'E'):
+                    # Galileo
+                    sat += 200
+                else:
+                    raise Albus_RINEX.RINEX_Data_Barf("Unsupported satellite type '%s' in SP3 at line '%s'"%(code,line))
+                assert(sat >= 0)
+                assert(sat < MAX_POSSIBLE_SATELLITES)
+                obs_data[time_count, sat, 0] = float(line[ 4:18]) * 1000.0 # in m
+                obs_data[time_count, sat, 1] = float(line[18:32]) * 1000.0 # in m
+                obs_data[time_count, sat, 2] = float(line[32:46]) * 1000.0 # in m
+                x = obs_data[time_count, sat, 0]
+                y = obs_data[time_count, sat, 1]
+                z = obs_data[time_count, sat, 2]
+                r = math.sqrt(x*x + y*y + z*z)
+                try:
+                    theta = math.acos(z/r)
+                    phi = math.atan2(y,x)
+                except:
+                    if(r == 0.0):
+                        phi = 0.0
+                        theta = 0.0
+                    elif(x == 0.0):
+                        phi = 0.0
+                    else:
+                        raise Albus_RINEX.RINEX_Data_Barf("Unknown failure for %E %E %E"%(x,y,z))
+                obs_data[time_count, sat, 3] = r
+                obs_data[time_count, sat, 4] = phi
+                obs_data[time_count, sat, 5] = theta
+            elif(line[0:2] == 'EP'):
+                pass
+            elif(line[0] == 'V'):
+                pass
+            elif(line[0:2] == 'EV'):
+                pass
+            elif(line[0:3] == 'EOF'):
+                break # end of file
+            else:
+                pass
+#               raise Albus_RINEX.RINEX_Data_Barf("Unsupported data type in line '%s'"%line)
+    finally:
+        fp.close()
+    print('Num_Data time_count', Num_Data, time_count)
+#   assert(Num_Data == time_count+1)
+    obs_data = _clean_up_phi_terms(obs_data)
+    print('obs_data shape', obs_data.shape)
+    print('MJD shape', MJD.shape)
+    print('time_offset', time_offset)
+    return MJD, obs_data
 
 
 ################################################################################
-def read_RINEX_sp3_file(filename, time_offset = None):
+def read_RINEX_sp3_file_old(filename, time_offset = None):
     """read the satellite position information from an SP3 file
 
 See the RINEX manuals at ftp://igs.org/pub/data/format
@@ -954,6 +1121,7 @@ obs_data   O  The output data array, as
         second = float(line[20:31])
         MJD_start = jma_tools.get_MJD_hms(year, month, day, hour, minute, second)
         Num_Data = int(line[32:39])
+        print('Num_Data:', Num_Data)
         if(Num_Data < 10):
             raise Albus_RINEX.RINEX_Data_Barf("Too few data times in file '%s' to get accurate interpolation"%filename)
         # skip to line 13
@@ -1034,6 +1202,7 @@ obs_data   O  The output data array, as
                         phi = 0.0
                     else:
                         raise Albus_RINEX.RINEX_Data_Barf("Unknown failure for %E %E %E"%(x,y,z))
+#               print('sat, x,y,z,r,theta,phi', sat,x,y,z,r,theta,phi)
                 obs_data[time_count, sat, 3] = r
                 obs_data[time_count, sat, 4] = phi
                 obs_data[time_count, sat, 5] = theta
@@ -1049,6 +1218,7 @@ obs_data   O  The output data array, as
                 raise Albus_RINEX.RINEX_Data_Barf("Unsupported data type in line '%s'"%line)
     finally:
         fp.close()
+    print('final time_count', time_count)
     assert(Num_Data == time_count+1)
     obs_data = _clean_up_phi_terms(obs_data)
     return MJD, obs_data
@@ -1087,6 +1257,7 @@ XYZ         O  numpy array of the satellite position
     assert(work_c.shape[0] >= num_terms)
     assert(work_d.shape[0] >= num_terms)
     XYZ = np.zeros((6), dtype='float64')
+   
     for p in range(3,6):
         dif = math.fabs(MJD_need-MJD[index_start])
         ns = 0
@@ -1282,6 +1453,7 @@ XYZ         O  numpy array of the satellite positions
     assert(NUM_TERMS_GLONASS <= NUM_TERMS_MAX)
     assert(NUM_OBS == MJD.shape[0])
     NUM_NEED = MJD_need.shape[0]
+    print('NUM_NEED', NUM_NEED)
     assert(NUM_NEED>0)
     XYZ = np.zeros((NUM_NEED,NUM_SAT,6), dtype='float64')
     work_c = np.zeros((NUM_TERMS_MAX), dtype='float64')
@@ -2626,7 +2798,9 @@ MJD_OUT   O  the whole numpy array of MJD values
     hour = 1.0 / 24.0
     reverse = 0
     pos = 0
+    counter = -1
     for M in MJDs:
+        counter = counter + 1
         l = len(M)
         MJD_OUT[pos:pos+l] = M[:]
         pos += l
@@ -3041,10 +3215,16 @@ sat_pos     O  The output data array, as
     sat_pos_list = []
     for m in range(MJD_start, MJD_end):
         year, month, day, frac = jma_tools.get_ymdf_from_JD(jma_tools.get_JD_from_MJD(m))
+        doy = jma_tools.get_day_of_year(year, month, day)
         gps_week, gps_dow, gps_seconds = jma_tools.get_GPS_from_MJD(m)
-        print ( 'MJD, gps_week, gps_dow, gps_seconds', m, gps_week, gps_dow, gps_seconds)
-        filename = Albus_RINEX.make_RINEX_ephemeris_filename("cod", gps_week,
-                                                             gps_dow)
+#       print ( 'MJD, gps_week, gps_dow, gps_seconds, year, doy', m, gps_week, gps_dow, gps_seconds, year, doy)
+        home_dir = os.path.expanduser('~')
+        file = home_dir + '/.netrc'
+        if os.path.isfile(file): # we can access CDDIS
+           group_name = 'jpl'
+        else:
+           group_name = 'cod'
+        filename = Albus_RINEX.make_RINEX_ephemeris_filename(group_name, gps_week, gps_dow, year, doy)
         ret_code = Albus_RINEX.get_GPS_ephemeris_file_from_web(filename,year,
                                                                gps_week,
                                                                output_directory,
@@ -3214,11 +3394,14 @@ sat_block_pos  O  An array of continguous block position ranges, as 3 element
     for m in range(MJD_start-1, MJD_end+1):
         year, month, day, frac = jma_tools.get_ymdf_from_JD(jma_tools.get_JD_from_MJD(m))
         doy = jma_tools.get_day_of_year(year, month, day)
+        gps_week, gps_dow, gps_seconds = jma_tools.get_GPS_from_MJD(m)
+
         # check for IONEX bias data
         if(m in get_station_base_observations.bias_IONEX):
             pass
         else:
-            IONEX_name = Albus_RINEX.make_IONEX_filename('cod',0,year,doy)
+            group_name = 'cod'
+            IONEX_name = Albus_RINEX.make_IONEX_filename(group_name,0,gps_week,year,doy)
             print ( 'initial IONEX_name', IONEX_name)
             return_code = Albus_RINEX.get_IONEX_file_from_web(IONEX_name,
                                                               year, month,
@@ -3226,7 +3409,7 @@ sat_block_pos  O  An array of continguous block position ranges, as 3 element
                                                               output_directory,
                                                               overwrite = overwrite)
             if(return_code < 0):
-                IONEX_name = Albus_RINEX.make_IONEX_filename('cod',1,year,doy)
+                IONEX_name = Albus_RINEX.make_IONEX_filename(group_name,1,gps_week,year,doy)
                 print ( 'second IONEX_name', IONEX_name)
                 return_code = Albus_RINEX.get_IONEX_file_from_web(IONEX_name,
                                                                   year, month,

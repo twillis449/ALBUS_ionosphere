@@ -5,10 +5,12 @@
 # I have made my own simple case
 # 2007 Jan 19  James M Anderson  --JIVE  start
 # 2020 Using pycurl with python3
+# 2023 Updated to access current CDDIS server
 
 
 import sys
 import pycurl
+import requests
 
 def main():
     print('**** in Albus_RINEX_download')
@@ -16,6 +18,18 @@ def main():
         print("Error: correct usage is %s inURL, outfilename timeout"%sys.argv[0])
         sys.exit(-2)
     print('Albus_RINEX_download system parameters', sys.argv)
+
+    if sys.argv[1].find('cddis')> -1:
+       url =  sys.argv[1]
+       filename = sys.argv[2]
+       r = requests.get(url)
+# Opens a local file of same name as remote file for writing to
+       with open(filename, 'wb') as fd:
+          for chunk in r.iter_content(chunk_size=1000):
+             fd.write(chunk)
+       fd.close()
+       sys.exit(0)
+
     if sys.argv[1].find('sftp')> -1:
       use_pysftp = True
       try:

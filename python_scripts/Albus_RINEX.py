@@ -1,6 +1,7 @@
 # Albus_RINEX.py
 # Python stuff for dealing with Ionosphere RINEX stuff
 # 2006 Jul 17  James M Anderson  --JIVE  start
+# 2023 Mar  4  A.G. Willis -- handle long product file names
 
 #from __future__ import (print_function)
 
@@ -614,22 +615,6 @@ OUTPUTS:  None
     gunzip_some_file(our_Z_file,our_file,RX3_flag= RX3_flag)
     return
     
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -683,17 +668,8 @@ filename      O  filename of RINEX file, no directory path
     filename = "%4.4s%3.3d0.%2.2d%1.1s"%(station_name,doy,yy,RINEX_type)
     return filename
 
-
-
-
-
-
-
 ################################################################################
-def make_RINEX_ephemeris_filename(group_name,
-                                  gps_week,
-                                  dow
-                                  ):
+def make_RINEX_ephemeris_filename(group_name, gps_week, dow, year, doy):
     """generate a RINEX ephemeris filename
 
 group_name    I  name of an ephemeris producing group.  Must be three characters.
@@ -708,26 +684,30 @@ filename      O  filename of RINEX ephemeris file, no directory path
     extension = "sp3"
     if(group_name == 'igs'): pass
     elif(group_name == 'igr'): pass
-    elif(group_name == 'jpl'): pass
+    elif(group_name == 'jpl'): 
+        extension = 'sp3'
     elif(group_name == 'cod'):
         extension = "eph"
     elif(group_name == 'esa'):
         extension = "eph"
     else:
         warnings.warn("Unrecognized ephemeris group '%s', if valid, inform programmer to update code.  Trying anyway."%group_name)
-    filename = "%3.3s%4.4d%1.1d.%3.3s"%(group_name, gps_week, dow, extension)
+    if extension == 'sp3':
+       filename = "%3.3s%4.4d%1.1d.%3.3s"%(group_name, gps_week, dow, extension)
+    else:
+      if gps_week < 2238: # week of 27 Nov 2022
+        filename = "%3.3s%4.4d%1.1d.%3.3s"%(group_name, gps_week, dow, extension)
+      else:
+         start_str = group_name.upper() + '0OPSFIN_'
+         end_str = '0000_01D_05M_ORB.SP3'
+         filename =  "%s%4.4d%3.3d%s"%(start_str,year, doy, end_str)
     return filename
-
-
-
-
-
-
 
 
 ################################################################################
 def make_IONEX_filename(group_name,
                         best_estimate,
+                        gps_week,
                         year,
                         doy
                         ):
@@ -759,14 +739,16 @@ filename      O  filename of IONEX file, no directory path
     b = 'g'
     if(best_estimate and group_name == 'cod'):
       group_name = 'cor'
-    filename = "%3.3s%1.1s%3.3d0.%2.2di"%(group_name,b,doy,yy)
+    
+    if gps_week >= 2238:  # 27 Nov 2022
+# sample file: COD0OPSFIN_20230100000_01D_01H_GIM.INX
+        start_str = group_name.upper() + '0OPSFIN_'
+        end_str = '0000_01D_01H_GIM.INX'
+        filename = "%s%4.4d%3.3d%s"%(start_str,year, doy, end_str)
+    else: 
+        filename = "%3.3s%1.1s%3.3d0.%2.2di"%(group_name,b,doy,yy)
+    print('IONEX filename is ', filename)
     return filename
-
-
-
-
-
-
 
 
 ################################################################################
@@ -779,7 +761,7 @@ def get_GPS_ephemeris_file_from_web(ephemeris_filename,
                                     ):
     """use urllib3 to get an ephemeris file from the Internet
 
-ephemeris_filename I The nameof the IONEX file to get.  Should normally be
+ephemeris_filename I The nameof the ephemeris file to get.  Should normally be
                      in the form ggggddd0.yyi, but you already know that.
 year              I  year of the observation - needed for call to CODE
 gps_week          I  the GPS week number
@@ -795,7 +777,7 @@ return_code       O  Status of getting file from web
                       0 all ok
                      -1 could not find on any FTP site
 """
-    print ( ' in get_GPS_ephemeris_file_from_web with FTP_site =', FTP_site )
+    print ( 'in get_GPS_ephemeris_file_from_web with FTP_site =', FTP_site )
     assert(FTP_site >= 0)
     # First, if we have run out of FTP sites, bail
     if(FTP_site > 6):
@@ -810,7 +792,10 @@ return_code       O  Status of getting file from web
         else:
             return 0
     # Third, check for a compressed file
-    our_Z_file = output_directory + '/' + ephemeris_filename + ".Z"
+    if gps_week < 2238:
+       our_Z_file = output_directory + '/' + ephemeris_filename + ".Z"
+    else:
+       our_Z_file = output_directory + '/' + ephemeris_filename + ".gz"
     if(os.path.isfile(our_Z_file)):
         if(overwrite):
             warnings.warn("File '%s' already exists.  Deleting."%our_Z_file)
@@ -823,41 +808,43 @@ return_code       O  Status of getting file from web
         warnings.warn("Warning: data %s is in the missing data list"%(ephemeris_filename))
         return -1
     # Where are we getting this from?
-    if(FTP_site == 0):
-        # UCSD
-        site_str = "ftp://garner.ucsd.edu/pub/products/%4.4d/%s.Z"%(gps_week, ephemeris_filename)
-    elif(FTP_site == 1): # note cddis replaced by CODE
+    home_dir = os.path.expanduser('~')
+    netrc_file = home_dir + '/.netrc'
+    if os.path.isfile(netrc_file):
+       use_cddis = True
+    else:
+       use_cddis = False
+       warnings.warn("To access the CDDIS site you need to open an account there")
+       warnings.warn("Go to https://cddis.nasa.gov/About/CDDIS_File_Download_Documentation.html")
+
+    if FTP_site == 0:
+       # cddis
+       if use_cddis:
+         print('TRYING CDDIS for EPHEMERIS FILE', ephemeris_filename)
+         if ephemeris_filename.find('jpl') >= 0:
+             site_str = "https://cddis.nasa.gov/archive/gnss/products/%4.4d/%s.Z"%(gps_week, ephemeris_filename)
+         else:
+           if gps_week < 2238:
+              site_str = "https://cddis.nasa.gov/archive/gnss/products/%4.4d/%s.Z"%(gps_week, ephemeris_filename)
+           else:
+              data_file = ephemeris_filename.upper()
+              site_str = "https://cddis.nasa.gov/archive/gnss/products/%4.4d/%s.gz"%(gps_week, ephemeris_filename)
+       else:
         # CODE, Switzerland
         data_file = ephemeris_filename.upper()
-        site_str = "ftp://ftp.aiub.unibe.ch/CODE/%4.4d/%s.Z"%(year, data_file)
-    elif(FTP_site == 2):
-        # IFAG, Germany
-        site_str = "http://igs.ifag.de/root_ftp/IGS/products/orbits/%4.4d/%s.Z"%(gps_week, ephemeris_filename)
-    elif(FTP_site == 3):
+        if gps_week < 2238:
+          site_str = "ftp://ftp.aiub.unibe.ch/CODE/%4.4d/%s.Z"%(year, data_file)
+        else:
+          site_str = "ftp://ftp.aiub.unibe.ch/CODE/%4.4d/%s.gz"%(year, data_file)
+        print('we should be using CODE site string:', site_str)
+    elif(FTP_site == 1): 
         # CODE, Switzerland
         data_file = ephemeris_filename.upper()
-        site_str = "ftp://ftp.aiub.unibe.ch/CODE/%4.4d/%s.Z"%(year, data_file)
-    elif(FTP_site == 4):
-        # CODE, Switzerland rapid file
-        data_file = ephemeris_filename.upper()
-        if data_file.find('EPH') > -1:
-           start_loc = data_file.find('EPH')
-           end_loc = start_loc + 3
-           data_file = data_file[0:start_loc] + 'EPH_R' + data_file[end_loc:len(data_file)]
-        site_str = "ftp://ftp.aiub.unibe.ch/CODE/%4.4d/%s.Z"%(year, data_file)
-        our_Z_file = output_directory + '/' + data_file  + ".Z"
-    elif(FTP_site == 5):
-        # CODE, Switzerland rapid file
-        data_file = ephemeris_filename.upper()
-        if data_file.find('EPH') > -1:
-           start_loc = data_file.find('EPH')
-           end_loc = start_loc + 3
-           data_file = data_file[0:start_loc] + 'EPH_R' + data_file[end_loc:len(data_file)-2]
-        site_str = "ftp://ftp.aiub.unibe.ch/CODE/%s"%(data_file)
-        our_Z_file = output_directory + '/' + data_file
-    elif(FTP_site == 6):
-        # IGN France
-        site_str = "ftp://igs.ensg.ign.fr/pub/igs/products/%4.4d/%s.Z"%(gps_week, ephemeris_filename)
+        if gps_week < 2238:
+          site_str = "ftp://ftp.aiub.unibe.ch/CODE/%4.4d/%s.Z"%(year, data_file)
+        else:
+          site_str = "ftp://ftp.aiub.unibe.ch/CODE/%4.4d/%s.gz"%(year, data_file)
+        print('we should be using CODE site string:', site_str)
     else:
         raise KeyError("Unknown ephemeris FTP site")
     try:
@@ -945,8 +932,8 @@ return_code       O  Status of getting file from web
     if(FTP_site == 0): # cddis replaced by CODE
         # CODE, Switzerland
         data_file = IONEX_filename.upper()
-        site_str = "ftp://ftp.aiub.unibe.ch/CODE/%4.4d/%s.Z"%(year, data_file)
-        our_Z_file = output_directory + '/' + data_file + ".Z"
+        site_str = "ftp://ftp.aiub.unibe.ch/CODE/%4.4d/%s.gz"%(year, data_file)
+        our_Z_file = output_directory + '/' + data_file + ".gz"
     elif(FTP_site == 1):
         # CODE, Switzerland
         data_file = IONEX_filename.upper()
@@ -956,7 +943,7 @@ return_code       O  Status of getting file from web
         # CODE, Switzerland rapid file
         data_file = IONEX_filename.upper()
         site_str = "ftp://ftp.aiub.unibe.ch/CODE/%s.Z"%(data_file)
-        our_Z_file = output_directory + '/' + data_file + ".Z"
+        our_Z_file = output_directory + '/' + data_file + ".gz"
     elif(FTP_site == 3):
         # IGN France
         site_str = "ftp://igs.ensg.ign.fr/pub/igs/products/ionosphere/%4.4d/%3.3d/%s.Z"%(year, doy, IONEX_filename)
