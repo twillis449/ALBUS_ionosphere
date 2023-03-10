@@ -41,6 +41,8 @@ def main():
         sys.exit(-3)
       else:
          try:
+           cnopts = pysftp.CnOpts()
+           cnopts.hostkeys = None
            split_location = sys.argv[1].find('/')
            host_name =  sys.argv[1][:split_location]
            print('sftp host name', host_name)
