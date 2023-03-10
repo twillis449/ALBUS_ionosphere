@@ -3224,6 +3224,7 @@ sat_pos     O  The output data array, as
            group_name = 'jpl'
         else:
            group_name = 'cod'
+        group_name = 'cod'
         filename = Albus_RINEX.make_RINEX_ephemeris_filename(group_name, gps_week, gps_dow, year, doy)
         ret_code = Albus_RINEX.get_GPS_ephemeris_file_from_web(filename,year,
                                                                gps_week,

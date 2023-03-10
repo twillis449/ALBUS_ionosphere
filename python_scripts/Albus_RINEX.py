@@ -21,6 +21,7 @@ import warnings
 import math
 import time as systime
 import subprocess
+import requests
 
 ################################################################################
 # JMA's ionosphere stuff
@@ -72,7 +73,7 @@ _RINEX_SITE_LIST_Aus_mwa = ["pert", "mro1", "mtma", "yar3", "exmt", "kalg", "kel
 _RINEX_SITE_LIST_Aus_atca = ["tntr", "bdst", "armd", "warw", "wari", "turo", "gatt", "str2", "str1", "pbot", "quam", "wtcf", "cnda", "cndo", "ihoe", "rand", "rank", "hern", "hay1", "toow", "ulla", "mena", "clev", "newe", "crdx", "puty", "nowe", "bee2", "tidb", "yung", "loth", "tmra", "dbbo", "brba", "unsw", "tamw", "forb", "wlca", "fors", "wyng", "cool", "nbrk", "nbri", "toog", "ymba", "blck", "peri", "bigg", "ngan", "cwra", "str3", "cole", "tmba", "tmbo", "bath", "ndra", "pmac", "nwra", "cops", "dorr", "nsta", "cble", "cblt", "clbi", "wlwn", "bjct", "robi", "wool", "dksn", "coma", "burk", "nwcs", "prce", "weem", "gwab", "mgrv", "wwlg", "glbn", "sym1", "tott", "tlpa", "nyma", "ckwl", "cbar", "carg", "gong", "wlgt", "cnbn", "rgln", "gunn", "edsv", "tmut", "albu", "sngo", "ftdn", "ardl", "wrrn", "scon", "liri", "wgga", "invl", "hill", "dune", "obrn", "mrwa", "hlbk", "park", "bank", "coff", "gilg", "mchl", "mack", "gfth", "gftn", "mthr", "nml1", "lgow", "mree", "gfel", "anna", "tare", "spwd", "dalb", "jeri", "nrmn", "oval", "gngn", "brdw", "chip", "msvl", "gurl", "bndy", "bing", "sydn", "vlwd", "wfal", "yaro", "orng", "brwn", "tid1", "tid2", "lkht", "wdbg", "csno", "yass", "ctmd", "tull", "walw", "ips2", "nmbn", "baln", "ashf", "mudg", "cwn2", "glin", "ryls", "prks", "ptkl"]
 _RINEX_SITE_LIST_Ned_0 = ["apel","cabw","delf","eijs","ijmu","kosg","ters","vlie","vlis","wsra","wsrt"]
 #_RINEX_SITE_LIST_BIGF_0 = ["abbs","abed","aber","abyw","alde","ambl","amer","appl","asap","bark","blak","but1","camb","card","carf","carl","dare","droi","drum","dund","dung","dunk","easi","east","edin","exmo","farn","gigg","gir1","glas","gore","hard","holy","hoob","hurn","ia02","ia03","ia04","iesg","inve","kili","king","leed","leek","lerw","lich","linc","live","liz1","locg","lond","lowe","lyn1","malg","manc","marg","nas1","neot","newa","newb","newc","newl","nfo1","norw","nott","nstg","oshq","oxfr","pers","pete","pmtg","pmth","pool","port","ral1","rich","sand","shee","shob","shre","skeg","stev","stoc","sunb","swan","taun","taut","thur","uist","warm","watt","weir","weyb","year","abea","abee","abep","aldb","attl","barr","bees","benb","brae","brec","buck","camp","chuh","colc","drot","dvtg","eskd","faug","foyl","fras","girv","helm","herm","hort","ioms","keyw","kinl","kirk","kirw","klre","lcar","liza","locg","loft","lwtg","mach","maid","mrkt","oban","omgh","pads","pork","praw","ral2","scar","seah","shoe","sken","stor","stro","swtg","tedd","thus","ulla","wear","well"]
-_RINEX_SITE_LIST_AOPR_0 = ["aopr"]
+# _RINEX_SITE_LIST_AOPR_0 = ["aopr"]
 _RINEX_SITE_LIST_ZA = ["anth","beni","beth","bftn","biso","brit","brnk","bwes","calv","cpnt","ctwn","dear","drba","elda","eras","gdal","geob","grey","grma","grnt","heid","hnus","ixop","kman","koks","kstd","lgbn","lsmh","malm","mfkg","mriv","nspt","nyls","pbwa","plbb","plet","pmbg","pret","pska","ptbg","qtwn","rbay","sbok","scot","secd","sosh","sprt","stbs","stng","tdou","upta","verg","welk","worc","bfta","mtut","rust","secd","sosh","sbas","sut1"]
 
 
@@ -91,13 +92,30 @@ class Command_Timeout_Error(IOError):
 class RINEX_Data_Barf(IOError):
     """Indicates that some internal header/data part of a RINEX file is bad"""
 
+#def get_cddis_rinex_file(url, filename):
+#    print('**** in get_cddis_rinex_file')
+#    print('url = ', url)
+#    print('output file', filename)
+#    r = requests.get(url)
+# Opens a local file of same name as remote file for writing to
+#    with open(filename, 'wb') as fd:
+#        for chunk in r.iter_content(chunk_size=1000):
+#            fd.write(chunk)
+#    fd.close()
 
-
-
-
-
-
-
+#def get_cddis_file(site_str, our_file):
+#   print('processing request to cddis')
+#   print('site_str', site_str)
+#   print('our_file', our_file)
+#   r = requests.get(site_str)
+## Opens a local file of same name as remote file for writing to
+#   with open(our_file, 'wb') as fd:
+#       for chunk in r.iter_content(chunk_size=10000000):
+#           fd.write(chunk)
+## Closes local file
+#   fd.close()
+#   print('cddis file written out')
+#  return
 
 ################################################################################
 def run_command_timeout(command, args, timeout):
@@ -222,21 +240,7 @@ a Command_Timeout_Error
 # It is IMPOSSIBLE  for you to get a 'True' response 
 # to the following test at present
         if(computer in get_url.computer_dict):
-            if(not FTP_GETTER_ALLOW):
-                raise Command_Timeout_Error("not allowed to FTP this computer")
-            if((get_url.computer_dict[computer][0] is None)
-               or (get_url.computer_dict[computer][1] is None)):
-                raise Command_Timeout_Error("This computer wants a password")
-#               sys.stdout.write("Username for computer %s: "%computer)
-#               username = sys.stdin.readline()[:-1]
-#               passwd = getpass.getpass()
-#               get_url.computer_dict[computer] = [username, passwd]
-            run_ftpcommand_timeout(FTP_GETTER,
-                                   [FTP_GETTER, infile, outfile,
-                                    "%d"%DEFAULT_TIMEOUT],
-                                    DEFAULT_TIMEOUT,
-                                   get_url.computer_dict[computer][0],
-                                   get_url.computer_dict[computer][1])
+            get_cddis_rinex_file(infile,outfile)
         else:
             run_command_timeout(URL_GETTER,
                                 [URL_GETTER, infile, outfile,
@@ -259,7 +263,7 @@ a Command_Timeout_Error
     return
 get_url.computer_dict = {}
 #get_url.computer_dict["jop30"] = [None,None]
-#get_url.computer_dict["gnss1.tudelft.nl"] = [None,None]
+#get_url.computer_dict["cddis"] = [None,None]
 #get_url.computer_dict["128.243.138.173"] = [None,None]  # BIGF restricted data
 
 
@@ -381,7 +385,13 @@ OUTPUTS:  None
     RX3_flag = False
     our_file = output_directory + '/' + RINEX_filename
     # First, if we have run out of FTP sites, bail
-    if(FTP_site > 17):
+    home_dir = os.path.expanduser('~')
+    netrc_file = home_dir + '/.netrc'
+    if os.path.isfile(netrc_file):
+       use_cddis = True
+    else:
+       use_cddis = False
+    if(FTP_site > 9):  # don't use CDDIS for the moment
         # Out of FTP sites.
         if(RINEX_filename[-1] != 'd'):
             GPS_stations.add_to_missing(RINEX_filename)
@@ -431,19 +441,17 @@ OUTPUTS:  None
     # Fifth, check for known locations of some files
     if(FTP_site == 0):
      if(RINEX_filename[0:4].lower() in _RINEX_SITE_LIST_Aus_mwa):
-         FTP_site = 12
-     if(RINEX_filename[0:4].lower() in _RINEX_SITE_LIST_ZA):
-         FTP_site = 16
+         FTP_site = 5
      if(RINEX_filename[0:4].lower() in _RINEX_SITE_LIST_Aus_atca):
-         FTP_site = 12
+         FTP_site = 5
      if(RINEX_filename[0:4].lower() in _RINEX_SITE_LIST_Ned_0):
-         FTP_site = 13
-     if(RINEX_filename[0:4].lower() in _RINEX_SITE_LIST_AOPR_0):
-         FTP_site = 15
+         FTP_site = 6
+     if(RINEX_filename[0:4].lower() in _RINEX_SITE_LIST_ZA):
+         FTP_site = 8
      if(RINEX_filename[0:4].lower() in _RINEX_SITE_LIST_NZ):
-         FTP_site = 17
+         FTP_site = 9
 #    if(RINEX_filename[0:4].lower() in _RINEX_SITE_LIST_BIGF_0):
-#        FTP_site = 14
+#        FTP_site = 7
     assert(year > 1979)
     assert(year < 2080)
     yy = year - 1900
@@ -455,11 +463,9 @@ OUTPUTS:  None
         if FTP_site == 0:
           if(RINEX_filename[-1] == 'd'):
             site_str = "ftp://garner.ucsd.edu/pub/rinex/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
-          elif(RINEX_filename[-1] == 'n'):
-            site_str = "ftp://garner.ucsd.edu/pub/nav/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
           else:
-            # guess and pray
-            site_str = "ftp://garner.ucsd.edu/pub/data/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
+             if(RINEX_filename[-1] == 'n'):
+                site_str = "ftp://garner.ucsd.edu/pub/nav/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
         else:
           if year >= 2020:   # need RINEX3
             RX3_flag = True
@@ -474,64 +480,23 @@ OUTPUTS:  None
           else:
             if(RINEX_filename[-1] == 'd'):
               site_str = "ftp://garner.ucsd.edu/pub/rinex/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
-            elif(RINEX_filename[-1] == 'n'):
-              site_str = "ftp://garner.ucsd.edu/pub/nav/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
             else:
-              # guess and pray
-              site_str = "ftp://garner.ucsd.edu/pub/data/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
+              if(RINEX_filename[-1] == 'n'):
+                 site_str = "ftp://garner.ucsd.edu/pub/nav/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
     elif(FTP_site == 2):
-        # IGS in Germany
-        #site_str = "http://igs.ifag.de/root_ftp/IGS/obs/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
-        site_str = "ftp://igs.bkg.bund.de/IGS/obs/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
-        if((RINEX_filename[0:4] == 'brdc') and ((RINEX_filename[-1] == 'n')
-                                                or (RINEX_filename[-1] == 'g'))):
-            #site_str = "http://igs.ifag.de/root_ftp/IGS/BRDC/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
-            site_str = "ftp://igs.bkg.bund.de/IGS/BRDC/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
-    elif(FTP_site == 3):
-        # GREF in Germany
-        #site_str = "http://igs.ifag.de/root_ftp/GREF/obs/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
-        site_str = "ftp://igs.bkg.bund.de/GREF/obs/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
-    elif(FTP_site == 4):
-        # CORS, in the United States, probably on the East coast
-        if(RINEX_filename[-1] == 'd'):
-            site_str = "ftp://www.ngs.noaa.gov/cors/rinex/%4.4d/%3.3d/%s/%s.Z"%(year, doy, RINEX_filename[0:4],RINEX_filename)
-        elif(RINEX_filename[-1] == 'o'):
-            site_str = "ftp://www.ngs.noaa.gov/cors/rinex/%4.4d/%3.3d/%s/%s.gz"%(year, doy, RINEX_filename[0:4],RINEX_filename)
-        elif(RINEX_filename[-1] == 'n'):
-            site_str = "ftp://www.ngs.noaa.gov/cors/rinex/%4.4d/%3.3d/%s.gz"%(year, doy, RINEX_filename)
-            #MM:Cannot find those anymore? I do see that some stations (brcd,igu1) are directly in the doy directory...
-        else:
-            # guess and pray
-            site_str = "ftp://www.ngs.noaa.gov/cors/rinex/%4.4d/%3.3d/%s/%s.Z"%(year, doy, RINEX_filename[0:4],RINEX_filename)
-    elif(FTP_site == 5):
-        # EUREF in Germany
-        #site_str = "http://igs.ifag.de/root_ftp/EUREF/obs/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
-        site_str = "ftp://igs.bkg.bund.de/EUREF/obs/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
-        if((RINEX_filename[0:4] == 'brdc') and ((RINEX_filename[-1] == 'n')
-                                                or (RINEX_filename[-1] == 'g'))):
-            #site_str = "http://igs.ifag.de/root_ftp/EUREF/BRDC/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
-            site_str = "ftp://igs.bkg.bund.de/EUREF/BRDC/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
-    elif(FTP_site == 6):
-        # EUREF in Italy
+        # IGS in Germany - doesnt seem to respond these days- we get connection refused messages
+        #site_str = "ftp://igs.bkg.bund.de/IGS/obs/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
+        #if((RINEX_filename[0:4] == 'brdc') and ((RINEX_filename[-1] == 'n') or (RINEX_filename[-1] == 'g'))):
+        #    site_str = "ftp://igs.bkg.bund.de/IGS/BRDC/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
+        # EUREF in Italy note: also has RINEX_V3 directory stuff for years >= 2010
         site_str = "ftp://geodaf.mt.asi.it/GEOD/GPSD/RINEX/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
-    elif(FTP_site == 7):
+    elif(FTP_site == 3):
         # IGN France
         site_str = "ftp://igs.ensg.ign.fr/pub/igs/data/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
-    elif(FTP_site == 8):
-        # EUREF in Austria, plus some Austrian stations
-        site_str = "ftp://olggps.oeaw.ac.at/pub/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
-        ## cannot find data from 2012, aha it might be in the next dir, see below
-    elif(FTP_site == 9):
-        # EUREF in Austria, but newer data
-        site_str = "ftp://olggps.oeaw.ac.at/pub/outdata/%s/%s.Z"%(RINEX_filename[0:4], RINEX_filename)
-    elif(FTP_site == 10):
+    elif(FTP_site == 4):
         # Belgium has a few stations
-        #site_str = "ftp://epncb.oma.be/gps_rob/data/rinex/daily/%s/%s.Z"%(RINEX_filename[0:4].upper(), RINEX_filename.upper())
         site_str = "ftp://epncb.oma.be/pub/obs/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename.upper())
-    elif(FTP_site == 11):
-        # Boulder site
-        site_str = "ftp://data-out.unavco.org/pub/rinex/obs/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
-    elif(FTP_site == 12):
+    elif(FTP_site == 5):
 # !@#$#%$%^^& f*ing Aussies - they stopped reporting rinex2 files 
 # and switched to rinex3 in2020
         # Australia site
@@ -553,35 +518,24 @@ OUTPUTS:  None
         print('trying to get ',  our_file )
         print ( '*********** accessing Australian FTP site!')
         print('site string', site_str)
-    elif(FTP_site == 13):
+    elif(FTP_site == 6):
         # Dutch National GPS Network (requires login)
         if(RINEX_filename[0:4] in _RINEX_SITE_LIST_Ned_0):
             site_str = "ftp://gnss1.tudelft.nl/rinex/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
         else:
             pass # site_str = "" from above, which will generate an IOError
-    elif(FTP_site == 14):
+    elif(FTP_site == 7):
         pass
-        # United Kingdom BIGF data
+        # United Kingdom BIGF data - need an account to get in here
 #       if(RINEX_filename[0:4] in _RINEX_SITE_LIST_BIGF_0):
             # for the moment, just pass, as I have to make a manual request
             # to download the data
             # pass
             #site_str = "ftp://128.243.138.173/anderson/%s.Z"%(RINEX_filename)
             #site_str = "ftp://www.ordnancesurvey.co.uk/gps/rinex/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
-
 #       else:
 #           pass # site_str = "" from above, which will generate an IOError
-    elif(FTP_site == 15):
-        # Arecibo AOPR data
-        if(RINEX_filename[0:4] in _RINEX_SITE_LIST_AOPR_0):
-            if(RINEX_filename[-1] == 'o'):
-                # This site only has .o data
-                site_str = "http://www.naic.edu/aisr/GPSTEC/Archive/%4.4d/%3.3d/%s.gz"%(year, doy, RINEX_filename)
-            else:
-                pass # site_str = "" from above, which will generate an IOError
-        else:
-            pass # site_str = "" from above, which will generate an IOError
-    elif(FTP_site == 16):
+    elif(FTP_site == 8):
         # South Africa Trignet
         print ( '*********** accessing South African Trignet FTP site!')
         if(RINEX_filename[0:4] in _RINEX_SITE_LIST_ZA):
@@ -590,7 +544,7 @@ OUTPUTS:  None
             our_Z_file = output_directory + '/' + ftp_file_name
         else:
             pass # site_str = "" from above, which will generate an IOError
-    elif(FTP_site == 17):
+    elif(FTP_site == 9):
         # New Zealand GeoNet and LINZ servers
         print ( '*********** accessing New Zealand FTP site!')
         if(RINEX_filename[0:4] in _RINEX_SITE_LIST_NZ):
@@ -599,10 +553,17 @@ OUTPUTS:  None
               site_str = "https://data.geonet.org.nz/gnss/rinex/%4.4d/%3.3d/%s.gz"%(year, doy, RINEX_filename)
         else:
             pass # site_str = "" from above, which will generate an IOError
+
+# Getting big Rinex files from CDDIS is not yet working
+#   elif(FTP_site == 10 and use_cddis): # cddis
+#      site_str = "https://cddis.nasa.gov/archive/gnss/data/daily/%4.4d/%3.3d/%2.2d%s/%s.Z"%(year, doy, yy, RINEX_filename[-1], RINEX_filename)
+#      print('cddis site string', site_str)
     else:
         print ( '************* unable to handle ftp site number ', FTP_site)
         raise KeyError("Unknown RINEX FTP site")
     try:
+        print('+++++++++++++++ calling get_url with', site_str, our_Z_file)
+        print('*********************************')
         get_url(site_str, our_Z_file)
     except IOError:
         get_RINEX_obs_file_from_web(RINEX_filename,
