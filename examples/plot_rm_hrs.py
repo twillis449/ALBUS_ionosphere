@@ -4,7 +4,10 @@ import os
 import sys
 import numpy
 import math 
-import hampel
+#import hampel
+# Savitzky-Golay filte
+from scipy.signal import savgol_filter
+
 from pylab import *
 
 #from string import split, strip
@@ -22,11 +25,11 @@ def getdata( filename ):
         min = float(info[-2])
         hour = float(info[-3])
         ref_time = hour + min/60.0 + sec/3600.0
-        print('reference time', ref_time)
         while(text[i][0:13] != 'seq  rel_time'):
            i = i+1
         rm = []
         rel_time = []
+        rm_error=[]
         start = i+1
         # get actual data
         for i in range( start,len(text)):
@@ -37,21 +40,21 @@ def getdata( filename ):
               if elev >= 15.0:
                 latest = ref_time + float(info[3]) / 3600
                 rel_time.append(latest)
-                rm.append(float(info[8]))
+                rm_val = float(info[8])
+                rm.append(rm_val)
+                error_ratio = rm_val * float(info[10]) / float(info[7])
+                rm_error.append(error_ratio)
           except:
             pass
         rm_arr = numpy.array(rm)
         rel_time = numpy.array(rel_time)
-        filtered = hampel.hampel(rm_arr, 5, 4)
-        filtered_data= hampel.hampel(filtered, 10, 1)
-        diff = filtered_data - rm_arr
-        return rel_time, filtered_data, latest, ref_time
+        return rel_time, rm_arr, rm_error, latest, ref_time
 
 def main( argv ):
   RM = True
   print('processing ALBUS file ', argv[1])
-  x_data, y_data, latest, ref_time  = getdata(argv[1])
-  print('reference time', ref_time)
+  x_data, y_data, error_vals, latest, ref_time  = getdata(argv[1])
+  y_data = savgol_filter(y_data, 7, 1)
 # print('shapes ', x_data.shape, y_data.shape, y_err.shape)
   xlim(ref_time,latest)
   print('calling plot')
@@ -61,10 +64,7 @@ def main( argv ):
     ylabel('RM ')
     title_string = 'RM as a function of time'
     plot_file =  argv[1] + '_rm_plot'
-  else:
-    ylabel('VTEC (TEC Units)')
-    title_string = 'VTEC as a function of time'
-    plot_file =  argv[1] + '_vtec_plot'
+    errorbar(x_data, y_data,yerr=error_vals, fmt='ro')
   title(title_string)
   grid(True)
 

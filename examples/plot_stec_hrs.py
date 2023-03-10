@@ -6,8 +6,9 @@ import numpy
 import math 
 import hampel
 from pylab import *
-
-#from string import split, strip
+from copy import deepcopy
+# Savitzky-Golay filte
+from scipy.signal import savgol_filter
 
 def getdata( filename ):
         text = open(filename, 'r').readlines()
@@ -22,7 +23,6 @@ def getdata( filename ):
         min = float(info[-2])
         hour = float(info[-3])
         ref_time = hour + min/60.0 + sec/3600.0
-        print('reference time', ref_time)
         while(text[i][0:13] != 'seq  rel_time'):
            i = i+1
         stec = []
@@ -48,17 +48,14 @@ def getdata( filename ):
         stec_arr = numpy.array(stec)
         stec_err = numpy.array(stec_err)
         rel_time = numpy.array(rel_time)
-        filtered = hampel.hampel(stec_arr, 5, 4)
-        filtered_data= hampel.hampel(filtered, 10, 1)
-        diff = filtered_data - stec_arr
-        return rel_time, filtered_data, stec_err, latest, ref_time
-#       return rel_time, stec_arr, stec_err, latest
+        return rel_time, stec_arr, stec_err, latest, ref_time
 
 def main( argv ):
   STEC = True
   print('processing ALBUS file ', argv[1])
   x_data, y_data, y_err, latest, ref_time  = getdata(argv[1])
-  print('reference time', ref_time)
+# Savitzky-Golay filter
+  y_data = savgol_filter(y_data, 7, 1)
 # print('shapes ', x_data.shape, y_data.shape, y_err.shape)
   xlim(ref_time,latest)
   if y_err.shape[0] == 0:
