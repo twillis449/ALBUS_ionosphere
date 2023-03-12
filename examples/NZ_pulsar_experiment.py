@@ -32,25 +32,25 @@ if __name__ == "__main__":
   DEC = "-65:45:19.1"
   # note: following date is near time of solar maximum
   # try date in 2018 for time near solar minimum
-  START_TIME="2014/12/01 00:00:00"
-  END_TIME="2014/12/01 23:59:59"
-  DATA_DIR = '/home/twillis/PSR_J1145_data_2014'
-  RED_TYPE = 'RI_G03'
+  START_TIME="2023/2/20 00:00:00"
+  END_TIME="2023/02/20 23:59:59"
+  DATA_DIR = '/home/twillis/PSR_J1145_data_2023'
+  RED_TYPE = 'RI_G01'
   TIME_STEP = 300
-  MAX_DIST = 300E3
-  NUM_PROCESSORS = 8
+  MAX_DIST = 250E3
+  NUM_PROCESSORS = 4
   DO_SER = 1
   DO_SER = 0
 
 # call the following function if you want to just track changes in the ionosphere at an elevation of 90 deg
 # i.e. direcly overhead
   if use_elev:
-    OBJECT="PSR_J1141-6545_300km_300s_2014_90El"
+    OBJECT="PSR_J1141-6545_zenith"
     iono.process_ionosphere(time_step=TIME_STEP,object=OBJECT,El=90.0,Lat=LAT,Long=LONG,Height=HEIGHT,start_time=START_TIME,end_time=END_TIME,max_dist=MAX_DIST,processing_option=RED_TYPE,do_serial=DO_SER,num_processors=NUM_PROCESSORS, gps_data_directory=DATA_DIR);
 
 #  use the following function if you want to track pulsar position
   else:
-    OBJECT="PSR_J1141-6545_300km_300s_2014"
+    OBJECT="PSR_J1141-6545_2023"
     iono.process_ionosphere(time_step=TIME_STEP,object=OBJECT,Ra=RA,Dec=DEC,Lat=LAT,Long=LONG,Height=HEIGHT,start_time=START_TIME,end_time=END_TIME,max_dist=MAX_DIST,processing_option=RED_TYPE,do_serial=DO_SER,num_processors=NUM_PROCESSORS, gps_data_directory=DATA_DIR);
 
   os.system('date')
