@@ -3,6 +3,7 @@
 # 2014 May 06  Anthony G Willis updated for use with CASA Measurement Sets
 # 2019 May 06  Anthony G Willis updated for work with python3 interface
 # 2021 Aug 22  Anthony G Willis updated for work with RINEX 3 files
+# 2023 Mar     Anthony G Willis update system to work with IGS Long Product File Names
 
 If you want to use the ALBUS software with CASA measurement sets you 
 must install the casacore package from https://code.google.com/p/casacore/ 
@@ -93,7 +94,7 @@ by the ALBUS package
 If you decide to rebuild the software for some reason first run 'make clean',
 followed by 'source remove_remainder'.
 
-To run the software, edit the script getGPSIONO.py. Examples of usage are 
+To run the software, edit the script getGPSIONO_3C138.py. Examples of usage are 
 given at the end of the file, and also at the ends of other scripts, especially
 MS_Iono_agw_azel_par.py in the python_scripts or examples subdirectory. 
 The examples illustrate the various parameters that the system will accept. 
@@ -128,7 +129,10 @@ column 5: elevation, in degrees
 column 6: azimuth, in degrees
 column 7; STEC, in TEC units
 column 8: rotation measure in radians/m^2
-column 9: factor by which to multiply STEC to get VTEC 
+column 9: factor by which to multiply STEC to get VTEC . Note - this is
+purely a geometric correction. If you actually want the vertical TEC at 
+a specified site, the example script vla_test.py, shows how use of the 
+use_elev flag, set to True, allows you to do so.
 
 See the file MS_Iono_agw_azel_par.py for documentation on the ionosphere 
 processing_options. The MO_PIM and MO_IRI models are only theoretical, and 
@@ -151,7 +155,9 @@ The GPS processing options you probably want to try are:
 RI_G03
 RI_G01
 in decreasing order of preference. Processing_option = 'RI_G05' may also
-give reasonable results.
+give reasonable results. NOTE: If you only have data from a single GPS station
+the RI_G03 solution seems to give OK TEC values but the RMs appear to 
+be garbage
 
 At present the function ionosphere_GPS_set_criteria in the file 
 MS_Iono_functions.py is not actually called - instead, to adjust any 
