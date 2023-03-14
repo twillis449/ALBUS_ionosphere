@@ -69,6 +69,8 @@ URL_GETTER = "Albus_RINEX_download.py"
 FTP_GETTER = "Albus_RINEX_userftp.py"
 FTP_GETTER_ALLOW = True
 
+_RINEX_SITE_LIST_VLA = ["mdo1", "nist", "pie1", "amc2", "blyt", "abq1", "azah", "azcn", "azco", "azgb", "azkr", "azmo", "azpe", "azsc", "cosa", "cot1", "cot2",  "dsrc",  "echo", "fern", "fred", "fst1", "gdac", "her2", "jtnt", "lvwd", "mexi", "myt1",  "nmgr",  "nmsf",  "nvbr", "nvlm",  "nvtr",  "okgm", "p003", "p009", "p011", "p015", "p026", "p028", "p031", "p034", "p035", "p036", "p037", "p038", "p039", "p040",  "p041",  "p105",  "p107",  "pltc",  "pub1",  "puc1", "sc01",  "srp1",  "sum1", "tcun",  "tmgo",  "txam", "txch", "txel", "txlu", "txod", "txpe", "txsa", "txsn", "wsmn", "zab1", "zab2",  "zdv1",  "apex",  "cdvv",  "glrs", "gmrc", "gnps", "hnps", "hurr",  "iid2",  "imps",  "ivco", "kayo", "mput", "ndap", "p012", "p104", "p106", "p108", "p110", "p112", "p123", "p498", "p499", "p500", "p501", "p502", "p506", "p507", "p508", "p509", "p511", "p611", "p621", "p622", "p623", "p626",  "pdbg",  "rg12",  "sa00", "sa24", "sa27", "sa31",  "sa46",  "sa48",  "sg24",  "sg33",  "spic",  "unr1",  "unr2",  "usmx",  "abq2",  "azbk",  "azcl",  "fst2",  "king", "myt2", "nmro", "nvcs", "nvlk", "pub2", "sum2", "gmpk", "aml5", "elp3", "lubb",  "ods5"]
+
 _RINEX_SITE_LIST_Aus_mwa = ["pert", "mro1", "mtma", "yar3", "exmt", "kalg", "keln", "bura", "cut0", "wlal", "espa", "nors", "alby", "nclf", "hil1", "karr", "ravn", "wagn", "medo", "lona", "hydn", "pthl", "yar2", "yarr", "nnor", "wilu", "bala", "lear", "tomp", "gasc", "yelo", "wara", "yula", "arub", "ucla", "bro1", "hill", "froy"]
 _RINEX_SITE_LIST_Aus_atca = ["tntr", "bdst", "armd", "warw", "wari", "turo", "gatt", "str2", "str1", "pbot", "quam", "wtcf", "cnda", "cndo", "ihoe", "rand", "rank", "hern", "hay1", "toow", "ulla", "mena", "clev", "newe", "crdx", "puty", "nowe", "bee2", "tidb", "yung", "loth", "tmra", "dbbo", "brba", "unsw", "tamw", "forb", "wlca", "fors", "wyng", "cool", "nbrk", "nbri", "toog", "ymba", "blck", "peri", "bigg", "ngan", "cwra", "str3", "cole", "tmba", "tmbo", "bath", "ndra", "pmac", "nwra", "cops", "dorr", "nsta", "cble", "cblt", "clbi", "wlwn", "bjct", "robi", "wool", "dksn", "coma", "burk", "nwcs", "prce", "weem", "gwab", "mgrv", "wwlg", "glbn", "sym1", "tott", "tlpa", "nyma", "ckwl", "cbar", "carg", "gong", "wlgt", "cnbn", "rgln", "gunn", "edsv", "tmut", "albu", "sngo", "ftdn", "ardl", "wrrn", "scon", "liri", "wgga", "invl", "hill", "dune", "obrn", "mrwa", "hlbk", "park", "bank", "coff", "gilg", "mchl", "mack", "gfth", "gftn", "mthr", "nml1", "lgow", "mree", "gfel", "anna", "tare", "spwd", "dalb", "jeri", "nrmn", "oval", "gngn", "brdw", "chip", "msvl", "gurl", "bndy", "bing", "sydn", "vlwd", "wfal", "yaro", "orng", "brwn", "tid1", "tid2", "lkht", "wdbg", "csno", "yass", "ctmd", "tull", "walw", "ips2", "nmbn", "baln", "ashf", "mudg", "cwn2", "glin", "ryls", "prks", "ptkl"]
 _RINEX_SITE_LIST_Ned_0 = ["apel","cabw","delf","eijs","ijmu","kosg","ters","vlie","vlis","wsra","wsrt"]
@@ -92,30 +94,6 @@ class Command_Timeout_Error(IOError):
 class RINEX_Data_Barf(IOError):
     """Indicates that some internal header/data part of a RINEX file is bad"""
 
-#def get_cddis_rinex_file(url, filename):
-#    print('**** in get_cddis_rinex_file')
-#    print('url = ', url)
-#    print('output file', filename)
-#    r = requests.get(url)
-# Opens a local file of same name as remote file for writing to
-#    with open(filename, 'wb') as fd:
-#        for chunk in r.iter_content(chunk_size=1000):
-#            fd.write(chunk)
-#    fd.close()
-
-#def get_cddis_file(site_str, our_file):
-#   print('processing request to cddis')
-#   print('site_str', site_str)
-#   print('our_file', our_file)
-#   r = requests.get(site_str)
-## Opens a local file of same name as remote file for writing to
-#   with open(our_file, 'wb') as fd:
-#       for chunk in r.iter_content(chunk_size=10000000):
-#           fd.write(chunk)
-## Closes local file
-#   fd.close()
-#   print('cddis file written out')
-#  return
 
 ################################################################################
 def run_command_timeout(command, args, timeout):
@@ -440,6 +418,8 @@ OUTPUTS:  None
         raise No_RINEX_File_Error("Error: data %s is in the missing data list"%(RINEX_filename))
     # Fifth, check for known locations of some files
     if(FTP_site == 0):
+     if(RINEX_filename[0:4].lower() in _RINEX_SITE_LIST_VLA):
+         FTP_site = 0
      if(RINEX_filename[0:4].lower() in _RINEX_SITE_LIST_Aus_mwa):
          FTP_site = 5
      if(RINEX_filename[0:4].lower() in _RINEX_SITE_LIST_Aus_atca):
@@ -467,7 +447,7 @@ OUTPUTS:  None
              if(RINEX_filename[-1] == 'n'):
                 site_str = "ftp://garner.ucsd.edu/pub/nav/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
         else:
-          if year >= 2020:   # need RINEX3
+          if year >= 2020:   # try RINEX3
             RX3_flag = True
             print('converting to RINEX3 file name from RINEX2 name: ', RINEX_filename)
             output = subprocess.Popen(['RX3name', RINEX_filename],
