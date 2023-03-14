@@ -11,6 +11,7 @@
 import sys
 import pycurl
 import requests
+import os
 
 def main():
     print('**** in Albus_RINEX_download')
@@ -28,7 +29,19 @@ def main():
           for chunk in r.iter_content(chunk_size=1000):
              fd.write(chunk)
        fd.close()
-       sys.exit(0)
+       # is this a data file or stupid cddis html file returned when there's not actual data
+       try:
+         text= open(filename, 'r').readlines()
+#        print('text[0]', text[0])
+#        print('find location', text[0].find('html'))
+         if text[0].find('html') >= 0: # its a garbage html file and not a data file
+           os.remove(filename)
+#          print('Failed to get data from CDDIS for ', sys.argv[1], ' file probably not found!!')
+           sys.exit(-3)
+       except:
+         file_stats = os.stat(filename)
+         print('CDDIS returned a binary file with Byte size', file_stats.st_size )
+         sys.exit(0)
 
     if sys.argv[1].find('sftp')> -1:
       use_pysftp = True
