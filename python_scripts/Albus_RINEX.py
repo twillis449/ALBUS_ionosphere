@@ -94,6 +94,30 @@ class Command_Timeout_Error(IOError):
 class RINEX_Data_Barf(IOError):
     """Indicates that some internal header/data part of a RINEX file is bad"""
 
+#def get_cddis_rinex_file(url, filename):
+#    print('**** in get_cddis_rinex_file')
+#    print('url = ', url)
+#    print('output file', filename)
+#    r = requests.get(url)
+# Opens a local file of same name as remote file for writing to
+#    with open(filename, 'wb') as fd:
+#        for chunk in r.iter_content(chunk_size=1000):
+#            fd.write(chunk)
+#    fd.close()
+
+#def get_cddis_file(site_str, our_file):
+#   print('processing request to cddis')
+#   print('site_str', site_str)
+#   print('our_file', our_file)
+#   r = requests.get(site_str)
+## Opens a local file of same name as remote file for writing to
+#   with open(our_file, 'wb') as fd:
+#       for chunk in r.iter_content(chunk_size=10000000):
+#           fd.write(chunk)
+## Closes local file
+#   fd.close()
+#   print('cddis file written out')
+#  return
 
 ################################################################################
 def run_command_timeout(command, args, timeout):
@@ -369,7 +393,7 @@ OUTPUTS:  None
        use_cddis = True
     else:
        use_cddis = False
-    if(FTP_site > 9):  # don't use CDDIS for the moment
+    if(FTP_site > 10): 
         # Out of FTP sites.
         if(RINEX_filename[-1] != 'd'):
             GPS_stations.add_to_missing(RINEX_filename)
@@ -535,8 +559,8 @@ OUTPUTS:  None
             pass # site_str = "" from above, which will generate an IOError
 
 # Getting big Rinex files from CDDIS is not yet working
-#   elif(FTP_site == 10 and use_cddis): # cddis
-#      site_str = "https://cddis.nasa.gov/archive/gnss/data/daily/%4.4d/%3.3d/%2.2d%s/%s.Z"%(year, doy, yy, RINEX_filename[-1], RINEX_filename)
+    elif(FTP_site == 10 and use_cddis): # cddis
+       site_str = "https://cddis.nasa.gov/archive/gnss/data/daily/%4.4d/%3.3d/%2.2d%s/%s.Z"%(year, doy, yy, RINEX_filename[-1], RINEX_filename)
 #      print('cddis site string', site_str)
     else:
         print ( '************* unable to handle ftp site number ', FTP_site)
