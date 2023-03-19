@@ -69,6 +69,7 @@ URL_GETTER = "Albus_RINEX_download.py"
 FTP_GETTER = "Albus_RINEX_userftp.py"
 FTP_GETTER_ALLOW = True
 
+_RINEX_SITE_LIST_EUROPE =  ['acor', 'adar', 'agrn', 'ajac', 'alac', 'alba', 'alme', 'ank2', 'aqui', 'ara2', 'argi', 'aris', 'arj6', 'asir', 'aubg', 'aut1', 'autn', 'axpv', 'baca', 'badh', 'baia', 'baut', 'bbys', 'bcln', 'bell', 'birg', 'bisk', 'bme1', 'boge', 'bogi', 'bogo', 'bolg', 'bor1', 'borj', 'borr', 'bpdl', 'brmf', 'brmg', 'brst', 'brts', 'brux', 'bscn', 'bsvz', 'bucu', 'budd', 'budp', 'bute', 'bydg', 'bzr2', 'cace', 'cag1', 'cako', 'cant', 'carg', 'casc', 'case', 'cebr', 'ceu1', 'cfrm', 'chio', 'chiz', 'clib', 'cniv', 'coba', 'como', 'cost', 'cpar', 'crak', 'creu', 'ctab', 'dare', 'delf', 'dent', 'deva', 'dgor', 'diep', 'dill', 'dlf1', 'dnmu', 'dour', 'drag', 'dub2', 'duth', 'dvcn', 'dyng', 'ebre', 'eglt', 'eijs', 'elba', 'enao', 'enis', 'entz', 'enza', 'esco', 'eusk', 'ffmj', 'fins', 'flrs', 'foyl', 'fra2', 'frne', 'func', 'gaia', 'galh', 'ganp', 'gari', 'gdrs', 'gell', 'geno', 'glsv', 'goet', 'goml', 'gop6', 'gope', 'gor2', 'grac', 'gras', 'graz', 'gsr1', 'guip', 'gwwl', 'has6', 'hel2', 'helg', 'hers', 'hert', 'hett', 'hobu', 'hofj', 'hofn', 'huel', 'ibiz', 'ieng', 'igeo', 'igm2', 'igmi', 'ignf', 'ijmu', 'ildx', 'invr', 'irbe', 'isrn', 'ista', 'izan', 'izmi', 'joe2', 'joen', 'jon6', 'joz2', 'joze', 'kad6', 'karl', 'kato', 'kda2', 'kev2', 'khar', 'kilp', 'kir0', 'kir8', 'kiru', 'kiv2', 'klnk', 'klop', 'knja', 'kos1', 'kra1', 'kraw', 'krrs', 'krs1', 'ktvl', 'kunz', 'kure', 'kuu2', 'lago', 'lama', 'lamp', 'larm', 'ldb2', 'leij', 'lek6', 'leon', 'leri', 'licc', 'lida', 'lign', 'lil2', 'linz', 'lliv', 'lodz', 'lov6', 'lpal', 'lroc', 'm0se', 'mad2', 'madr', 'mala', 'mall', 'man2', 'mar6', 'mar7', 'marp', 'mars', 'mas1', 'mat1', 'mate', 'matg', 'mdvj', 'medi', 'meli', 'mers', 'met3', 'metg', 'mets', 'mik3', 'mikl', 'mkrs', 'mlhd', 'mlvl', 'mnkw', 'mnsk', 'mogi', 'mop2', 'mopi', 'mops', 'morp', 'msel', 'muk2', 'nabg', 'newl', 'nico', 'noa1', 'nor7', 'not1', 'novp', 'npaz', 'nya1', 'nya2', 'nyal', 'obe4', 'olk2', 'ons1', 'onsa', 'orid', 'oriv', 'oros', 'osk6', 'osls', 'ost6', 'oul2', 'ove6', 'pado', 'pasa', 'pat0', 'pdel', 'penc', 'pfa3', 'pins', 'pmth', 'polv', 'pore', 'pots', 'pous', 'poze', 'ppsh', 'prat', 'pryl', 'psto', 'pstv', 'ptbb', 'pulk', 'puyv', 'pyha', 'pza2', 'qaq1', 'rabt', 'raeg', 'rah1', 'ramo', 'rant', 'redu', 'redz', 'reyk', 'riga', 'rio1', 'rivo', 'rom2', 'rove', 'rvne', 'saba', 'sala', 'sart', 'sas2', 'savu', 'sbg2', 'scil', 'scoa', 'scor', 'sfer', 'shoe', 'sjdv', 'ske0', 'ske8', 'smla', 'sneo', 'snik', 'sod3', 'soda', 'sofi', 'sons', 'sprn', 'spt0', 'spt7', 'srjv', 'stas', 'stnb', 'sul5', 'suld', 'sulp', 'sun6', 'sur4', 'sve6', 'svll', 'svtl', 'swas', 'swki', 'tar0', 'teos', 'ter2', 'terc', 'ters', 'teru', 'tit2', 'tll1', 'tlmf', 'tlse', 'tlsg', 'toil', 'tor1', 'tori', 'torn', 'trds', 'treu', 'trf2', 'trmi', 'tro1', 'tubi', 'tubo', 'tuc2', 'tuo2', 'uben', 'ucag', 'ume6', 'unpg', 'untr', 'usal', 'usdl', 'uzhl', 'vaa2', 'vaas', 'vaco', 'vae6', 'vala', 'vale', 'vars', 'ven1', 'vfch', 'vigo', 'vil0', 'vil6', 'vill', 'vir2', 'virg', 'vis0', 'vis6', 'vitr', 'vlis', 'vln1', 'vlns', 'vnrs', 'ware', 'warn', 'wrlg', 'wroc', 'wsrt', 'wtza', 'wtzr', 'wtzs', 'wtzz', 'wuth', 'yebe', 'zada', 'zara', 'zeck', 'zim2', 'zimm', 'zouf', 'zprs', 'zywi', 'zzon']
 _RINEX_SITE_LIST_VLA = ["mdo1", "nist", "pie1", "amc2", "blyt", "abq1", "azah", "azcn", "azco", "azgb", "azkr", "azmo", "azpe", "azsc", "cosa", "cot1", "cot2",  "dsrc",  "echo", "fern", "fred", "fst1", "gdac", "her2", "jtnt", "lvwd", "mexi", "myt1",  "nmgr",  "nmsf",  "nvbr", "nvlm",  "nvtr",  "okgm", "p003", "p009", "p011", "p015", "p026", "p028", "p031", "p034", "p035", "p036", "p037", "p038", "p039", "p040",  "p041",  "p105",  "p107",  "pltc",  "pub1",  "puc1", "sc01",  "srp1",  "sum1", "tcun",  "tmgo",  "txam", "txch", "txel", "txlu", "txod", "txpe", "txsa", "txsn", "wsmn", "zab1", "zab2",  "zdv1",  "apex",  "cdvv",  "glrs", "gmrc", "gnps", "hnps", "hurr",  "iid2",  "imps",  "ivco", "kayo", "mput", "ndap", "p012", "p104", "p106", "p108", "p110", "p112", "p123", "p498", "p499", "p500", "p501", "p502", "p506", "p507", "p508", "p509", "p511", "p611", "p621", "p622", "p623", "p626",  "pdbg",  "rg12",  "sa00", "sa24", "sa27", "sa31",  "sa46",  "sa48",  "sg24",  "sg33",  "spic",  "unr1",  "unr2",  "usmx",  "abq2",  "azbk",  "azcl",  "fst2",  "king", "myt2", "nmro", "nvcs", "nvlk", "pub2", "sum2", "gmpk", "aml5", "elp3", "lubb",  "ods5"]
 
 _RINEX_SITE_LIST_Aus_mwa = ["pert", "mro1", "mtma", "yar3", "exmt", "kalg", "keln", "bura", "cut0", "wlal", "espa", "nors", "alby", "nclf", "hil1", "karr", "ravn", "wagn", "medo", "lona", "hydn", "pthl", "yar2", "yarr", "nnor", "wilu", "bala", "lear", "tomp", "gasc", "yelo", "wara", "yula", "arub", "ucla", "bro1", "hill", "froy"]
@@ -442,8 +443,8 @@ OUTPUTS:  None
         raise No_RINEX_File_Error("Error: data %s is in the missing data list"%(RINEX_filename))
     # Fifth, check for known locations of some files
     if(FTP_site == 0):
-     if(RINEX_filename[0:4].lower() in _RINEX_SITE_LIST_VLA):
-         FTP_site = 0
+#    if(RINEX_filename[0:4].lower() in _RINEX_SITE_LIST_VLA):
+#        FTP_site = 0
      if(RINEX_filename[0:4].lower() in _RINEX_SITE_LIST_Aus_mwa):
          FTP_site = 5
      if(RINEX_filename[0:4].lower() in _RINEX_SITE_LIST_Aus_atca):
@@ -454,6 +455,8 @@ OUTPUTS:  None
          FTP_site = 8
      if(RINEX_filename[0:4].lower() in _RINEX_SITE_LIST_NZ):
          FTP_site = 9
+     if(RINEX_filename[0:4].lower() in _RINEX_SITE_LIST_EUROPE):
+         FTP_site = 4
 #    if(RINEX_filename[0:4].lower() in _RINEX_SITE_LIST_BIGF_0):
 #        FTP_site = 7
     assert(year > 1979)
@@ -488,18 +491,28 @@ OUTPUTS:  None
               if(RINEX_filename[-1] == 'n'):
                  site_str = "ftp://garner.ucsd.edu/pub/nav/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
     elif(FTP_site == 2):
-        # IGS in Germany - doesnt seem to respond these days- we get connection refused messages
-        #site_str = "ftp://igs.bkg.bund.de/IGS/obs/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
-        #if((RINEX_filename[0:4] == 'brdc') and ((RINEX_filename[-1] == 'n') or (RINEX_filename[-1] == 'g'))):
-        #    site_str = "ftp://igs.bkg.bund.de/IGS/BRDC/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
         # EUREF in Italy note: also has RINEX_V3 directory stuff for years >= 2010
+#       site_str = "ftp://geodaf.mt.asi.it/GEOD/GPSD/RINEX_V3/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
         site_str = "ftp://geodaf.mt.asi.it/GEOD/GPSD/RINEX/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
     elif(FTP_site == 3):
-        # IGN France
-        site_str = "ftp://igs.ensg.ign.fr/pub/igs/data/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
+        # IGN France - hum -doesn't seem to have data for 2023
+        if year < 2023:
+          site_str = "ftp://igs.ensg.ign.fr/pub/igs/data/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
     elif(FTP_site == 4):
-        # Belgium has a few stations
-        site_str = "ftp://epncb.oma.be/pub/obs/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename.upper())
+        if year < 2020:
+        # Belgium centre for EUREF data - now migrating to RINEX 3
+          site_str = "ftp://epncb.oma.be/pub/obs/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename.upper())
+        else:   # try rinex 3
+          RX3_flag = True
+          print('converting to RINEX3 file name from RINEX2 name: ', RINEX_filename)
+          output = subprocess.Popen(['RX3name', RINEX_filename],
+                          stdout=subprocess.PIPE).communicate()[0]
+          RINEX3_filename = output.decode('utf-8')[:-2]
+          print('Belgium RINEX3_filename', RINEX3_filename)
+          our_file = output_directory + '/' + RINEX_filename
+          our_Z_file = output_directory + '/' + RINEX3_filename + '.gz'
+          site_str = "ftp://epncb.oma.be/pub/obs/%4.4d/%3.3d/%s.gz"%(year, doy, RINEX3_filename)
+
     elif(FTP_site == 5):
 # !@#$#%$%^^& f*ing Aussies - they stopped reporting rinex2 files 
 # and switched to rinex3 in2020
