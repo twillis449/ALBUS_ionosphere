@@ -74,7 +74,7 @@ def main():
             
 
     HAS_PYCURL = True
-    if HAS_PYCURL:  #  currently the system used for retrieving ftp data
+    if HAS_PYCURL:  #  currently the system used for retrieving most ftp data
       print ('using PyCurl')
       print ('system parameters ', sys.argv)
       HAS_FTPLIB = False
@@ -98,27 +98,6 @@ def main():
       except:
         pass
 
-    if HAS_FTPLIB:
-      in_str = sys.argv[1]
-      # we ignore the initial ftp:// characters
-      divider = in_str[6:].find('/') 
-      ftp_server = in_str[6:6+divider]
-      file_to_get  = in_str[6+divider:]
-      print('file_server is ', ftp_server)
-      print('file to get is ', file_to_get)
-      try:
-        timeout = int(sys.argv[3])
-        ftp = ftplib.FTP(ftp_server, timeout=timeout)
-        ftp.login()
-        localfile = open(sys.argv[2], 'wb')
-        ftp.retrbinary('RETR ' + file_to_get, localfile.write, 1024)
-        ftp.quit()
-        localfile.close()
-      except ftplib.all_errors as msg: 
-        print('An ftplib error occurred:', msg)
-      HAS_PYCURL = False
-      
-   
     sys.exit(0)
 
 if __name__ == '__main__':
