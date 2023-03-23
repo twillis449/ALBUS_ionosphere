@@ -27,6 +27,7 @@
  2015 Apr 28  AGW  --add in additional Australian Geodesy stations
  2018 Jun 12  AGW  --add in further additional Australian Geodesy stations
  2020 Mar 10  AGW  --add in further additional New Zealand stations ~ 234 more stations
+ 2023 Mar     AGW  --add in updates to EUREF and global GNSS network
  Column names are Mark, Name, Latitude, Longitude, Elevation
          10        20        30        40        50        60        70 
 012345678901234567890123456789012345678901234567890123456789012345678901234567
@@ -4495,4 +4496,403 @@
  WRAU  A XXXXXXXXX P          Wairau Valley 173 35 10.2  -41 35 42.0    536.3704 
  WRPA  A XXXXXXXXX P              Wairarapa 175 34 59.6  -41 03 45.2    204.8078 
  YALD  A XXXXXXXXX P              Yaldhurst 172 28 52.1  -43 29 26.8    064.653 
+ ACOR  A ACOR00ESP P         A Coruna   ESP  08 23 56.2   43 21 51.8     67.0 
+ ADAR  A ADAR00GBR P        Aberdaron   GBR  04 44 28.8   52 47 21.2    148.4 
+ AGRN  A AGRN00ITA P        Agrigento   ITA  13 35 47.6   37 18 11.9    244.9 
+ AJAC  A AJAC00FRA P          Ajaccio   FRA  08 45 45.4   41 55 38.8     98.8 
+ ALAC  A ALAC00ESP P         Alicante   ESP  00 28 52.4   38 20 20.1     60.3 
+ ALBA  A ALBA00ESP P         Albacete   ESP  01 51 23.1   38 58 40.5    751.6 
+ ALME  A ALME00ESP P          Almeria   ESP  02 27 34.0   36 51 09.1    127.5 
+ ANK2  A ANK200TUR P           Ankara   TUR  32 46 31.3   39 50 34.1   1294.3 
+ AQUI  A AQUI00ITA P         L'Aquila   ITA  13 21 00.9   42 22 05.7    713.0 
+ ARA2  A ARA200SVN P             Areh   SVN  15 30 31.6   46 29 40.6   1292.1 
+ ARGI  A ARGI00FRO P  Argir, Torshavn   FRO  06 47 00.7   61 59 50.5    110.2 
+ ARIS  A ARIS00GBR P          Arisaig   GBR  05 50 58.0   56 54 34.5     59.2 
+ ARJ6  A ARJ600SWE P         Arjeplog   SWE  18 07 29.9   66 19 04.9    489.7 
+ ASIR  A ASIR00ITA P             Roma   ITA  12 37 04.9   41 51 16.9    130.3 
+ AUBG  A AUBG00DEU P         Augsburg   DEU  10 55 16.7   48 25 16.7    508.6 
+ AUT1  A AUT100GRC P     Thessaloniki   GRC  23 00 13.4   40 34 00.5    150.0 
+ AUTN  A AUTN00FRA P            Autun   FRA  04 17 20.3   46 57 13.8    352.9 
+ AXPV  A AXPV00FRA P  Aix En Provence   FRA  05 19 59.5   43 29 28.4    229.0 
+ BACA  A BACA00ROU P            Bacau   ROU  26 54 44.0   46 33 43.4    219.2 
+ BADH  A BADH00DEU P      Bad Homburg   DEU  08 36 35.5   50 13 40.7    261.3 
+ BAIA  A BAIA00ROU P        Baia Mare   ROU  23 33 27.8   47 39 06.4    270.8 
+ BAUT  A BAUT00DEU P          Bautzen   DEU  14 31 18.2   51 11 32.4    211.8 
+ BBYS  A BBYS00SVK P  Banska Bystrica   SVK  19 09 03.6   48 45 06.5    487.4 
+ BCLN  A BCLN00ESP P Sant Vicenc dels   ESP  02 00 15.0   41 24 19.5     84.7 
+ BELL  A BELL00ESP P Bellmunt de Sega   ESP  01 24 04.1   41 35 58.6    852.5 
+ BIRG  A BIRG00ITA P          Trapani   ITA  12 30 21.5   37 54 23.2     69.6 
+ BISK  A BISK00CZE P       Zlate Hory   CZE  17 25 43.0   50 15 24.2    950.9 
+ BME1  A BME100HUN P         Budapest   HUN  19 03 27.7   47 28 44.5    178.8 
+ BOGE  A BOGE00POL P      Borowa Gora   POL  21 02 05.9   52 28 30.8    142.3 
+ BOGI  A BOGI00POL P      Borowa Gora   POL  21 02 06.8   52 28 30.0    139.9 
+ BOGO  A BOGO00POL P      Borowa Gora   POL  21 02 07.2   52 28 33.4    149.6 
+ BOLG  A BOLG00ITA P          Bologna   ITA  11 21 24.4   44 30 00.8     99.6 
+ BOR1  A BOR100POL P         Borowiec   POL  17 04 24.4   52 16 37.0    124.9 
+ BORJ  A BORJ00DEU P Borkum (Island o   DEU  06 39 59.2   53 34 44.1     53.0 
+ BORR  A BORR00ESP P         Borriana   ESP  00 04 59.6   39 54 18.6     72.9 
+ BPDL  A BPDL00POL P   Biala Podlaska   POL  23 07 38.5   52 02 07.0    196.7 
+ BRMF  A BRMF00FRA P             Bron   FRA  04 56 18.2   45 43 33.8    256.7 
+ BRMG  A BRMG00DEU P       Bremgarten   DEU  07 37 58.4   47 54 27.9    261.6 
+ BRST  A BRST00FRA P            Brest   FRA  04 29 47.8   48 22 49.8     65.5 
+ BRTS  A BRTS00BLR P            Brest   BLR  23 42 48.2   52 05 15.4    197.2 
+ BRUX  A BRUX00BEL P         Brussels   BEL  04 21 30.8   50 47 53.0    158.3 
+ BSCN  A BSCN00FRA P         Besançon   FRA  05 59 21.8   47 14 48.8    358.6 
+ BSVZ  A BSVZ00ITA P        Basovizza   ITA  13 52 30.9   45 38 34.2    444.5 
+ BUCU  A BUCU00ROU P        Bucuresti   ROU  26 07 32.7   44 27 50.2    143.2 
+ BUDD  A BUDD00DNK P       Copenhagen   DNK  12 29 59.8   55 44 19.9     87.9 
+ BUDP  A BUDP00DNK P        Kobenhavn   DNK  12 30 00.1   55 44 20.5     94.0 
+ BUTE  A BUTE00HUN P         Budapest   HUN  19 03 23.5   47 28 51.4    180.9 
+ BYDG  A BYDG00POL P        Bydgoszcz   POL  17 59 37.0   53 08 04.4    104.3 
+ BZR2  A BZR200ITA P    Bolzano Bozen   ITA  11 20 17.6   46 29 44.8    331.2 
+ CACE  A CACE00ESP P          Caceres   ESP  06 20 30.4   39 28 44.0    437.9 
+ CAG1  A CAG100ITA P         Cagliari   ITA  09 06 36.5   39 13 40.9    135.0 
+ CAKO  A CAKO00HRV P          Cakovec   HRV  16 26 20.7   46 23 13.6    222.1 
+ CANT  A CANT00ESP P        Santander   ESP  03 47 53.0   43 28 19.1     99.3 
+ CARG  A CARG00ESP P        Cartagena   ESP  00 58 25.9   37 35 47.8     57.3 
+ CASC  A CASC00PRT P          Cascais   PRT  09 25 06.7   38 41 36.3     77.1 
+ CASE  A CASE00ESP P Cassa de la Selv   ESP  02 54 15.0   41 52 58.4    250.6 
+ CEBR  A CEBR00ESP P         Cebreros   ESP  04 22 04.3   40 27 12.3    775.8 
+ CEU1  A CEU100ESP P            Ceuta   ESP  05 18 23.0   35 53 31.1     52.4 
+ CFRM  A CFRM00CZE P    Frydek Mistek   CZE  18 21 11.5   49 41 05.3    373.6 
+ CHIO  A CHIO00GBR P       Chilbolton   GBR  01 26 17.9   51 08 56.3    130.4 
+ CHIZ  A CHIZ00FRA P            Chize   FRA  00 24 27.7   46 08 00.5    113.2 
+ CLIB  A CLIB00CZE P          Liberec   CZE  15 03 35.6   50 46 18.1    448.4 
+ CNIV  A CNIV00UKR P        Chernihiv   UKR  31 18 49.0   51 31 08.2    175.9 
+ COBA  A COBA00ESP P          Cordoba   ESP  04 43 16.0   37 54 56.3    212.8 
+ COMO  A COMO00ITA P             Como   ITA  09 05 44.2   45 48 07.8    292.3 
+ COST  A COST00ROU P        Constanta   ROU  28 39 27.1   44 09 41.4     46.2 
+ CPAR  A CPAR00CZE P        Pardubice   CZE  15 46 59.7   50 02 22.4    283.3 
+ CRAK  A CRAK00CZE P         Rakovnik   CZE  13 43 45.2   50 06 08.6    381.9 
+ CREU  A CREU00ESP P         Cadaques   ESP  03 18 56.1   42 19 07.8    132.7 
+ CTAB  A CTAB00CZE P            Tabor   CZE  14 40 48.8   49 24 35.3    495.2 
+ DARE  A DARE00GBR P        Daresbury   GBR  02 38 25.8   53 20 41.3     87.7 
+ DELF  A DELF00NLD P            Delft   NLD  04 23 15.3   51 59 10.0     74.4 
+ DENT  A DENT00BEL P        Dentergem   BEL  03 23 58.8   50 56 01.3     63.9 
+ DEVA  A DEVA00ROU P             Deva   ROU  22 54 48.7   45 52 42.3    246.7 
+ DGOR  A DGOR00MNE P        Podgorica   MNE  19 12 12.1   42 25 02.9     95.0 
+ DIEP  A DIEP00DEU P         Diepholz   DEU  08 20 32.0   52 35 17.0     81.7 
+ DILL  A DILL00DEU P        Dillingen   DEU  06 41 58.8   49 22 17.6    227.6 
+ DLF1  A DLF100NLD P            Delft   NLD  04 23 14.9   51 59 09.7     75.8 
+ DNMU  A DNMU00UKR P           Dnipro   UKR  35 03 45.9   48 27 18.4    174.6 
+ DOUR  A DOUR00BEL P          Dourbes   BEL  04 35 41.8   50 05 41.6    282.7 
+ DRAG  A DRAG00ISR P   Metzoki dragot   ISR  35 23 31.5   31 35 35.5     31.8 
+ DUB2  A DUB200HRV P        Dubrovnik   HRV  18 06 37.1   42 39 00.6    457.9 
+ DUTH  A DUTH00GRC P           Xanthi   GRC  24 55 00.5   41 08 24.8    109.2 
+ DVCN  A DVCN00SVK P         Devicany   SVK  18 40 57.9   48 18 25.9    287.0 
+ DYNG  A DYNG00GRC P         DIONYSOS   GRC  23 55 56.8   38 04 42.8    510.6 
+ EBRE  A EBRE00ESP P         Roquetes   ESP  00 29 32.5   40 49 15.2    107.3 
+ EGLT  A EGLT00FRA P         Egletons   FRA  02 03 07.2   45 24 12.1    667.0 
+ EIJS  A EIJS00NLD P          Eijsden   NLD  05 41 01.0   50 45 29.7    103.8 
+ ELBA  A ELBA00ITA P San Piero Campo    ITA  10 12 40.0   42 45 10.5    269.5 
+ ENAO  A ENAO00PRT P Santa Cruz da Gr   PRT  28 01 33.6   39 05 28.3     91.5 
+ ENIS  A ENIS00GBR P      Enniskillen   GBR  07 38 41.5   54 23 43.4    107.3 
+ ENTZ  A ENTZ00FRA P         Entzheim   FRA  07 38 23.6   48 32 57.7    203.1 
+ ENZA  A ENZA00ITA P         Piacenza   ITA  09 44 11.7   44 54 26.3    210.4 
+ ESCO  A ESCO00ESP P        Naut Aran   ESP  00 58 32.4   42 41 36.8   2507.8 
+ EUSK  A EUSK00DEU P       Euskirchen   DEU  06 45 48.7   50 40 26.9    245.3 
+ FFMJ  A FFMJ00DEU P Frankfurt / Main   DEU  08 39 53.9   50 05 26.1    178.3 
+ FINS  A FINS00FIN P         Finstrom   FIN  19 57 04.6   60 13 44.8     53.4 
+ FLRS  A FLRS00PRT P Santa Cruz das F   PRT  31 07 35.0   39 27 13.8     79.9 
+ FOYL  A FOYL00GBR P      Londonderry   GBR  07 20 11.9   54 59 01.5     68.9 
+ FRA2  A FRA200UKR P  Ivano-Frankivsk   UKR  24 42 37.1   48 55 04.6    302.4 
+ FRNE  A FRNE00ITA P        Frosinone   ITA  13 18 03.2   41 38 41.3    249.9 
+ FUNC  A FUNC00PRT P          Funchal   PRT  16 54 27.4   32 38 52.6     78.5 
+ GAIA  A GAIA00PRT P             Gaia   PRT  08 35 20.7   41 06 21.7    287.8 
+ GALH  A GALH00ITA P          Isnello   ITA  14 01 13.2   37 56 22.6    645.2 
+ GANP  A GANP00SVK P Ganovce - Poprad   SVK  20 19 22.6   49 02 05.0    746.0 
+ GARI  A GARI00ITA P  Porto Garibaldi   ITA  12 14 58.0   44 40 36.9     48.2 
+ GDRS  A GDRS00UKR P          Gorodok   UKR  29 26 47.3   50 35 54.3    196.9 
+ GELL  A GELL00DEU P           Gellin   DEU  14 19 18.5   53 27 01.0     80.9 
+ GENO  A GENO00ITA P           Genova   ITA  08 55 16.0   44 25 09.8    153.5 
+ GLSV  A GLSV00UKR P             Kiev   UKR  30 29 48.3   50 21 51.0    226.8 
+ GOET  A GOET00DEU P       Goettingen   DEU  09 57 02.0   51 30 00.8    214.9 
+ GOML  A GOML00BLR P            Gomel   BLR  30 58 00.4   52 25 12.0    174.0 
+ GOP6  A GOP600CZE P         Ondrejov   CZE  14 47 08.2   49 54 49.2    592.6 
+ GOPE  A GOPE00CZE P         Ondrejov   CZE  14 47 08.2   49 54 49.3    592.6 
+ GOR2  A GOR200DEU P         Gorleben   DEU  11 20 58.6   53 02 59.0     61.7 
+ GRAC  A GRAC00FRA P         Caussols   FRA  06 55 14.7   43 45 16.2   1319.8 
+ GRAS  A GRAS00FRA P         Caussols   FRA  06 55 14.1   43 45 17.1   1319.3 
+ GRAZ  A GRAZ00AUT P             Graz   AUT  15 29 36.5   47 04 01.7    538.3 
+ GSR1  A GSR100SVN P        Ljubljana   SVN  14 32 37.4   46 02 53.3    351.7 
+ GUIP  A GUIP00FRA P         Guipavas   FRA  04 24 42.6   48 26 40.6    154.7 
+ GWWL  A GWWL00POL P Gorzow Wielkopol   POL  15 12 18.8   52 44 16.7    127.4 
+ HAS6  A HAS600SWE P       Hassleholm   SWE  13 43 04.8   56 05 31.8    114.4 
+ HEL2  A HEL200DEU P Helgoland Island   DEU  07 52 35.5   54 11 10.7     92.2 
+ HELG  A HELG00DEU P Helgoland Island   DEU  07 53 35.1   54 10 28.1     48.4 
+ HERS  A HERS00GBR P         Hailsham   GBR  00 20 10.3   50 52 02.3     76.5 
+ HERT  A HERT00GBR P         Hailsham   GBR  00 20 03.7   50 52 02.9     83.3 
+ HETT  A HETT00FIN P            Hetta   FIN  23 39 55.1   68 24 24.0    403.7 
+ HOBU  A HOBU00DEU P Hohenbuenstorf,    DEU  10 28 34.7   53 03 02.3    152.2 
+ HOFJ  A HOFJ00DEU P              Hof   DEU  11 52 33.2   50 18 46.5    614.9 
+ HOFN  A HOFN00ISL P            Hoefn   ISL  15 11 52.5   64 16 02.2     82.3 
+ HUEL  A HUEL00ESP P           Huelva   ESP  06 55 13.1   37 11 59.9     81.8 
+ IBIZ  A IBIZ00ESP P            Ibiza   ESP  01 26 56.3   38 54 40.5     59.9 
+ IENG  A IENG00ITA P           Torino   ITA  07 38 21.9   45 00 54.5    316.6 
+ IGEO  A IGEO00MDA P         Chisinau   MDA  28 50 36.7   47 01 49.3    100.8 
+ IGM2  A IGM200ITA P          Firenze   ITA  11 12 50.2   43 47 44.9     94.9 
+ IGMI  A IGMI00ITA P          Firenze   ITA  11 12 49.7   43 47 44.3     95.1 
+ IGNF  A IGNF00FRA P      Saint-Mande   FRA  02 25 27.5   48 50 44.3    123.6 
+ IJMU  A IJMU00NLD P         Ijmuiden   NLD  04 33 21.8   52 27 43.1     54.1 
+ ILDX  A ILDX00FRA P        Ile d'Aix   FRA  01 10 36.5   46 00 34.0     59.7 
+ INVR  A INVR00GBR P        Inverness   GBR  04 13 09.3   57 29 10.5     65.5 
+ IRBE  A IRBE00LVA P           Irbene   LVA  21 51 07.2   57 33 15.9     45.8 
+ ISRN  A ISRN00ITA P          Isernia   ITA  14 15 58.4   41 36 27.7    593.6 
+ ISTA  A ISTA00TUR P         Istanbul   TUR  29 01 09.6   41 06 16.0    147.2 
+ IZAN  A IZAN00ESP P           Guimar   ESP  16 29 58.8   28 18 29.0   2417.4 
+ IZMI  A IZMI00TUR P            izmir   TUR  27 04 54.6   38 23 41.3     74.9 
+ JOE2  A JOE200FIN P          Joensuu   FIN  30 05 46.2   62 23 28.1    113.8 
+ JOEN  A JOEN00FIN P          Joensuu   FIN  30 05 46.2   62 23 28.2    113.4 
+ JON6  A JON600SWE P        Jonkoping   SWE  14 03 34.9   57 44 43.5    260.4 
+ JOZ2  A JOZ200POL P       Jozefoslaw   POL  21 01 56.4   52 05 52.2    152.3 
+ JOZE  A JOZE00POL P       Jozefoslaw   POL  21 01 53.5   52 05 50.2    141.4 
+ KAD6  A KAD600SWE P         Karlstad   SWE  13 30 20.2   59 26 38.6    114.0 
+ KARL  A KARL00DEU P        Karlsruhe   DEU  08 24 40.5   49 00 40.5    182.9 
+ KATO  A KATO00POL P         Katowice   POL  19 02 08.3   50 15 11.8    332.4 
+ KDA2  A KDA200SVN P           Korada   SVN  13 33 39.1   46 03 54.2    858.0 
+ KEV2  A KEV200FIN P          Utsjoki   FIN  27 00 25.7   69 45 21.4    136.4 
+ KHAR  A KHAR00UKR P          Kharkiv   UKR  36 14 20.4   50 00 18.4    201.0 
+ KILP  A KILP00FIN P      Kilpisjarvi   FIN  20 54 50.9   68 56 29.6    539.7 
+ KIR0  A KIR000SWE P           Kiruna   SWE  21 03 36.8   67 52 39.3    498.0 
+ KIR8  A KIR800SWE P           Kiruna   SWE  21 03 36.6   67 52 39.2    498.0 
+ KIRU  A KIRU00SWE P           Kiruna   SWE  20 58 06.4   67 51 26.5    390.9 
+ KIV2  A KIV200FIN P        Aanekoski   FIN  25 42 07.0   62 49 11.7    217.0 
+ KLNK  A KLNK00BLR P     Kalinkovichi   BLR  29 19 53.4   52 07 41.5    163.5 
+ KLOP  A KLOP00DEU P Kloppenheim / Fr   DEU  08 43 47.8   50 13 11.1    222.4 
+ KNJA  A KNJA00SRB P        Knjazevac   SRB  22 15 19.1   43 33 59.5    291.0 
+ KOS1  A KOS100NLD P         Kootwijk   NLD  05 49 05.6   52 10 24.1    104.8 
+ KRA1  A KRA100POL P           Krakow   POL  19 55 13.7   50 03 58.0    267.1 
+ KRAW  A KRAW00POL P           Krakow   POL  19 55 13.7   50 03 58.1    266.6 
+ KRRS  A KRRS00UKR P     Kropyvnytsky   UKR  32 15 46.9   48 31 05.5    162.7 
+ KRS1  A KRS100TUR P             Kars   TUR  43 05 36.4   40 35 18.4   1811.7 
+ KTVL  A KTVL00UKR P Katzively, Great   UKR  33 58 10.1   44 23 34.4     67.4 
+ KUNZ  A KUNZ00CZE P           Kunzak   CZE  15 12 03.4   49 06 26.2    703.3 
+ KURE  A KURE00EST P       Kuressaare   EST  22 30 36.2   58 15 20.3     41.5 
+ KUU2  A KUU200FIN P          Kuusamo   FIN  29 02 00.8   65 54 36.8    379.2 
+ LAGO  A LAGO00PRT P            Lagos   PRT  08 40 06.2   37 05 56.2     62.7 
+ LAMA  A LAMA00POL P          Olsztyn   POL  20 40 11.8   53 53 32.6    186.7 
+ LAMP  A LAMP00ITA P        Lampedusa   ITA  12 36 20.4   35 29 58.2     57.8 
+ LARM  A LARM00GRC P           Larisa   GRC  22 23 16.5   39 36 50.8    151.3 
+ LDB2  A LDB200DEU P       Lindenberg   DEU  14 07 15.3   52 12 32.9    159.5 
+ LEIJ  A LEIJ00DEU P          Leipzig   DEU  12 22 26.8   51 21 14.3    178.4 
+ LEK6  A LEK600SWE P          Leksand   SWE  14 52 37.7   60 43 19.9    477.7 
+ LEON  A LEON00ESP P             Leon   ESP  05 39 03.5   42 35 18.3    970.3 
+ LERI  A LERI00GBR P          Lerwick   GBR  01 11 01.4   60 08 18.0    131.4 
+ LICC  A LICC00GBR P           London   GBR  00 10 29.4   51 29 59.2     88.7 
+ LIDA  A LIDA00BLR P             Lida   BLR  25 18 14.0   53 53 26.3    189.3 
+ LIGN  A LIGN00ITA P           Lignan   ITA  07 28 39.8   45 47 23.8   1721.9 
+ LIL2  A LIL200FRA P            Lille   FRA  03 08 09.4   50 36 48.6     96.5 
+ LINZ  A LINZ00AUT P             Linz   AUT  14 16 59.0   48 18 35.2    335.3 
+ LLIV  A LLIV00ESP P           Llivia   ESP  01 58 23.3   42 28 42.3   1466.9 
+ LODZ  A LODZ00POL P             Lodz   POL  19 27 34.2   51 46 43.4    259.3 
+ LOV6  A LOV600SWE P             Lovo   SWE  17 49 44.1   59 20 16.4     79.5 
+ LPAL  A LPAL00ESP P Roque de los Muc   ESP  17 53 37.8   28 45 50.3   2207.0 
+ LROC  A LROC00FRA P      La Rochelle   FRA  01 13 09.6   46 09 32.2     57.9 
+ M0SE  A M0SE00ITA P             Roma   ITA  12 29 35.7   41 53 35.2    120.6 
+ MAD2  A MAD200ESP P          Robledo   ESP  04 14 58.8   40 25 45.0    829.5 
+ MADR  A MADR00ESP P          Robledo   ESP  04 14 58.8   40 25 45.0    829.5 
+ MALA  A MALA00ESP P           Malaga   ESP  04 23 36.7   36 43 34.0    119.8 
+ MALL  A MALL00ESP P Palma de Mallorc   ESP  02 37 28.4   39 33 09.4     62.0 
+ MAN2  A MAN200FRA P          Le Mans   FRA  00 09 19.0   48 01 07.0    168.0 
+ MAR6  A MAR600SWE P         Maartsbo   SWE  17 15 30.7   60 35 42.5     75.4 
+ MAR7  A MAR700SWE P            Gavle   SWE  17 15 30.4   60 35 42.2     74.3 
+ MARP  A MARP00UKR P         Mariupol   UKR  37 29 52.4   47 05 50.7     96.2 
+ MARS  A MARS00FRA P        Marseille   FRA  05 21 13.6   43 16 43.6     61.7 
+ MAS1  A MAS100ESP P       Maspalomas   ESP  15 37 59.8   27 45 49.5    197.2 
+ MAT1  A MAT100ITA P           MATERA   ITA  16 42 16.4   40 38 56.6    534.5 
+ MATE  A MATE00ITA P           Matera   ITA  16 42 16.0   40 38 56.9    535.6 
+ MATG  A MATG00ITA P           Matera   ITA  16 42 16.8   40 38 56.5    537.0 
+ MDVJ  A MDVJ00RUS P       Mendeleevo   RUS  37 12 52.2   56 01 17.4    257.4 
+ MEDI  A MEDI00ITA P         Medicina   ITA  11 38 48.5   44 31 11.8     50.0 
+ MELI  A MELI00ESP P          Melilla   ESP  02 57 05.9   35 16 52.4     93.5 
+ MERS  A MERS00TUR P          Erdemli   TUR  34 15 21.1   36 33 59.0     38.5 
+ MET3  A MET300FIN P      Kirkkonummi   FIN  24 23 40.2   60 13 02.8     79.2 
+ METG  A METG00FIN P        METSAHOVI   FIN  24 23 03.0   60 14 31.1     59.7 
+ METS  A METS00FIN P      Kirkkonummi   FIN  24 23 43.1   60 13 02.9     94.6 
+ MIK3  A MIK300FIN P          Mikkeli   FIN  27 06 10.2   61 34 26.7    167.3 
+ MIKL  A MIKL00UKR P         Mykolaiv   UKR  31 58 22.2   46 58 22.0     94.7 
+ MKRS  A MKRS00UKR P        Mukachevo   UKR  22 42 33.6   48 22 43.2    188.2 
+ MLHD  A MLHD00IRL P       Malin Head   IRL  07 20 21.1   55 22 20.1     78.6 
+ MLVL  A MLVL00FRA P  Marne-la-Vallee   FRA  02 35 14.3   48 50 27.8    160.7 
+ MNKW  A MNKW00BLR P            Minsk   BLR  27 33 57.3   53 54 58.1    257.4 
+ MNSK  A MNSK00BLR P            Minsk   BLR  27 33 57.2   53 54 58.1    257.1 
+ MOGI  A MOGI00BLR P          Mogilev   BLR  30 19 33.7   53 55 07.1    212.2 
+ MOP2  A MOP200SVK P     Modra-Piesok   SVK  17 16 25.8   48 22 21.7    581.3 
+ MOPI  A MOPI00SVK P     Modra-Piesok   SVK  17 16 25.9   48 22 21.8    578.3 
+ MOPS  A MOPS00ITA P           Modena   ITA  10 56 57.0   44 37 45.7     85.0 
+ MORP  A MORP00GBR P          Morpeth   GBR  01 41 07.8   55 12 46.0    144.5 
+ MSEL  A MSEL00ITA P         Medicina   ITA  11 38 47.4   44 31 12.1     49.3 
+ MUK2  A MUK200UKR P        Mukachevo   UKR  22 43 20.6   48 26 44.9    170.4 
+ NABG  A NABG00NOR P       Ny-Alesund   NOR  11 51 26.3   78 56 35.1     42.9 
+ NEWL  A NEWL00GBR P           Newlyn   GBR  05 32 34.0   50 06 10.9     64.5 
+ NICO  A NICO00CYP P          Nicosia   CYP  33 23 47.2   35 08 27.5    191.7 
+ NOA1  A NOA100GRC P           Athens   GRC  23 51 50.5   38 02 49.4    537.8 
+ NOR7  A NOR700SWE P       Norrkoping   SWE  16 14 46.9   58 35 24.5     40.5 
+ NOT1  A NOT100ITA P             Noto   ITA  14 59 23.3   36 52 34.0    126.2 
+ NOVP  A NOVP00BLR P      Novopolotsk   BLR  28 38 44.7   55 32 04.3    169.1 
+ NPAZ  A NPAZ00SRB P       Novi Pazar   SRB  20 31 09.4   43 08 22.7    549.5 
+ NYA1  A NYA100NOR P       Ny-Alesund   NOR  11 51 55.1   78 55 46.4     83.7 
+ NYA2  A NYA200NOR P       Ny Alesund   NOR  11 51 31.1   78 55 49.2     81.5 
+ NYAL  A NYAL00NOR P       Ny-Alesund   NOR  11 51 54.3   78 55 46.5     79.0 
+ OBE4  A OBE400DEU P Oberpfaffenhofen   DEU  11 16 40.3   48 05 05.3    650.6 
+ OLK2  A OLK200FIN P            Rauma   FIN  21 30 20.9   61 11 27.7     39.4 
+ ONS1  A ONS100SWE P           Onsala   SWE  11 55 28.3   57 23 43.2     44.4 
+ ONSA  A ONSA00SWE P           Onsala   SWE  11 55 31.8   57 23 43.1     45.5 
+ ORID  A ORID00MKD P            Ohrid   MKD  20 47 38.6   41 07 38.3    773.0 
+ ORIV  A ORIV00FIN P          Orivesi   FIN  24 12 42.3   61 36 58.6    155.9 
+ OROS  A OROS00HUN P         Oroshaza   HUN  20 40 15.5   46 33 18.0    134.3 
+ OSK6  A OSK600SWE P       Oskarshamn   SWE  15 59 48.7   57 03 56.4    150.2 
+ OSLS  A OSLS00NOR P             Oslo   NOR  10 22 03.9   59 44 11.7    221.5 
+ OST6  A OST600SWE P        Ostersund   SWE  14 51 28.7   63 26 33.9    489.8 
+ OUL2  A OUL200FIN P             Oulu   FIN  25 53 33.2   65 05 11.0     82.6 
+ OVE6  A OVE600SWE P        Overkalix   SWE  22 46 24.4   66 19 04.2    222.8 
+ PADO  A PADO00ITA P           Padova   ITA  11 53 45.8   45 24 40.1     64.7 
+ PASA  A PASA00ESP P           Pasaia   ESP  01 55 53.5   43 19 18.3     67.3 
+ PAT0  A PAT000GRC P           Patras   GRC  21 47 12.3   38 17 01.2    121.0 
+ PDEL  A PDEL00PRT P    Ponta Delgada   PRT  25 39 46.0   37 44 51.9    110.8 
+ PENC  A PENC00HUN P             Penc   HUN  19 16 53.5   47 47 22.6    291.7 
+ PFA3  A PFA300AUT P          Bregenz   AUT  09 47 04.8   47 30 55.1   1090.3 
+ PINS  A PINS00BLR P            Pinsk   BLR  26 05 36.1   52 06 38.3    180.2 
+ PMTH  A PMTH00GBR P         Plymouth   GBR  04 07 34.3   50 24 59.3    175.1 
+ POLV  A POLV00UKR P          Poltava   UKR  34 32 34.5   49 36 09.4    178.1 
+ PORE  A PORE00HRV P            Porec   HRV  13 35 42.1   45 13 33.6     66.2 
+ POTS  A POTS00DEU P          Potsdam   DEU  13 03 57.9   52 22 45.5    144.4 
+ POUS  A POUS00CZE P          Poustka   CZE  12 17 52.3   50 08 18.4    572.2 
+ POZE  A POZE00HRV P           Pozega   HRV  17 40 31.7   45 19 58.1    212.5 
+ PPSH  A PPSH00NOR P Polish Polar Sta   NOR  15 32 18.1   77 00 08.9     52.3 
+ PRAT  A PRAT00ITA P            Prato   ITA  11 05 56.8   43 53 08.0    120.0 
+ PRYL  A PRYL00UKR P          Pryluky   UKR  32 24 01.6   50 35 31.8    172.5 
+ PSTO  A PSTO00PRT P      Porto Santo   PRT  16 20 06.7   33 03 35.3     75.1 
+ PSTV  A PSTV00BLR P          Postavy   BLR  26 50 20.6   55 06 45.6    176.8 
+ PTBB  A PTBB00DEU P     Braunschweig   DEU  10 27 35.1   52 17 46.3    130.2 
+ PULK  A PULK00RUS P    ST.PETERSBURG   RUS  30 19 40.0   59 46 18.6    101.2 
+ PUYV  A PUYV00FRA P  Le Puy en Velay   FRA  03 52 43.9   45 02 37.0    710.0 
+ PYHA  A PYHA00FIN P         Pyhajoki   FIN  24 14 15.5   64 29 51.3     26.3 
+ PZA2  A PZA200SVN P         Prilozje   SVN  15 15 38.4   45 35 26.7    212.7 
+ QAQ1  A QAQ100GRL P Qaqortoq / Julia   GRL  46 02 51.9   60 42 54.9    110.4 
+ RABT  A RABT00MAR P            Rabat   MAR  06 51 15.4   33 59 53.2     90.1 
+ RAEG  A RAEG00PRT P    Vila do Porto   PRT  25 07 35.0   36 59 08.5    297.9 
+ RAH1  A RAH100UKR P           Rakhiv   UKR  24 12 19.1   48 03 17.3    494.7 
+ RAMO  A RAMO00ISR P     Mitzpe Ramon   ISR  34 45 47.3   30 35 51.9    893.1 
+ RANT  A RANT00DEU P Rantum / Island    DEU  08 17 26.7   54 48 38.0     47.1 
+ REDU  A REDU00BEL P             Redu   BEL  05 08 41.6   50 00 05.4    369.9 
+ REDZ  A REDZ00POL P        Redzikowo   POL  17 07 03.1   54 28 20.6    108.4 
+ REYK  A REYK00ISL P        Reykjavik   ISL  21 57 19.7   64 08 19.6     93.1 
+ RIGA  A RIGA00LVA P             Riga   LVA  24 03 31.6   56 56 55.0     34.7 
+ RIO1  A RIO100ESP P          Logrono   ESP  02 25 33.9   42 27 51.3    450.4 
+ RIVO  A RIVO00ITA P Rivolto (Codroip   ITA  13 02 53.7   45 58 55.6    116.2 
+ ROM2  A ROM200FIN P            Kuhmo   FIN  29 55 54.5   64 13 02.5    243.0 
+ ROVE  A ROVE00ITA P         Rovereto   ITA  11 02 31.6   45 53 36.6    261.7 
+ RVNE  A RVNE00UKR P            Rivne   UKR  26 15 41.9   50 36 18.2    260.9 
+ SABA  A SABA00SRB P            Sabac   SRB  19 41 48.0   44 45 34.4    140.9 
+ SALA  A SALA00ESP P        Salamanca   ESP  05 29 45.1   40 56 42.3    855.4 
+ SART  A SART00ITA P Pranusanguni San   ITA  09 14 43.5   39 29 24.4    665.3 
+ SAS2  A SAS200DEU P Sassnitz Island    DEU  13 38 35.1   54 30 39.5     39.2 
+ SAVU  A SAVU00FIN P        Savukoski   FIN  28 57 21.0   67 57 39.0    265.2 
+ SBG2  A SBG200AUT P         Salzburg   AUT  13 06 37.5   47 48 12.3   1323.0 
+ SCIL  A SCIL00GBR P        Hugh Town   GBR  06 17 44.9   49 54 52.4     83.8 
+ SCOA  A SCOA00FRA P          Ciboure   FRA  01 40 54.1   43 23 42.8     60.2 
+ SCOR  A SCOR00GRL P Scoresbysund/Itt   GRL  21 57 01.2   70 29 07.2    128.5 
+ SFER  A SFER00ESP P     San Fernando   ESP  06 12 20.3   36 27 51.6     84.1 
+ SHOE  A SHOE00GBR P     Shoeburyness   GBR  00 49 37.3   51 33 17.2     49.0 
+ SJDV  A SJDV00FRA P Saint Jean des V   FRA  04 40 35.7   45 52 44.7    432.4 
+ SKE0  A SKE000SWE P      Skellefteaa   SWE  21 02 53.8   64 52 45.1     81.2 
+ SKE8  A SKE800SWE P      Skellefteaa   SWE  21 02 53.3   64 52 45.1     81.2 
+ SMLA  A SMLA00UKR P            Smila   UKR  31 51 58.7   49 12 05.9    183.1 
+ SNEO  A SNEO00GBR P         St Neots   GBR  00 06 45.0   52 11 07.3    119.3 
+ SNIK  A SNIK00ITA P             BARI   ITA  16 52 42.0   41 06 29.0     77.5 
+ SOD3  A SOD300FIN P        Sodankyla   FIN  26 23 21.4   67 25 14.8    300.8 
+ SODA  A SODA00FIN P        Sodankyla   FIN  26 23 20.6   67 25 15.1    299.7 
+ SOFI  A SOFI00BGR P            Sofia   BGR  23 23 41.0   42 33 21.9   1119.6 
+ SONS  A SONS00ESP P          Sonseca   ESP  03 57 50.3   39 40 31.3    808.9 
+ SPRN  A SPRN00HUN P           Sopron   HUN  16 34 59.0   47 41 01.1    279.0 
+ SPT0  A SPT000SWE P            Boras   SWE  12 53 28.8   57 42 53.8    219.9 
+ SPT7  A SPT700SWE P            Borås   SWE  12 53 29.2   57 42 53.7    221.1 
+ SRJV  A SRJV00BIH P         Sarajevo   BIH  18 24 50.1   43 52 04.3    645.1 
+ STAS  A STAS00NOR P        Stavanger   NOR  05 35 55.0   59 01 03.8    104.9 
+ STNB  A STNB00PRT P          Santana   PRT  16 53 12.7   32 48 36.6    458.5 
+ SUL5  A SUL500DNK P          Suldrup   DNK  09 44 31.7   56 50 30.0    119.8 
+ SULD  A SULD00DNK P          Suldrup   DNK  09 44 31.7   56 50 30.3    120.7 
+ SULP  A SULP00UKR P             Lviv   UKR  24 00 52.2   49 50 08.1    370.5 
+ SUN6  A SUN600SWE P        Sundsvall   SWE  17 39 35.2   62 13 56.9     32.3 
+ SUR4  A SUR400EST P          Suurupi   EST  24 22 48.9   59 27 48.9     84.4 
+ SVE6  A SVE600SWE P             Sveg   SWE  14 42 00.3   62 01 02.5    491.0 
+ SVLL  A SVLL00ITA P          Savelli   ITA  16 45 04.4   39 18 51.5   1209.3 
+ SVTL  A SVTL00RUS P          Svetloe   RUS  29 46 51.1   60 31 58.3     76.8 
+ SWAS  A SWAS00GBR P          Swansea   GBR  03 58 54.3   51 33 55.9     91.9 
+ SWKI  A SWKI00POL P          Suwalki   POL  22 55 41.6   54 05 55.0    215.8 
+ TAR0  A TAR000ESP P           Tarifa   ESP  05 36 09.7   36 00 30.8     50.1 
+ TEOS  A TEOS00ITA P           Teramo   ITA  13 43 50.1   42 39 13.5    441.9 
+ TER2  A TER200UKR P         Ternopil   UKR  25 36 36.6   49 33 52.4    393.7 
+ TERC  A TERC00PRT P Angra do Heroism   PRT  27 09 10.8   38 43 08.4    406.9 
+ TERS  A TERS00NLD P West-Terschellin   NLD  05 13 09.8   53 21 45.8     56.1 
+ TERU  A TERU00ESP P           Teruel   ESP  01 07 27.5   40 21 01.8    956.2 
+ TIT2  A TIT200DEU P             Titz   DEU  06 25 53.7   51 02 06.8    156.1 
+ TLL1  A TLL100IRL P           Dublin   IRL  06 21 48.6   53 17 29.2    163.2 
+ TLMF  A TLMF00FRA P         Toulouse   FRA  01 22 30.3   43 34 28.6    220.9 
+ TLSE  A TLSE00FRA P         Toulouse   FRA  01 28 51.2   43 33 38.5    207.2 
+ TLSG  A TLSG00FRA P         Toulouse   FRA  01 29 06.1   43 32 59.0    208.8 
+ TOIL  A TOIL00EST P            Toila   EST  27 32 11.9   59 25 19.3     76.7 
+ TOR1  A TOR100ESP P TORREJON DE ARDO   ESP  03 27 08.7   40 28 21.7    661.0 
+ TORI  A TORI00ITA P           Torino   ITA  07 39 40.6   45 03 48.1    310.7 
+ TORN  A TORN00FIN P           Tornio   FIN  24 19 55.2   66 04 39.4     70.7 
+ TRDS  A TRDS00NOR P        Trondheim   NOR  10 19 09.0   63 22 17.0    317.7 
+ TREU  A TREU00ITA P           Trento   ITA  11 08 41.3   46 04 01.9    401.4 
+ TRF2  A TRF200AUT P          Pernitz   AUT  15 51 32.0   47 55 40.7   1092.2 
+ TRMI  A TRMI00ITA P          Termoli   ITA  14 59 17.8   42 00 16.5     87.9 
+ TRO1  A TRO100NOR P          Tromsoe   NOR  18 56 22.7   69 39 45.8    138.0 
+ TUBI  A TUBI00TUR P            Gebze   TUR  29 27 02.4   40 47 12.2    221.8 
+ TUBO  A TUBO00CZE P             Brno   CZE  16 35 34.2   49 12 21.2    324.4 
+ TUC2  A TUC200GRC P           Chania   GRC  24 04 14.0   35 31 59.5    161.0 
+ TUO2  A TUO200FIN P          Kaarina   FIN  22 26 35.9   60 24 57.1     59.4 
+ UBEN  A UBEN00ITA P        Benevento   ITA  14 46 38.7   41 07 50.3    225.3 
+ UCAG  A UCAG00ITA P         Cagliari   ITA  09 06 36.5   39 13 40.9    132.5 
+ UME6  A UME600SWE P             Umea   SWE  19 30 34.2   63 34 41.3     55.1 
+ UNPG  A UNPG00ITA P          Perugia   ITA  12 21 20.5   43 07 09.8    351.2 
+ UNTR  A UNTR00ITA P            Terni   ITA  12 40 25.6   42 33 31.2    219.3 
+ USAL  A USAL00ITA P            Lecce   ITA  18 06 41.3   40 20 05.7     66.6 
+ USDL  A USDL00POL P   Ustrzyki Dolne   POL  22 35 08.8   49 25 58.5    529.9 
+ UZHL  A UZHL00UKR P         Uzhgorod   UKR  22 17 51.4   48 37 55.1    232.0 
+ VAA2  A VAA200FIN P            Vaasa   FIN  21 46 14.0   62 57 40.2     58.4 
+ VAAS  A VAAS00FIN P            Vaasa   FIN  21 46 14.3   62 57 40.3     58.5 
+ VACO  A VACO00CZE P            Vacov   CZE  13 43 27.0   49 08 01.6    799.4 
+ VAE6  A VAE600SWE P       Vanersborg   SWE  12 02 06.3   58 41 35.4    169.8 
+ VALA  A VALA00ESP P       Valladolid   ESP  04 42 30.0   41 42 09.0    765.9 
+ VALE  A VALE00ESP P         Valencia   ESP  00 20 15.5   39 28 51.0     77.6 
+ VARS  A VARS00NOR P           Vardoe   NOR  31 01 52.3   70 20 10.9    174.8 
+ VEN1  A VEN100ITA P          Venezia   ITA  12 21 14.7   45 25 50.1     58.9 
+ VFCH  A VFCH00FRA P Villefranche-sur   FRA  01 43 10.8   47 17 39.1    154.6 
+ VIGO  A VIGO00ESP P             Vigo   ESP  08 48 47.1   42 11 02.3     87.8 
+ VIL0  A VIL000SWE P       Vilhelmina   SWE  16 33 35.7   64 41 52.2    449.9 
+ VIL6  A VIL600SWE P       Vilhelmina   SWE  16 33 35.7   64 41 52.1    450.4 
+ VILL  A VILL00ESP P      Villafranca   ESP  03 57 07.1   40 26 36.9    647.4 
+ VIR2  A VIR200FIN P        Virolahti   FIN  27 33 17.8   60 32 19.6     37.0 
+ VIRG  A VIRG00ITA P          Cascina   ITA  10 30 04.8   43 37 51.0     71.9 
+ VIS0  A VIS000SWE P            Visby   SWE  18 22 02.3   57 39 13.9     79.8 
+ VIS6  A VIS600SWE P            Visby   SWE  18 22 02.5   57 39 14.0     79.4 
+ VITR  A VITR00BLR P          Vitebsk   BLR  30 13 03.0   55 11 15.4    203.5 
+ VLIS  A VLIS00NLD P       Vlissingen   NLD  03 35 50.4   51 26 34.4     54.4 
+ VLN1  A VLN100IRL P         Valentia   IRL  10 14 30.1   51 56 22.5     76.8 
+ VLNS  A VLNS00LTU P          Vilnius   LTU  25 17 55.2   54 39 11.3    240.8 
+ VNRS  A VNRS00UKR P        Vinnytsia   UKR  28 25 38.3   49 13 10.8    318.9 
+ WARE  A WARE00BEL P          Waremme   BEL  05 14 43.1   50 41 23.5    187.9 
+ WARN  A WARN00DEU P Rostock-Warnemue   DEU  12 06 05.1   54 10 11.2     50.7 
+ WRLG  A WRLG00DEU P    Bad Koetzting   DEU  12 52 32.5   49 08 41.9    660.4 
+ WROC  A WROC00POL P          Wroclaw   POL  17 03 43.3   51 06 47.7    180.3 
+ WSRT  A WSRT00NLD P       Westerbork   NLD  06 36 16.2   52 54 52.6     86.0 
+ WTZA  A WTZA00DEU P    Bad Koetzting   DEU  12 52 44.0   49 08 39.2    665.9 
+ WTZR  A WTZR00DEU P    Bad Koetzting   DEU  12 52 44.1   49 08 39.1    666.0 
+ WTZS  A WTZS00DEU P    Bad Koetzting   DEU  12 52 43.1   49 08 41.2    663.4 
+ WTZZ  A WTZZ00DEU P    Bad Koetzting   DEU  12 52 44.1   49 08 39.2    665.9 
+ WUTH  A WUTH00NOR P Polish Polar Sta   NOR  15 32 19.0   77 00 09.0     52.2 
+ YEBE  A YEBE00ESP P            Yebes   ESP  03 05 19.1   40 31 29.6    972.8 
+ ZADA  A ZADA00HRV P            Zadar   HRV  15 13 39.3   44 06 47.4     64.3 
+ ZARA  A ZARA00ESP P         Zaragoza   ESP  00 52 55.8   41 38 00.2    296.1 
+ ZECK  A ZECK00RUS P   Zelenchukskaya   RUS  41 33 54.2   43 47 18.2   1167.0 
+ ZIM2  A ZIM200CHE P       Zimmerwald   CHE  07 27 54.1   46 52 37.5    956.5 
+ ZIMM  A ZIMM00CHE P       Zimmerwald   CHE  07 27 55.0   46 52 37.5    956.4 
+ ZOUF  A ZOUF00ITA P       Cercivento   ITA  12 58 24.8   46 33 26.0   1946.5 
+ ZPRS  A ZPRS00UKR P     Zaporizhzhia   UKR  35 09 41.3   47 49 43.4     93.6 
+ ZYWI  A ZYWI00POL P           Zywiec   POL  19 12 21.4   49 41 12.1    412.8 
+ ZZON  A ZZON00HUN P     Zalaegerszeg   HUN  16 49 55.3   46 53 29.2    253.0 
 -SITE/ID
