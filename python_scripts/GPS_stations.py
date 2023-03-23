@@ -28,16 +28,6 @@ import string
 
 
 
-
-
-
-
-
-
-
-
-
-
 ################################################################################
 # Global variables
 SECONDS_PER_DAY = 24.0*60.0*60.0
@@ -53,10 +43,6 @@ IONOSPHERE_KB = 2.79924925E10   # s^{-1} T^{-1}
 
 
 
-
-
-
-
 ################################################################################
 # need to keep a list of GPS stations
 GPS_stations = {}
@@ -65,17 +51,8 @@ GPS_stations = {}
 GPS_observation_missing = {}
 ################################################################################
 # need to keep a list of global GPS stations which are used for frame reference
-# first try reading data from IGS08stns list
-try:
- filename = os.environ['HOME'] + "/albus/libdata/JMA/IGS08stns"
- text = open(filename, 'r').readlines()
- GPS_global_station_list = text[0].strip().split()
- print('got GPS_global_station_list from', filename)
-except:
-  GPS_global_station_list = ['algo', 'alic', 'alrt', 'amc2', 'artu', 'asc1', 'aspa', 'bahr', 'bili', 'bjfs', 'bor1', 'braz', 'brus', 'cagl', 'cas1', 'cedu', 'chat', 'chpi', 'chur', 'coco', 'conz', 'cord', 'cro1', 'daej', 'darw', 'dav1', 'dgar', 'dubo', 'flin', 'glps', 'glsv', 'gode', 'gold', 'gras', 'guam', 'guao', 'harb', 'hlfx', 'hnlc', 'hob2', 'hofn', 'holm', 'hrao', 'hyde', 'iisc', 'irkt', 'ispa', 'jab1', 'joze', 'karr', 'kely', 'kerg', 'kit3', 'kokb', 'kunm', 'lae1', 'lhaz', 'lpgs', 'mac1', 'madr', 'mali', 'mana', 'mas1', 'mate', 'maw1', 'mbar', 'mcm4', 'mdo1', 'mdvj', 'mets', 'nico', 'nklg', 'nlib', 'not1', 'noum', 'novj', 'nrc1', 'nril', 'nya1', 'nyal', 'ohi2', 'ohi3', 'onsa', 'pdel', 'pert', 'petp', 'pie1', 'pimo', 'pol2', 'polv', 'pots', 'qaq1', 'quin', 'rabt', 'ramo', 'reun', 'reyk', 'riog', 'sant', 'sch2', 'scub', 'sey1', 'sfer', 'stjo', 'suth', 'syog', 'thti', 'thu3', 'tidb', 'tixi', 'tow2', 'trab', 'tro1', 'trom', 'tskb', 'ulab', 'unsa', 'usno', 'vesl', 'vill', 'wes2', 'whit', 'will', 'wsrt', 'wtzr', 'wuhn', 'yar1', 'yell', 'zimm', 'drao']
 
-
-
+GPS_global_station_list = ['abmf', 'abpo', 'ac23', 'ac24', 'acrg', 'acso', 'adis', 'aggo', 'aira', 'ajac', 'albh', 'algo', 'alic', 'alrt', 'amc4', 'ank2', 'anmg', 'antc', 'antf', 'areg', 'areq', 'arht', 'artu', 'aruc', 'ascg', 'aspa', 'atru', 'auck', 'badg', 'baie', 'bake', 'bako', 'bamf', 'barh', 'baut', 'bele', 'bhr3', 'bhr4', 'bik0', 'bill', 'bjco', 'bjfs', 'bjnm', 'blyt', 'bnoa', 'boav', 'bogi', 'bogt', 'bor1', 'braz', 'brew', 'brft', 'brmg', 'brst', 'brun', 'brux', 'bshm', 'btng', 'bucu', 'bzr2', 'cags', 'cas1', 'ccj2', 'cebr', 'cedu', 'cggn', 'chan', 'chil', 'chof', 'chpg', 'chpi', 'chti', 'chum', 'chur', 'chwk', 'cibg', 'cit1', 'ckis', 'cksv', 'cmp9', 'cmum', 'cnmr', 'coco', 'cord', 'coso', 'cote', 'coyq', 'cpnm', 'cpvg', 'crfp', 'cro1', 'cuib', 'cusv', 'cut0', 'cuut', 'cyne', 'cztg', 'dae2', 'daej', 'dakr', 'darw', 'dav1', 'dear', 'dgar', 'dhlg', 'djig', 'dlf1', 'dltv', 'drag', 'drao', 'dubo', 'dumg', 'dund', 'dyng', 'ebre', 'eil3', 'eil4', 'enao', 'eprt', 'escu', 'faa1', 'fair', 'falk', 'ffmj', 'flin', 'flrs', 'frdn', 'ftna', 'func', 'gamb', 'gamg', 'ganp', 'gcgo', 'geno', 'glps', 'glsv', 'gode', 'godn', 'gods', 'godz', 'gol2', 'gold', 'gop6', 'gop7', 'gope', 'grac', 'gras', 'graz', 'guam', 'guat', 'guug', 'hal1', 'hamd', 'harb', 'hers', 'hert', 'hksl', 'hkws', 'hlfx', 'hnlc', 'hnpt', 'hnus', 'hob2', 'hofn', 'holb', 'holm', 'holp', 'hrag', 'hrao', 'hueg', 'hyde', 'ieng', 'iisc', 'iitk', 'ineg', 'invk', 'iqal', 'iqqe', 'irkj', 'irkm', 'isba', 'ishi', 'ispa', 'ista', 'izmi', 'jctw', 'jdpr', 'jfng', 'jnav', 'jog2', 'joz2', 'joze', 'jplm', 'jpre', 'karr', 'kat1', 'kerg', 'khar', 'kir0', 'kir8', 'kiri', 'kiru', 'kit3', 'kitg', 'kmnm', 'kokb', 'kokv', 'kos1', 'kost', 'kouc', 'koug', 'kour', 'krgg', 'krs1', 'ksu1', 'kuj2', 'kzn2', 'lae1', 'lama', 'laut', 'lbch', 'lck3', 'lck4', 'leij', 'lhaz', 'licc', 'llag', 'lmmf', 'lpal', 'lpgs', 'lroc', 'm0se', 'mac1', 'mad2', 'madr', 'mag0', 'maju', 'mal2', 'mana', 'mar6', 'mar7', 'mars', 'mas1', 'mat1', 'mate', 'matg', 'maui', 'maw1', 'mayg', 'mbar', 'mchl', 'mcil', 'mcm4', 'mdo1', 'mdvj', 'medi', 'meli', 'mers', 'met3', 'metg', 'mets', 'mfkg', 'mgue', 'mikl', 'mizu', 'mkea', 'mobj', 'mobk', 'mobn', 'mobs', 'moiu', 'monp', 'morp', 'mqzg', 'mrc1', 'mrl1', 'mrl2', 'mro1', 'mssa', 'mtka', 'mtv1', 'mtv2', 'nabg', 'nain', 'nano', 'naur', 'naus', 'ncku', 'nico', 'nist', 'nium', 'nklg', 'nlib', 'nnor', 'not1', 'novm', 'nrc1', 'nril', 'nrmd', 'ntus', 'nvsk', 'nya1', 'nya2', 'nyal', 'oak1', 'oak2', 'obe4', 'ohi2', 'ohi3', 'ons1', 'onsa', 'op71', 'opmt', 'orid', 'osn3', 'osn4', 'ous2', 'owmg', 'p043', 'p051', 'p053', 'p389', 'p779', 'p802', 'pado', 'palm', 'parc', 'park', 'pbr4', 'pdel', 'penc', 'pert', 'pets', 'pgen', 'picl', 'pie1', 'pimo', 'pin1', 'pngm', 'poal', 'pohn', 'pol2', 'polv', 'pots', 'pove', 'pppc', 'prds', 'pre3', 'pre4', 'ptag', 'ptbb', 'ptgg', 'ptvl', 'qaq1', 'qiki', 'qui3', 'qui4', 'quin', 'rabt', 'raeg', 'ramo', 'rbay', 'rdsd', 'redu', 'reso', 'reun', 'reyk', 'rgdg', 'riga', 'rio2', 'riop', 'roag', 'rock', 'roth', 'salu', 'samo', 'sant', 'sask', 'savo', 'sbok', 'sch2', 'scip', 'scor', 'scrz', 'sctb', 'scub', 'sejn', 'seme', 'sey2', 'seyg', 'sfdm', 'sfer', 'sgoc', 'sgpo', 'shao', 'she2', 'shlg', 'sin1', 'smst', 'sni1', 'sod3', 'sofi', 'solo', 'spk1', 'spt0', 'sptu', 'ssia', 'stfu', 'sthl', 'stj3', 'stjo', 'stk2', 'stpm', 'str1', 'str2', 'sulp', 'suth', 'sutm', 'suwn', 'svtl', 'sydn', 'syog', 'tabl', 'tana', 'tash', 'tcms', 'tdou', 'tehn', 'thtg', 'thti', 'thu2', 'tid1', 'tidb', 'tit2', 'tixi', 'tlse', 'tlsg', 'tnml', 'tong', 'topl', 'torp', 'tow2', 'trak', 'tro1', 'tsk2', 'tskb', 'tubi', 'tuva', 'twtf', 'ucal', 'uclp', 'uclu', 'ufpr', 'ulab', 'uldi', 'unb3', 'unbd', 'unbj', 'unbn', 'unsa', 'ural', 'urum', 'uscl', 'usn7', 'usn8', 'usn9', 'usp1', 'usud', 'utqi', 'uzhl', 'vacs', 'vald', 'vill', 'vis0', 'vndp', 'voim', 'wab2', 'wark', 'warn', 'wdc5', 'wdc6', 'wes2', 'wgtn', 'whc1', 'whit', 'widc', 'will', 'wind', 'wlsn', 'wroc', 'wsrt', 'wtz3', 'wtza', 'wtzr', 'wtzs', 'wtzz', 'wuh2', 'wuhn', 'wuth', 'xmis', 'yakt', 'yar2', 'yar3', 'yarr', 'yebe', 'yel2', 'yell', 'yibl', 'ykro', 'yons', 'yssk', 'zamb', 'zeck', 'zim2', 'zim3', 'zimm']
 
 
 # Now, I need to keep some coordinate conversion things
