@@ -37,8 +37,7 @@ PROG = \
 
 
 DATA = \
-	gps_pos_default.snx\
-	IGS08stns
+	gps_pos_default.snx
 
 all: 
 .PHONY: all
