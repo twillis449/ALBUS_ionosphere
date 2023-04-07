@@ -215,12 +215,14 @@ GPS         O  The filled dictionary
     # dunnon what encoding was used on this file but it is not UTF 8.
     # strip whatever is not ASCII further down
     fp = open(filename, "rb") 
-    wide = True
     counter = 0
     try:
         site_id_found = 0
         for line in fp:
             line = ''.join(map(chr, map(lambda x: x if x < 127 else ord(' '), line)))
+            print('GPS Stations line is ', line)
+            if line[0:1] == '#':   # a comment
+              continue
             if(site_id_found == 0):
                 if(line[0:8] == "+SITE/ID"):
                     site_id_found = 1
@@ -231,14 +233,9 @@ GPS         O  The filled dictionary
                     return GPS
                 else:
                   name = line[1:5].lower()
-                  if wide:
-                    longitude = Albus_Coordinates.deg_str_to_rad(line[44:56])
-                    latitude  = Albus_Coordinates.deg_str_to_rad(line[57:69])
-                    height    = float(line[70:78])
-                  else:
-                    longitude = Albus_Coordinates.deg_str_to_rad(line[44:55])
-                    latitude  = Albus_Coordinates.deg_str_to_rad(line[56:67])
-                    height    = float(line[67:75])
+                  longitude = Albus_Coordinates.deg_str_to_rad(line[44:56])
+                  latitude  = Albus_Coordinates.deg_str_to_rad(line[57:69])
+                  height    = float(line[70:78])
                 x,y,z = cartesian_coord(longitude, latitude, height, WGS84)
 #               print('** name, long, lat, ht ', name,longitude, latitude, height)
                 GPS[name] = [x,y,z]
