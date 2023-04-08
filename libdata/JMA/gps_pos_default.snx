@@ -36,6 +36,9 @@
  IGS International GNSS Service
 -INPUT/ACKNOWLEDGMENTS
 +SITE/ID
+#
+# old GNSS stations
+#
  ABMF  A 97103M001 P Guadeloupe (971), Guad 298 28 20.9   16 15 44.3    -25.6
  ABNY  A AUM000492 P          WA, Australia 117 53 11.6  -35  1 37.8    -12.8
  ADIS  A 31502M001 P  Addis Ababa, Ethiopia  38 45 58.7    9  2  6.5   2439.1
@@ -1174,6 +1177,9 @@
  zimj  A 14001M006 P Zimmerwald, Switzerlan   7 27 54.4   46 52 37.7    954.3  
  zimm  A 14001M004 P Zimmerwald, Switzerlan   7 27 55.1   46 52 37.6    956.7  
  zwe2  A 12330M003 P Zwenigorod, Russia      36 45 36.0   55 42  0.0    272.0  
+# 
+# looks like EU stations
+#
  ALME  A 13437M001 P                        357 32 26.0   36 51  9.1    127.5  
  AURI  A      M    P                          7 28 33.8   53 28  2.6     65.7  
  AUT1  A 12619M002 P                         23  0 13.4   40 34  0.5    150.1  
@@ -1261,6 +1267,9 @@
  YEBE  A 13420M001 P                        356 54 40.9   40 31 29.6    972.7  
  ZIMM  A 14001M004 P                          7 27 55.0   46 52 37.6    956.3  
  ZWE2  A 12330M003 P                         36 45 30.2   55 41 57.4    208.2  
+#
+# US stations
+#
  1lsu  A XXXXXMXXX P LA  LOUISIANA STATE U  268 49 11.1  +30 24 26.7     -5.2  
  1nsu  A XXXXXMXXX P LA  NORTHWESTERN S.U.  266 54  8.7  +31 45  2.9     29.3  
  1ulm  A XXXXXMXXX P LA  U OF LA AT MONROE  267 55 26.8  +32 31 44.5     17.3  
