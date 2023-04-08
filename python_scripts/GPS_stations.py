@@ -220,7 +220,6 @@ GPS         O  The filled dictionary
         site_id_found = 0
         for line in fp:
             line = ''.join(map(chr, map(lambda x: x if x < 127 else ord(' '), line)))
-            print('GPS Stations line is ', line)
             if line[0:1] == '#':   # a comment
               continue
             if(site_id_found == 0):
