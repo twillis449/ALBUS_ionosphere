@@ -18,8 +18,8 @@ if __name__ == "__main__":
   startime = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
   print("program start at %s" % startime)
 
-  use_elev = True # to monitor variations of the ionosphere directly overhead
-                  # set to False to track a given RA/DEC
+  use_elev = False # True = monitor variations of the ionosphere directly overhead, i.e. VTEC
+                   # False = track a source at a given RA/DEC
 # Warkworth telescope location
   LONG="174:40:01.0"
   LAT="-36:25:55.0"
@@ -34,12 +34,12 @@ if __name__ == "__main__":
   # try date in 2018 for time near solar minimum
   START_TIME="2023/2/20 00:00:00"
   END_TIME="2023/02/20 23:59:59"
-  DATA_DIR = '/home/twillis/PSR_J1145_data_2023'
-  RED_TYPE = 'RI_G01'
+  home_dir = os.path.expanduser('~')
+  DATA_DIR = home_dir + '/PSR_J1145_data_2023'
+  RED_TYPE = 'RI_G03'
   TIME_STEP = 300
   MAX_DIST = 250E3
-  NUM_PROCESSORS = 4
-  DO_SER = 1
+  NUM_PROCESSORS = 6
   DO_SER = 0
 
 # call the following function if you want to just track changes in the ionosphere at an elevation of 90 deg
