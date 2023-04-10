@@ -214,12 +214,12 @@ GPS         O  The filled dictionary
     print('input file is ', filename)
     # dunnon what encoding was used on this file but it is not UTF 8.
     # strip whatever is not ASCII further down
-    fp = open(filename, "rb") 
+    fp = open(filename, "r") 
     counter = 0
     try:
         site_id_found = 0
         for line in fp:
-            line = ''.join(map(chr, map(lambda x: x if x < 127 else ord(' '), line)))
+#           line = ''.join(map(chr, map(lambda x: x if x < 127 else ord(' '), line)))
             if line[0:1] == '#':   # a comment
               continue
             if(site_id_found == 0):
@@ -232,6 +232,8 @@ GPS         O  The filled dictionary
                     return GPS
                 else:
                   name = line[1:5].lower()
+                  if name in GPS:  
+                    continue
                   longitude = Albus_Coordinates.deg_str_to_rad(line[44:56])
                   latitude  = Albus_Coordinates.deg_str_to_rad(line[57:69])
                   height    = float(line[70:78])
@@ -278,7 +280,8 @@ GPS         O  The filled dictionary
                 if(line[0:8] == "-SITE/ID"):
                     break
                 name = line[1:5].lower()
-                
+                if name in GPS:  
+                    continue
                 longitude = Albus_Coordinates.deg_str_to_rad(line[44:55])
                 latitude  = Albus_Coordinates.deg_str_to_rad(line[56:67])
                 height    = float(line[67:75])
