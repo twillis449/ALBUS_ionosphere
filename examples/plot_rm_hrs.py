@@ -4,13 +4,12 @@ import os
 import sys
 import numpy
 import math 
-#import hampel
+from hampel import *
+from pylab import *
+from copy import deepcopy
+from optparse import OptionParser
 # Savitzky-Golay filte
 from scipy.signal import savgol_filter
-
-from pylab import *
-
-#from string import split, strip
 
 def getdata( filename ):
         text = open(filename, 'r').readlines()
@@ -42,8 +41,11 @@ def getdata( filename ):
                 rel_time.append(latest)
                 rm_val = float(info[8])
                 rm.append(rm_val)
-                error_ratio = rm_val * float(info[10]) / float(info[7])
-                rm_error.append(error_ratio)
+                try:
+                  error_ratio = rm_val * float(info[10]) / float(info[7])
+                  rm_error.append(error_ratio)
+                except:
+                  continue
           except:
             pass
         rm_arr = numpy.array(rm)
@@ -52,19 +54,38 @@ def getdata( filename ):
 
 def main( argv ):
   RM = True
+  parser = OptionParser(usage = '%prog [options] ')
+  parser.add_option('-f', '--file', dest = 'filename', help = 'Name of ALbus file to be processed  (default = None)', default = None)
+  parser.add_option('-s', '--smooth', dest = 'smooth', help = 'Type of smoothing, sg , h, or None  (default = None)', default = None)
+  (options,args) = parser.parse_args()
+  filename = options.filename
+  print('processing ALBUS file ', filename)
+  smoothing = str(options.smooth).lower()
   print('processing ALBUS file ', argv[1])
-  x_data, y_data, error_vals, latest, ref_time  = getdata(argv[1])
-  y_data = savgol_filter(y_data, 7, 1)
+  x_data, y_data, error_vals, latest, ref_time  = getdata(filename)
+# Savitzky-Golay filter
+  if smoothing == 'sg':
+    print('Doing Savitzky-Golay smoothing')
+    y_data = savgol_filter(y_data, 7, 1)
+  elif smoothing == 'h':
+    print('Doing Hampel filtering')
+    filtered = hampel(y_data, 5, 4)
+    y_data = hampel(filtered, 10, 1)
+  
 # print('shapes ', x_data.shape, y_data.shape, y_err.shape)
+  RM = True
   xlim(ref_time,latest)
-  print('calling plot')
-  plot(x_data, y_data,'ro')
-  xlabel('hours (UT)')
-  if RM:
-    ylabel('RM ')
-    title_string = 'RM as a function of time'
-    plot_file =  argv[1] + '_rm_plot'
+  if len(error_vals) == 0:
+    print('calling plot')
+    plot(x_data, y_data,'ro')
+  else:
+    print('calling errorbar')
+    plot(x_data, y_data,'ro')
     errorbar(x_data, y_data,yerr=error_vals, fmt='ro')
+  if RM:
+    ylabel('RM (rad/m^2)')
+    title_string = 'RM as a function of time'
+    plot_file =  filename + '_rm_plot'
   title(title_string)
   grid(True)
 

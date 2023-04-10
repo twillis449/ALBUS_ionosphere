@@ -4,9 +4,10 @@ import os
 import sys
 import numpy
 import math 
-import hampel
+from hampel import *
 from pylab import *
 from copy import deepcopy
+from optparse import OptionParser
 # Savitzky-Golay filte
 from scipy.signal import savgol_filter
 
@@ -25,8 +26,8 @@ def getdata( filename ):
         ref_time = hour + min/60.0 + sec/3600.0
         while(text[i][0:13] != 'seq  rel_time'):
            i = i+1
-        stec = []
-        stec_err = []
+        tec = []
+        tec_err = []
         rel_time = []
         start = i+1
         # get actual data
@@ -38,42 +39,51 @@ def getdata( filename ):
               if elev >= 15.0:
                 latest = ref_time + float(info[3]) / 3600
                 rel_time.append(latest)
-                stec.append(float(info[7]))
+                tec_val = float(info[7])
+                tec.append(tec_val)
                 try:
-                  stec_err.append(float(info[10]))
+                  tec_err.append(float(info[10]))
                 except:
-                  pass
+                  continue
+
           except:
             pass
-        stec_arr = numpy.array(stec)
-        stec_err = numpy.array(stec_err)
+        tec_arr = numpy.array(tec)
+        tec_err = numpy.array(tec_err)
         rel_time = numpy.array(rel_time)
-        return rel_time, stec_arr, stec_err, latest, ref_time
+        return rel_time, tec_arr, tec_err, latest, ref_time
 
 def main( argv ):
-  STEC = True
+  parser = OptionParser(usage = '%prog [options] ')
+  parser.add_option('-f', '--file', dest = 'filename', help = 'Name of ALbus file to be processed  (default = None)', default = None)
+  parser.add_option('-s', '--smooth', dest = 'smooth', help = 'Type of smoothing, sg , h, or None  (default = None)', default = None)
+  (options,args) = parser.parse_args()
+  filename = options.filename
+  print('processing ALBUS file ', filename)
+  smoothing = str(options.smooth).lower()
   print('processing ALBUS file ', argv[1])
-  x_data, y_data, y_err, latest, ref_time  = getdata(argv[1])
+  x_data, y_data, error_vals, latest, ref_time  = getdata(filename)
 # Savitzky-Golay filter
-  y_data = savgol_filter(y_data, 7, 1)
+  if smoothing == 'sg':
+    print('Doing Savitzky-Golay smoothing')
+    y_data = savgol_filter(y_data, 7, 1)
+  elif smoothing == 'h':
+    print('Doing Hampel filtering')
+    filtered = hampel(y_data, 5, 4)
+    y_data = hampel(filtered, 10, 1)
+  
 # print('shapes ', x_data.shape, y_data.shape, y_err.shape)
   xlim(ref_time,latest)
-  if y_err.shape[0] == 0:
+  if len(error_vals) == 0:
     print('calling plot')
     plot(x_data, y_data,'ro')
   else:
     print('calling errorbar')
-    plot(x_data, y_data,'ro')
-    errorbar(x_data, y_data,yerr=y_err, fmt='ro')
-  xlabel('hours (UT)')
-  if STEC:
-    ylabel('STEC (TEC Units)')
-    title_string = 'STEC as a function of time'
-    plot_file =  argv[1] + '_stec_plot'
-  else:
-    ylabel('VTEC (TEC Units)')
-    title_string = 'VTEC as a function of time'
-    plot_file =  argv[1] + '_vtec_plot'
+    print('error_vals', error_vals)
+    errorbar(x_data, y_data,yerr=error_vals, fmt='ro')
+  ylabel('TEC (TEC units)')
+  title_string = 'TEC as a function of time'
+  plot_file =  filename + '_tec_plot'
   title(title_string)
   grid(True)
 
