@@ -32,6 +32,9 @@ def ITRFToWGS84(x, y, z):
    h = (p / math.cos(lat)) - v
    lat = math.degrees(lat)
    lon = math.degrees(lon)
+# make sure longitude in range 0 -> 360 degrees
+   if lon < 0:
+     lon = lon + 360.0
    return lat, lon, h
 	
 ########################################
