@@ -39,7 +39,7 @@ if __name__ == "__main__":
   data_dir = 'VLA_test_2016'
   DATA_DIR = home_dir + '/' + data_dir
 
-  RED_TYPE = 'RI_G01'
+  RED_TYPE = 'RI_G03'
   TIME_STEP = 300
   MAX_DIST = 300E3
   NUM_PROCESSORS = 6
