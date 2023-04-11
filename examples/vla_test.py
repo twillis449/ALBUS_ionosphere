@@ -41,10 +41,10 @@ if __name__ == "__main__":
 
   RED_TYPE = 'RI_G01'
   TIME_STEP = 300
-  MAX_DIST = 200E3
-  NUM_PROCESSORS = 1
-  DO_SER = 0
+  MAX_DIST = 300E3
+  NUM_PROCESSORS = 6
   DO_SER = 1
+  DO_SER = 0
 
 
 # call the following function if you want to just track changes in the ionosphere at an elevation of 90 deg
