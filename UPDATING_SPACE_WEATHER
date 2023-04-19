@@ -7,10 +7,14 @@ command from THIS (ALBUS_ionosphere) top level directory.
 
 To get kpf107.dat updates enter : 
 ftp://ftp.gfz-potsdam.de/pub/home/obs/kp-ap/wdc in your browser and get whatever
-you need. The data are in the form kpxxxx.wdc, where xxxx is the year. The data are usually a couple of weeks behind the current date. Append the new data to the end of the stored kpf107.dat after deleting any repetitive dates. 
+you need. The data are in the form kpxxyy.wdc, where xx is the year and yy is the month. 
+The data are usually a couple of weeks behind the current date. Append the new data to the end 
+of the stored kpf107.dat after deleting any repetitive dates. 
 
 http://omniweb.gsfc.nasa.gov/form/dx1.html is the current (2013) site to get IMF24 data. 
-See the png image IMF24_request.png in this directory for an example of the fields to be selected.
+See the png image IMF24_request.png in this directory for an example of the fields to be 
+selected. After you make your selection click on the 'submit' button at the bottom of
+the web page.
 
 It looks like satellite orbit data can be provided quickly from:
 ftp igscb.jpl.nasa.gov
