@@ -28,7 +28,8 @@ RUN docker-apt-install build-essential\
                        flex \
                        python3-urllib3 \
                        unzip \
-                       python3-nose
+                       python3-nose \
+                       python3-requests
 
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-$GNUCOMPILER 100 && \
     update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-$GNUCOMPILER 100 && \
