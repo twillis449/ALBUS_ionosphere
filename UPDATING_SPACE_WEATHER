@@ -11,6 +11,13 @@ you need. The data are in the form kpxxyy.wdc, where xx is the year and yy is th
 The data are usually a couple of weeks behind the current date. Append the new data to the end 
 of the stored kpf107.dat after deleting any repetitive dates. 
 
+WARNING::: as about circa Jan 2018 Potsdam no longer propagates the critical f10.7 numbers.
+Otawa still measures them and they can be downloaded from here:
+ftp://ftp.seismo.nrcan.gc.ca/spaceweather/solar_flux/daily_flux_values/fluxtable.txt
+They need to be filled into character column 66-70 with character column 71 set correctly
+see kp_ap.fmt file in the noaa_dat directory. The fluxtable.txt file needs to be pulled manually
+and updated using the fluxadjused flux column (which should have the 10000Jy unit -- please check)
+
 http://omniweb.gsfc.nasa.gov/form/dx1.html is the current (2013) site to get IMF24 data. 
 See the png image IMF24_request.png in this directory for an example of the fields to be 
 selected. After you make your selection click on the 'submit' button at the bottom of
@@ -19,4 +26,6 @@ the web page.
 It looks like satellite orbit data can be provided quickly from:
 ftp igscb.jpl.nasa.gov
 cd pub/product/GPS_week ...
+
+
 

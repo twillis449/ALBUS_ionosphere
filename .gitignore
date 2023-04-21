@@ -29,3 +29,5 @@ albus_report*
 acceptance_tests/.output
 *.pyc
 __pycache__
+
+.noaacache
