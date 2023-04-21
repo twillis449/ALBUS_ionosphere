@@ -214,12 +214,13 @@ GPS         O  The filled dictionary
     print('input file is ', filename)
     # dunnon what encoding was used on this file but it is not UTF 8.
     # strip whatever is not ASCII further down
-    fp = open(filename, "r") 
+    # this fails to read properly with Python3.6. It reads with Python3.8
+    fp = open(filename, "rb") 
     counter = 0
     try:
         site_id_found = 0
         for line in fp:
-#           line = ''.join(map(chr, map(lambda x: x if x < 127 else ord(' '), line)))
+            line = ''.join(map(chr, map(lambda x: x if x < 127 else ord(' '), line)))
             if line[0:1] == '#':   # a comment
               continue
             if(site_id_found == 0):
