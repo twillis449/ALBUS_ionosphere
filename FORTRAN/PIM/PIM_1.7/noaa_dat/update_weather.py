@@ -5,6 +5,10 @@ from datetime import timezone
 import datetime
 import shutil
 import urllib.request
+from glob import glob
+import re
+from calendar import monthrange
+import numpy as np
 
 def parse_kpf(lines):
     """
@@ -136,10 +140,16 @@ def parse_kpf(lines):
             raise ValueError(f"{errorstr} invalid value encountered {str(e)}")
         if not(year >= 0 and year <= 99):
             raise ValueError(f"{errorstr} Invalid year code")
+        if year > 80:
+            cc = 1900
+        else:
+            cc = 2000
         if not(month >= 1 and month <= 12):
             raise ValueError(f"{errorstr} Invalid month code")
-        if not(day >= 1 and day <= 31): #ambiguous century
+        if not(day >= 1 and day <= monthrange(year+cc, month)[1]):
             raise ValueError(f"{errorstr} Invalid day code")
+        f107unix = datetime.datetime(year+cc,month,day,
+                                     17,0,0,tzinfo=timezone.utc).timestamp()
         if not(fqual) in [0,1,2,3]:
             raise ValueError("Invalid flux qualifier")
         if not (cpfig >= 0 and cpfig <= 2.5):
@@ -174,7 +184,8 @@ def parse_kpf(lines):
             'f107': f107,
             'fqual': fqual,
             'original': l.replace("\n", ""),
-            'needfixing': needfixing
+            'needfixing': needfixing,
+            'f107unix': f107unix
         })
     return dicokpf
 
@@ -215,10 +226,7 @@ def reconstitute_kpf(dicokpf, only_neadfixing=True):
             lines.append("".join(fmt))
         else:
             lines.append(kpf["original"]) # to make diff more manageable since some lines fill blanks with zeros others doesnt etc.
-        try:
-            assert len(lines[-1]) == 71
-        except:
-            import ipdb; ipdb.set_trace()
+        assert len(lines[-1]) == 71
     return lines
 
 def merge_dicos(old, new):
@@ -230,8 +238,73 @@ def merge_dicos(old, new):
     notexist = list(filter(lambda n: __fmtkpfday(n['year'],n['month'],n['day']) not in havedates,
                            new))
     merged = old + notexist
-    merged_sorted = sorted(merged, key=lambda n: __fmtkpfday(n['year'],n['month'],n['day']))
+    merged_sorted = sorted(merged, key=lambda n: n['f107unix'])
     return merged_sorted, notexist
+
+def process_otowa(otowalines):
+    otowalines = filter(lambda l: len(l) > 0, otowalines)
+    otowalines = map(lambda l: l.strip(), otowalines)
+    foundhdr = False
+    __compulsory_hdr = ['fluxdate', 'fluxtime', 'fluxadjflux']
+    vels = {}
+    headervals = []
+    for il, l in enumerate(otowalines):
+        errstr = f"Error parsing Otowa datafile near line {il}."
+        l = l.split("#")[0]
+        if re.match(r'(?:[\-]+[\W]+)+', l): continue
+        if not foundhdr:
+            headervals = re.findall(r"[a-zA-Z0-9]+", l)
+            if all(map(lambda c: c in headervals, __compulsory_hdr)):
+                foundhdr = True
+        else:
+            lnvels = re.findall(r"[0-9.]+", l)
+            if len(lnvels) != len(headervals):
+                raise RuntimeError(f"{errstr} Column number mismatch")
+            for c, v in zip(headervals, lnvels):
+                if c == 'fluxdate':
+                    if len(v) != 8:
+                        ValueError(f"{errstr} Year not YYYYMMDD format")
+                    try:
+                        year = int(v[0:4])
+                        month = int(v[4:6])
+                        day = int(v[6:])
+                    except ValueError as e:
+                        raise ValueError(f"{errstr} Invalid date encountered")
+                    if not(month >= 1 and month <= 12):
+                        raise ValueError(f"{errstr} Invalid month")
+                    if not(day >= 1 and day <= monthrange(year, month)[1]):
+                        raise ValueError(f"{errstr} Invalid day")
+                    v = (year, month, day)
+                if c == 'fluxtime':
+                    if len(v) != 8:
+                        ValueError(f"{errstr} Time not in hhmmss format")
+                    try:
+                        hr = int(v[0:2])
+                        mm = int(v[2:4])
+                        ss = int(v[4:])
+                    except ValueError as e:
+                        raise ValueError(f"{errstr} Invalid time encountered")
+                    if not(hr >= 0 and hr <= 23):
+                        raise ValueError(f"{errstr} Invalid hour")
+                    if not(mm >= 0 and mm <= 59):
+                        raise ValueError(f"{errstr} Invalid minute")
+                    if not(ss >= 0 and ss <= 59):
+                        raise ValueError(f"{errstr} Invalid second")
+                    v = (hr, mm, ss)
+                if c == 'fluxadjflux':
+                    try:
+                        v = float(v)
+                    except ValueError as e:
+                        raise ValueError(f"{errstr} Invalid flux value encountered")
+                vels.setdefault(c, []).append(v)
+    if not foundhdr:
+        raise RuntimeError(f"No header information found in Otowa data")
+    for d, t in zip(vels['fluxdate'], vels['fluxtime']):
+        dt = datetime.datetime(d[0], d[1], d[2],
+                               t[0], t[1], t[2], tzinfo=timezone.utc)
+        vels.setdefault('utctimestamp', []).append(dt.timestamp())
+    return vels
+
 
 parser = argparse.ArgumentParser(description="Update NOAA weather",
                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -291,6 +364,52 @@ for year in range(args.startyear, args.endyear+1):
     print(f"\tProcessed {len(new_records)} lines from KPF file '{outdatafile}'. "
           f"{len(new_insertions)} new entries added")
 
+# since 2018 potsdam has not propagated f10.7 cm flux values. We need to call our Canadian friends to get them
+needsf107 = list(filter(lambda kpf: kpf['fqual'] == 3, # i.e. missing
+                        merged_kpffile))
+if len(needsf107) > 0:
+    print(f"We detect {len(needsf107)} KPF records need 10.7cm solar flux values. Fetching them from Otowa...")
+    f107cachefiles = glob(os.path.join(args.cachedir, 'f107.*.dat'))
+    closest_match = ""
+    closest_match_time = -1
+    for f in f107cachefiles:
+        cfn = os.path.split(f)[1]
+        cfn_date = float(cfn.replace('f107.', '').replace('.dat', ''))
+        if closest_match_time == -1 or abs(cfn_date - utc_timestamp) < closest_match_time:
+            closest_match_time = cfn_date
+            closest_match = f
+    if closest_match:
+        oldest_f107 = abs(closest_match_time - utc_timestamp)
+        print(f"Nearest available Otowa data in cache is {abs(closest_match_time - utc_timestamp):.0f} seconds old.")
+         # these files are huge and the sun is quite stable over long periods so don't do this too often!
+        if oldest_f107 > 3600 * 24 * 7:
+            print(f"Otowa data may be stale... will redownload")
+            closest_match = ""
+        else:
+            print("Using Otowa data from cached values")
+    if not closest_match:
+        newfile = os.path.join(args.cachedir, f'f107.{utc_timestamp}.dat')
+        print(f"Calling Otowa at '{args.otowa}'...")
+        urllib.request.urlretrieve(args.otowa, newfile)
+        closest_match = newfile
+    with open(closest_match) as otowa:
+        otowalines = otowa.readlines()
+        otowa_db = process_otowa(otowalines)
+    #NN interp 10000Jy fluxscale onto the kpf database using nearest neighbour
+    for kpf in needsf107:
+        tdiff = abs(kpf['f107unix'] - np.array(otowa_db['utctimestamp']))
+        nni = np.argmin(tdiff)
+        kpf['fqual'] = 2 # interpolated / extrapolated
+        kpf['f107'] = otowa_db['fluxadjflux'][nni]
+        if tdiff[nni] > 3600*24*31*6:
+            print(f"Warning: Data record at {kpf['year']}/{kpf['month']}/{kpf['day']} will have interpolated "
+                  f"flux more than {tdiff[nni]}s old!. Cannot take. Invalidating!")
+            kpf['f107'] = 30.
+            kpf['fqual'] = 3
+        elif tdiff[nni] > 3600*24:
+            print(f"Warning: Data record at {kpf['year']}/{kpf['month']}/{kpf['day']} will have interpolated "
+                  f"flux more than one day old")
+        
 print(f"New KPF file '{outputkpffile}' will have {len(merged_kpffile)} entries "
       f"compared to {len(current_records)} previous entries")
 reconstituted = reconstitute_kpf(merged_kpffile)
