@@ -383,7 +383,11 @@ overwrite         I  May files be overwritten?  0 No, else yes
 OUTPUTS:  None
 """
     assert(FTP_site >= 0)
-    print('*** get_RINEX_obs_file_from_web: original RINEX2 file requested', RINEX_filename)
+    print(f'Initiate get_RINEX_obs_file_from_web: '
+          f'{RINEX_filename}, year {year}, month {month}, day {day}, '
+          f'doy {doy}, outputdir {output_directory}, ftp site {FTP_site}, '
+          f'overwrite {overwrite}')
+    
     RX3_flag = False
     our_file = output_directory + '/' + RINEX_filename
     # First, if we have run out of FTP sites, bail
@@ -559,12 +563,16 @@ OUTPUTS:  None
             pass # site_str = "" from above, which will generate an IOError
 
 # Getting big Rinex files from CDDIS is not yet working
-    elif(FTP_site == 10 and use_cddis): # cddis
-       site_str = "https://cddis.nasa.gov/archive/gnss/data/daily/%4.4d/%3.3d/%2.2d%s/%s.Z"%(year, doy, yy, RINEX_filename[-1], RINEX_filename)
-#      print('cddis site string', site_str)
+    elif(FTP_site == 10): # cddis
+       if use_cddis:
+          site_str = "https://cddis.nasa.gov/archive/gnss/data/daily/%4.4d/%3.3d/%2.2d%s/%s.Z"%(year, doy, yy, RINEX_filename[-1], RINEX_filename)
+       else:
+           pass # will raise IOerror
     else:
         print ( '************* unable to handle ftp site number ', FTP_site)
         raise KeyError("Unknown RINEX FTP site")
+    if not site_str:
+        raise No_RINEX_File_Error("Out of potential RINEX sites for this")
     try:
         print('+++++++++++++++ calling get_url with', site_str, our_Z_file)
         print('*********************************')
