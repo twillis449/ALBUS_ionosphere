@@ -84,6 +84,7 @@ def main( argv ):
     errorbar(x_data, y_data,yerr=error_vals, fmt='ro')
   if RM:
     ylabel('RM (rad/m^2)')
+    xlabel('UT (hours)')
     title_string = 'RM as a function of time'
     plot_file =  filename + '_rm_plot'
   title(title_string)

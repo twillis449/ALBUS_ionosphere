@@ -78,10 +78,9 @@ def main( argv ):
     print('calling plot')
     plot(x_data, y_data,'ro')
   else:
-    print('calling errorbar')
-    print('error_vals', error_vals)
     errorbar(x_data, y_data,yerr=error_vals, fmt='ro')
   ylabel('TEC (TEC units)')
+  xlabel('UT (hours)')
   title_string = 'TEC as a function of time'
   plot_file =  filename + '_tec_plot'
   title(title_string)
