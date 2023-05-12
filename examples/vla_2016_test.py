@@ -26,7 +26,7 @@ if __name__ == "__main__":
   LONG="-107:37:3.82"
   HEIGHT=2124
 
-# we compare ALBUS result with that of Malins et al 2016  - available at
+# we compare ALBUS result with that of Malins et al 2018  - available at
 # https://agupubs.onlinelibrary.wiley.com/doi/full/10.1029/2018RS006559
 # we track Pulsar B0950+08
 
