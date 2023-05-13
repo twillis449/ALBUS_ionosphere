@@ -61,7 +61,6 @@ def main( argv ):
   filename = options.filename
   print('processing ALBUS file ', filename)
   smoothing = str(options.smooth).lower()
-  print('processing ALBUS file ', argv[1])
   x_data, y_data, error_vals, latest, ref_time  = getdata(filename)
 # Savitzky-Golay filter
   if smoothing == 'sg':
@@ -76,10 +75,8 @@ def main( argv ):
   RM = True
   xlim(ref_time,latest)
   if len(error_vals) == 0:
-    print('calling plot')
     plot(x_data, y_data,'ro')
   else:
-    print('calling errorbar')
     plot(x_data, y_data,'ro')
     errorbar(x_data, y_data,yerr=error_vals, fmt='ro')
   if RM:
