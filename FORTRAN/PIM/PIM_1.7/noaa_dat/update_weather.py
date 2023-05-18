@@ -10,6 +10,11 @@ import re
 from calendar import monthrange
 import numpy as np
 
+DEFAULT_CACHE_DIR='.noaacache'
+dt = datetime.datetime.now(timezone.utc)
+utc_time = dt.replace(tzinfo=timezone.utc)
+utc_timestamp = utc_time.timestamp()
+
 def parse_kpf(lines):
     """
     -------------------------------------------------------------------------------
@@ -241,15 +246,15 @@ def merge_dicos(old, new):
     merged_sorted = sorted(merged, key=lambda n: n['f107unix'])
     return merged_sorted, notexist
 
-def process_otowa(otowalines):
-    otowalines = filter(lambda l: len(l) > 0, otowalines)
-    otowalines = map(lambda l: l.strip(), otowalines)
+def process_ottawa(ottawalines):
+    ottawalines = filter(lambda l: len(l) > 0, ottawalines)
+    ottawalines = map(lambda l: l.strip(), ottawalines)
     foundhdr = False
     __compulsory_hdr = ['fluxdate', 'fluxtime', 'fluxadjflux']
     vels = {}
     headervals = []
-    for il, l in enumerate(otowalines):
-        errstr = f"Error parsing Otowa datafile near line {il}."
+    for il, l in enumerate(ottawalines):
+        errstr = f"Error parsing Ottawa datafile near line {il}."
         l = l.split("#")[0]
         if re.match(r'(?:[\-]+[\W]+)+', l): continue
         if not foundhdr:
@@ -298,29 +303,148 @@ def process_otowa(otowalines):
                         raise ValueError(f"{errstr} Invalid flux value encountered")
                 vels.setdefault(c, []).append(v)
     if not foundhdr:
-        raise RuntimeError(f"No header information found in Otowa data")
+        raise RuntimeError(f"No header information found in Ottawa data")
     for d, t in zip(vels['fluxdate'], vels['fluxtime']):
         dt = datetime.datetime(d[0], d[1], d[2],
                                t[0], t[1], t[2], tzinfo=timezone.utc)
         vels.setdefault('utctimestamp', []).append(dt.timestamp())
     return vels
 
+def get_cached_value(url, 
+                     prefix='f107',
+                     suffix='dat',
+                     remote_filename='f107.dat',
+                     utc_timestamp=utc_timestamp, 
+                     cachedir=DEFAULT_CACHE_DIR,
+                     cache_cadence=24*3600):
+    cachefiles = glob(os.path.join(cachedir, f'{prefix}.*.{suffix}'))
+    closest_match = ""
+    closest_match_time = -1
+    for f in cachefiles:
+        cfn = os.path.split(f)[1]
+        cfn_date = float(cfn.replace(f'{prefix}.', '').replace(f'.{suffix}', ''))
+        if closest_match_time == -1 or abs(cfn_date - utc_timestamp) < abs(closest_match_time - utc_timestamp):
+            closest_match_time = cfn_date
+            closest_match = f
+    if closest_match:
+        timediff = abs(closest_match_time - utc_timestamp)
+        print(f"Nearest available data in cache is {timediff:.0f} seconds old.")
+        if timediff > cache_cadence:
+            print(f"Data '{closest_match}' may be stale... will redownload")
+            closest_match = ""
+        else:
+            print(f"Using '{closest_match}' data from cached values")
+    if not closest_match:
+        remotefile = f'{url}/{remote_filename}' if remote_filename else url
+        localfile = os.path.join(args.cachedir, f'{prefix}.{utc_timestamp}.{suffix}')
+        print(f"Trying to obtain data from '{url}'...")
+        urllib.request.urlretrieve(remotefile, localfile)
+        closest_match = localfile
+    return closest_match
+
+def process_potsdam(potsdam_lines):
+    """
+    # This is alternatate format from Potsdam to their KPF files. We can directly reconstitute the KPF version from this data
+    # so it may be best to merge values from here into a KPF dictionary
+
+    # PLEASE CITE: Matzka, J., Stolle, C., Yamazaki, Y., Bronkalla, O. and Morschhauser, A., 2021. The geomagnetic Kp index 
+    # and derived indices of geomagnetic activity. Space Weather, https://doi.org/10.1029/2020SW002641
+    #
+    # Kp, ap and Ap
+    # The three-hourly equivalent planetary amplitude ap is derived from Kp and the daily equivalent planetary amplitude Ap is the daily mean of ap.
+    # Kp is unitless. Ap and ap are unitless and can be multiplied by 2 nT to yield the average geomagnetic disturbance at 50 degree geomagnetic latitude.
+    # Kp, ap and Ap were introduced by Bartels (1949, 1957) and are produced by Geomagnetic Observatory Niemegk, GFZ German Research Centre for Geosciences.
+    # Described in: Matzka et al. (2021), see reference above.
+    # Data publication: Matzka, J., Bronkalla, O., Tornow, K., Elger, K. and Stolle, C., 2021. Geomagnetic Kp index. V. 1.0. GFZ Data Services, 
+    # https://doi.org/10.5880/Kp.0001
+    # Note: the most recent values are nowcast values and will be replaced by definitive values as soon as they become available.
+    # 
+    # International Sunspot Number SN
+    # The international sunspot number SN (written with subscript N) is given as the daily total sunspot number version 2.0 introduced in 2015.
+    # The sunspot data is available under the licence CC BY-NC 4.0 from WDC-SILSO, Royal Observatory of Belgium, Brussels. Described in:
+    # Clette, F., Lefevre, L., 2016. The New Sunspot Number: assembling all corrections. Solar Physics, 291, https://doi.org/10.1007/s11207-016-1014-y 
+    # Note: the most recent values are preliminary and replaced by definitive values as soon as they become available.
+    #
+    # F10.7 Solar Radio Flux
+    # Local noon-time observed (F10.7obs) and adjusted (F10.7adj) solar radio flux F10.7 in s.f.u. (10^-22 W m^-2 Hz^-1) is provided by 
+    # Dominion Radio Astrophysical Observatory and Natural Resources Canada.
+    # Described in: Tapping, K.F., 2013. The 10.7 cm solar radio flux (F10.7). Space Weather, 11, 394-406, https://doi.org/10.1002/swe.20064 
+    # Note: For ionospheric and atmospheric studies the use of F10.7obs is recommended.
+    # 
+    # Short file description (for a detailed file description, see Kp_ap_Ap_SN_F107_format.txt):
+    # 40 header lines, all starting with #
+    # ASCII, blank separated and fixed length, missing data indicated by -1.000 for Kp, -1 for ap and SN, -1.0 for F10.7
+    # YYYY MM DD is date of UT day, days is days since 1932-01-01 00:00 UT to start of UT day, days_m is days since 1932-01-01 00:00 UT to midday of UT day
+    # BSR is Bartels solar rotation number, dB is day within BSR 
+    # Kp1 to Kp8 (Kp for the eight eighth of the UT day), ap1 to ap8 (ap for the eight eighth of the UT day), Ap, SN, F10.7obs, F10.7adj
+    # D indicates if the Kp and SN values are definitive or preliminary. D=0: Kp and SN preliminary; D=1: Kp definitive, SN preliminary; D=2 Kp and SN definitive
+    #
+    #
+    # The format for each line is (i stands for integer, f for float):
+    #iii ii ii iiiii fffff.f iiii ii ff.fff ff.fff ff.fff ff.fff ff.fff ff.fff ff.fff ff.fff iiii iiii iiii iiii iiii iiii iiii iiii  iiii iii ffffff.f ffffff.f i
+    """
+    potsdam_lines = filter(lambda l: len(l) > 0, potsdam_lines)
+    potsdam_lines = map(lambda l: l.strip(), potsdam_lines)
+    foundhdr = False
+    __compulsory_hdr = ["YYY", "MM", "DD", "days", "days_m", "Bsr", "dB", 
+                        "Kp1", "Kp2", "Kp3", "Kp4", "Kp5", "Kp6", "Kp7",
+                        "Kp8", "ap1", "ap2", "ap3", "ap4", "ap5", "ap6",
+                        "ap7", "ap8", "Ap", "SN", "F10.7obs", "F10.7adj", "D"]
+    vels = {}
+    headervals = []
+    for il, l in enumerate(potsdam_lines):
+        errstr = f"Error parsing Potsdam datafile near line {il}."        
+        if not foundhdr:
+            if len(l.split("#")) != 2: continue # must be in comment line
+            l = l.split("#")[1]
+            headervals = re.findall(r"[a-zA-Z0-9_.]+", l)
+            if all(map(lambda c: c in headervals, __compulsory_hdr)):
+                foundhdr = True
+        else:
+            l = l.split("#")[0]
+            lnvels = re.findall(r"[0-9.]+", l)
+            if len(lnvels) != len(headervals):
+                raise RuntimeError(f"{errstr} Column number mismatch")
+            for c, v in zip(headervals, lnvels):
+                try:
+                    if c in ["YYY", "MM", "DD", "days", "Bsr", "dB",
+                            "ap1", "ap2", "ap3", "ap4", "ap5", "ap6", "ap7",
+                            "Ap", "SN", "D"]:
+                        v = int(v)
+                    if c in ["F10.7obs", "F10.7adj",
+                            "Kp1", "Kp2", "Kp3", "Kp4", "Kp5", "Kp6", "Kp7", "Kp8", 
+                            "days_m"]:
+                        v = float(v)
+                except ValueError as e:
+                    raise ValueError(f"{errstr} Invalid value for column {c}")
+                vels.setdefault(c, []).append(v)
+    if not foundhdr:
+        raise RuntimeError(f"No header information found in Potsdam data")
+    for yyy, mm, dd, dd_frac in zip(vels['YYY'], vels['MM'], vels['DD'], vels['days_m']):
+        hhh = int(np.floor((dd_frac - np.floor(dd_frac)) * 24.0))
+        mmm = int(((dd_frac - np.floor(dd_frac)) * 24.0 - hhh) * 60.)
+        dt = datetime.datetime(yyy, mm, dd,
+                               hhh, mmm, 0, tzinfo=timezone.utc)
+        vels.setdefault('utctimestamp', []).append(dt.timestamp())
+    return vels
 
 parser = argparse.ArgumentParser(description="Update NOAA weather",
                                 formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument("startyear", type=int, help="Provide starting year for lookup")
 parser.add_argument("endyear", type=int, help="Provide ending year for lookup")
 parser.add_argument("--potsdam", type=str, help="URL for Potsdam yearly", default="ftp://ftp.gfz-potsdam.de/pub/home/obs/kp-ap/wdc/yearly/")
-parser.add_argument("--otowa", type=str, help="URL for Otowa F10.7 numbers", default="ftp://ftp.seismo.nrcan.gc.ca/spaceweather/solar_flux/daily_flux_values/fluxtable.txt")
+parser.add_argument("--potsdam-current", type=str, help="URL for  the current Potsdam collated information. This table seems to have F10.7 fluxes and International Sunspot numbers",
+                    default="https://www-app3.gfz-potsdam.de/kp_index/Kp_ap_Ap_SN_F107_since_1932.txt")
+parser.add_argument("--ottawa", type=str, help="URL for Ottawa F10.7 numbers", default="ftp://ftp.seismo.nrcan.gc.ca/spaceweather/solar_flux/daily_flux_values/fluxtable.txt")
 parser.add_argument("--kpffile", type=str, help="kpf107 file to append with new data (will not overwrite file)", default="kpf107.dat")
-parser.add_argument("--cachedir", type=str, help="Cache directory for downloaded files", default=".noaacache") # make sure this is in gitignore and dockerignore...
+parser.add_argument("--cachedir", type=str, help="Cache directory for downloaded files", default=DEFAULT_CACHE_DIR) # make sure this is in gitignore and dockerignore...
 parser.add_argument("--clearcache", help="Remove cached files before running", action='store_true', default=False) # make sure this is in gitignore and dockerignore...
 args = parser.parse_args()
 
 if args.startyear > 2080:
     raise ValueError("PIM format does not support year 2081 and beyond")
 if args.startyear < 2005:
-    raise ValueError("This script only accepts starting years from 2005 onwards (Otowa don't have historic records beyond this)")
+    raise ValueError("This script only accepts starting years from 2005 onwards (Ottawa don't have historic records beyond this)")
 if args.startyear > args.endyear:
     raise ValueError("Start year exceeds end year")
 newkpffile = False
@@ -333,9 +457,6 @@ elif args.clearcache:
     shutil.rmtree(args.cachedir)
     os.mkdir(args.cachedir)
 
-dt = datetime.datetime.now(timezone.utc)
-utc_time = dt.replace(tzinfo=timezone.utc)
-utc_timestamp = utc_time.timestamp()
 outputkpffile = args.kpffile + "." + str(utc_timestamp) if not newkpffile else args.kpffile
 
 current_records = []
@@ -350,14 +471,11 @@ for year in range(args.startyear, args.endyear+1):
     print(f"Processing year {year}...")
     # Contact Potsdam for data in kpf107.fmt specification
     # if needed
-    fn = f'kp{year:d}.wdc'
-    outdatafile = os.path.join(args.cachedir, fn)
-    if not (os.path.exists(outdatafile) and os.path.isfile(outdatafile)):
-        requrl = args.potsdam + f'/{fn}'
-        print(f"\tCalling Potsdam at '{requrl}'...")   
-        urllib.request.urlretrieve(requrl, outdatafile)
-    else:
-        print(f"\tUsing cached file at '{outdatafile}'")
+    remotefn = f'kp{year:d}.wdc'
+    outdatafile = get_cached_value(url=args.potsdam, 
+                                   prefix=f'kp.{year:d}', 
+                                   suffix='wdc', 
+                                   remote_filename=remotefn)
     with open(outdatafile) as updatedata:
         new_records = parse_kpf(updatedata.readlines())
     merged_kpffile, new_insertions = merge_dicos(current_records, new_records)
@@ -365,43 +483,25 @@ for year in range(args.startyear, args.endyear+1):
           f"{len(new_insertions)} new entries added")
 
 # since 2018 potsdam has not propagated f10.7 cm flux values. We need to call our Canadian friends to get them
+# there may also be updated values -- these should be daily but could be affected by outages
 needsf107 = list(filter(lambda kpf: kpf['fqual'] == 3, # i.e. missing
                         merged_kpffile))
 if len(needsf107) > 0:
-    print(f"We detect {len(needsf107)} KPF records need 10.7cm solar flux values. Fetching them from Otowa...")
-    f107cachefiles = glob(os.path.join(args.cachedir, 'f107.*.dat'))
-    closest_match = ""
-    closest_match_time = -1
-    for f in f107cachefiles:
-        cfn = os.path.split(f)[1]
-        cfn_date = float(cfn.replace('f107.', '').replace('.dat', ''))
-        if closest_match_time == -1 or abs(cfn_date - utc_timestamp) < closest_match_time:
-            closest_match_time = cfn_date
-            closest_match = f
-    if closest_match:
-        oldest_f107 = abs(closest_match_time - utc_timestamp)
-        print(f"Nearest available Otowa data in cache is {abs(closest_match_time - utc_timestamp):.0f} seconds old.")
-         # these files are huge and the sun is quite stable over long periods so don't do this too often!
-        if oldest_f107 > 3600 * 24 * 7:
-            print(f"Otowa data may be stale... will redownload")
-            closest_match = ""
-        else:
-            print("Using Otowa data from cached values")
-    if not closest_match:
-        newfile = os.path.join(args.cachedir, f'f107.{utc_timestamp}.dat')
-        print(f"Calling Otowa at '{args.otowa}'...")
-        urllib.request.urlretrieve(args.otowa, newfile)
-        closest_match = newfile
-    with open(closest_match) as otowa:
-        otowalines = otowa.readlines()
-        otowa_db = process_otowa(otowalines)
+    print(f"We detect {len(needsf107)} KPF records need 10.7cm solar flux values. Fetching them from Ottawa...")
+    closest_match = get_cached_value(url=args.ottawa,
+                                     prefix='f107',
+                                     suffix='dat',
+                                     remote_filename=None)
+    with open(closest_match) as ottawa:
+        ottawalines = ottawa.readlines()
+        ottawa_db = process_ottawa(ottawalines)
     #NN interp 10000Jy fluxscale onto the kpf database using nearest neighbour
     for kpf in needsf107:
-        tdiff = abs(kpf['f107unix'] - np.array(otowa_db['utctimestamp']))
+        tdiff = abs(kpf['f107unix'] - np.array(ottawa_db['utctimestamp']))
         nni = np.argmin(tdiff)
-        kpf['fqual'] = 2 # interpolated / extrapolated
-        kpf['f107'] = otowa_db['fluxadjflux'][nni]
-        if tdiff[nni] > 3600*24*31*6:
+        kpf['fqual'] = 0 # close enough otherwise warning messages are raised later on
+        kpf['f107'] = ottawa_db['fluxadjflux'][nni]
+        if tdiff[nni] > 3600*24*10:
             print(f"Warning: Data record at {kpf['year']}/{kpf['month']}/{kpf['day']} will have interpolated "
                   f"flux more than {tdiff[nni]}s old!. Cannot take. Invalidating!")
             kpf['f107'] = 30.
@@ -409,7 +509,39 @@ if len(needsf107) > 0:
         elif tdiff[nni] > 3600*24:
             print(f"Warning: Data record at {kpf['year']}/{kpf['month']}/{kpf['day']} will have interpolated "
                   f"flux more than one day old")
+            kpf['fqual'] = 2 # interpolated / extrapolated
         
+# International Sunspot Number (SN) 
+# Royal Observatory of Belgium, Brussels. Clette, F., Lefevre, L., 2016.
+# Work by Elvidge et al. 2023 shows that this is worse than using slightly higher
+# radio frequencies but for completeness sake we will fill things either way
+# from collation by Potsdam
+needssn = list(filter(lambda kpf: kpf['isn'] == None, # i.e. missing
+                      merged_kpffile))
+if len(needssn) > 0:
+    print(f"We detect {len(needssn)} KPF records need International Sunspot Numbers. "
+          f"Fetching them from Royal Observatory Belguim via Potsdam...")
+    closest_match = get_cached_value(url=args.potsdam_current,
+                                     prefix='kp.withsn',
+                                     suffix='txt',
+                                     remote_filename=None)
+    with open(closest_match) as potsdam:
+        potsdam_lines = potsdam.readlines()
+        potsdam_db = process_potsdam(potsdam_lines)
+    # nearest intl sunspot number
+    for kpf in needssn:
+        tdiff = abs(kpf['f107unix'] - np.array(potsdam_db['utctimestamp']))
+        nni = np.argmin(tdiff)
+        kpf['isn'] = potsdam_db['SN'][nni]
+        if tdiff[nni] > 3600*24*10:
+            print(f"Warning: Data record at {kpf['year']}/{kpf['month']}/{kpf['day']} will have interpolated "
+                  f"International Sunspot Number more than {tdiff[nni]}s old!. Cannot take. Invalidating!")
+            kpf['isn'] = None
+        elif tdiff[nni] > 3600*24:
+            print(f"Warning: Data record at {kpf['year']}/{kpf['month']}/{kpf['day']} will have interpolated "
+                  f"International Sunspot Number more than one day old")
+
+# Finally reconsitute and dump
 print(f"New KPF file '{outputkpffile}' will have {len(merged_kpffile)} entries "
       f"compared to {len(current_records)} previous entries")
 reconstituted = reconstitute_kpf(merged_kpffile)
