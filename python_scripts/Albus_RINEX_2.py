@@ -288,10 +288,11 @@ XYZ        O  Cartesian station position in Earth centered coodriantes, in m
         XYZ_set = False
         XYZ = None
         try:
-            fp = open(filename, "r")
+            fp = open(filename, "rb")
         except IOError:
             raise Albus_RINEX.No_RINEX_File_Error("Error: RINEX file '%s' cannot be opened"%filename)
         line = fp.readline()
+        line = ''.join(map(chr, map(lambda x: x if x < 127 else ord(' '), line)))
         if((line[60:80] != "RINEX VERSION / TYPE")
            or (line[20] != 'O')):
             raise Albus_RINEX.RINEX_Data_Barf("Error: RINEX file '%s' not a proper observation file"%filename)
@@ -301,6 +302,7 @@ XYZ        O  Cartesian station position in Earth centered coodriantes, in m
             raise Albus_RINEX.RINEX_Data_Barf("Error: RINEX file '%s' has unsupporter version type %.2f"%(filename, version))
         while(1):
             line = fp.readline()
+            line = ''.join(map(chr, map(lambda x: x if x < 127 else ord(' '), line)))
             if(line[60:73] == "END OF HEADER"):
                 break
             elif(line[60:79] == "APPROX POSITION XYZ"):
@@ -406,6 +408,7 @@ XYZ        O  Cartesian station position in Earth centered coodriantes, in m
                     if(line_pos >= 60):
                         line_pos = 6
                         line = fp.readline()
+                        line = ''.join(map(chr, map(lambda x: x if x < 127 else ord(' '), line)))
                     code = line[line_pos+4:line_pos+6]
                     obs_info_code[count] = code
                     if(code in list(_DATA_POS.keys())):
@@ -445,6 +448,7 @@ XYZ        O  Cartesian station position in Earth centered coodriantes, in m
                 MJD[i] = MJD_start + i*interval
         while(1):
             line = fp.readline()
+            line = ''.join(map(chr, map(lambda x: x if x < 127 else ord(' '), line)))
             l = len(line)
             if(l <= 1):
                 break
@@ -481,6 +485,7 @@ XYZ        O  Cartesian station position in Earth centered coodriantes, in m
                             continue
                     for skip in range(num_list_to_skip):
                         line = fp.readline()
+                        line = ''.join(map(chr, map(lambda x: x if x < 127 else ord(' '), line)))
                         if(PRINT_DEBUG_LEVEL > 0):
                             sys.stderr.write(line)
                     continue
@@ -525,6 +530,7 @@ XYZ        O  Cartesian station position in Earth centered coodriantes, in m
                 if(line_pos >= 68):
                     line_pos = 32
                     line = fp.readline()
+                    line = ''.join(map(chr, map(lambda x: x if x < 127 else ord(' '), line)))
                 if(num_times > 0):
                     code = line[line_pos]
                     sat = int(line[line_pos+1:line_pos+3])
@@ -555,9 +561,11 @@ XYZ        O  Cartesian station position in Earth centered coodriantes, in m
                 # skipping over data values
                 for i in range(num_sat*lines_per_sat):
                     line = fp.readline()
+                    line = ''.join(map(chr, map(lambda x: x if x < 127 else ord(' '), line)))
             else:
                 for sat in range(num_sat):
                     line = fp.readline()
+                    line = ''.join(map(chr, map(lambda x: x if x < 127 else ord(' '), line)))
                     l = len(line)
                     line_pos = -16
                     obs_count = 0
@@ -566,6 +574,7 @@ XYZ        O  Cartesian station position in Earth centered coodriantes, in m
                         if(line_pos >= 80):
                             line_pos = 0
                             line = fp.readline()
+                            line = ''.join(map(chr, map(lambda x: x if x < 127 else ord(' '), line)))
                             l = len(line)
                         if((l >= line_pos+14) and (obs_info[obs_count] != None)):
                             try:
