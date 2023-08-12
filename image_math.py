@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
-# a script to subtract specified areas from a radio_cutout field
+# a script to simple math operations (add, subtract, multiply. divide) on two 
+# images with same parameters - pixels, pxel separation etc
+btract specified areas from a radio_cutout field
 from astropy.io import fits
 from check_array import check_array
 from process_polygon_data import *
