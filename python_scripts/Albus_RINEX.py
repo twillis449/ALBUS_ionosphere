@@ -62,7 +62,7 @@ IONOSPHERE_KB = 2.79924925E10   # s^{-1} T^{-1}
 
 
 # default amount of time to allow for downloading RINEX, IONEX, etc. data, in s
-DEFAULT_TIMEOUT = 300
+DEFAULT_TIMEOUT = 150
 # program name to get stuff
 URL_GETTER = "Albus_RINEX_download.py"
 # program name to get ftp stuff by password access
