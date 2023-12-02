@@ -58,55 +58,8 @@
 	get the ‘actual’ point source signal.</p>
 	<p>Get_galaxy_parameters integrates the signal contained within
 	specified polygon areas of a radio astronomy image to derive
-	integrated flux densities and other parameters of a radio s</p>
+	integrated flux densities and other parameters of a radio source.</p>
 	<p><br/>
-<br/>
-
-	</p>
-	<p><br/>
-<br/>
-
-	</p>
-	<p><br/>
-<br/>
-
-	</p>
-	<p><br/>
-<br/>
-
-	</p>
-	<p><br/>
-<br/>
-
-	</p>
-	<p><br/>
-<br/>
-
-	</p>
-	<p><br/>
-<br/>
-
-	</p>
-	<p><br/>
-<br/>
-
-	</p>
-	<p><br/>
-<br/>
-
-	</p>
-	<p><br/>
-<br/>
-
-	</p>
-	<p><br/>
-<br/>
-
-	</p>
-	<p><br/>
-<br/>
-
-	</p>
 </div>
 </body>
 </html>
