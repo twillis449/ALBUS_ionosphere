@@ -59,7 +59,6 @@ def maxDist(p,scale):
 def process_json_file(in_data, pixel_size=0.0):
 
   num_contours = in_data['num_contours']
-# print('num_contours', num_contours)
   try:
     coords = in_data['coords']
   except:
@@ -70,11 +69,12 @@ def process_json_file(in_data, pixel_size=0.0):
 # print('number of separate contours', num_contours)
   outer_list = []
   for j in range(num_contours):
-    poly_coord = in_data[str(j)]
-    if len(poly_coord) > 2:
-      p = Polygon(poly_coord)
-      inner_list = [j,p.area]
-      outer_list.append(inner_list)
+    if in_data.get(str(j)):
+      poly_coord = in_data[str(j)]
+      if len(poly_coord) > 2:
+        p = Polygon(poly_coord)
+        inner_list = [j,p.area]
+        outer_list.append(inner_list)
   length = len(outer_list)
   if length > 0:
     arr2d = np.array(outer_list)
