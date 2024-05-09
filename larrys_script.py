@@ -22,8 +22,6 @@
 
 import numpy as np
 from astropy.io import fits
-from scipy.ndimage.filters import minimum_filter as minf2D
-from scipy.ndimage.filters import maximum_filter as maxf2D
 from skimage.morphology import erosion, dilation
 from skimage.morphology import  rectangle
 
@@ -41,7 +39,6 @@ def check_array(data):
 
 def generate_morphology_images(argv):
   file=sys.argv[1]
-  file = file + '.fits'
   X=int(sys.argv[2])
   Y=int(sys.argv[3])
 
@@ -63,6 +60,7 @@ def generate_morphology_images(argv):
 # absolute minimum fits file with just about zero header information
 
   location =  file.find('.fits')
+  location =  file.find('.FITS')
   hdu.data = openmp
   hdu.header['DATAMAX'] =  hdu.data.max()
   hdu.header['DATAMIN'] =  hdu.data.min()
