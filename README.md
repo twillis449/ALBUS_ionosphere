@@ -5,17 +5,20 @@
 	<title></title>
 	<meta name="generator" content="LibreOffice 7.3.7.2 (Linux)"/>
 	<meta name="created" content="00:00:00"/>
-	<meta name="changed" content="2023-08-12T16:43:19.562063061"/>
+	<meta name="changed" content="2024-04-11T17:41:02.300435378"/>
+	<meta name="created" content="00:00:00">
+	<meta name="created" content="00:00:00">
 </head>
 <body lang="en-CA" dir="ltr">
 <div id="page_1" dir="ltr"><p>Please watch the video at
-	https://www.youtube.com/watch?v=cO5TYy396xU for detailed
-	instructions on how to use the data analysis scripts. Hopefully, it
-	will not put you to sleep! More detailed written instructions may
-	follow.</p>
+	<a href="https://youtu.be/4o3l9kb3ASI">https://youtu.be/4o3l9kb3ASI</a>
+	(Bullet Cluster) and  <a href="https://youtu.be/MHznxXPHMMk">https://youtu.be/MHznxXPHMMk</a>
+	(AbellS1063) for detailed instructions on how to use the data
+	analysis scripts. Hopefully, it will not put you to sleep! More
+	detailed written instructions may follow.</p>
 	<p>external python packages needed</p>
 	<p>numpy, matplotlib, scikit-image, astropy, scipy, shapely , json,
-	cosmocalc (at https://cxc.harvard.edu/contrib/cosmocalc/)</p>
+	OpenCV, cosmocalc (at https://cxc.harvard.edu/contrib/cosmocalc/)</p>
 	<p>Installation: Put the python code in some directory that's in
 	your PYTHONPATH, make the scripts executable, and hopefully things
 	will work for you. The code has been tested with python 3.8 on
@@ -25,7 +28,9 @@
 	<p>Get_morphology_images uses morphological erosion and dilation to
 	remove background sources from a radio astronomy image. It extends
 	the technique described in Rudnick, 2002
-	https://iopscience.iop.org/article/10.1086/342499/pdf.</p>
+	<a href="https://iopscience.iop.org/article/10.1086/342499/pdf">https://iopscience.iop.org/article/10.1086/342499/pdf</a>.
+	See <a href="https://en.wikipedia.org/wiki/Mathematical_morphology">https://en.wikipedia.org/wiki/Mathematical_morphology</a>
+	for a general description of mathematical morphology.</p>
 	<p>The process can be described through the following equations:</p>
 	<p>o = original image</p>
 	<p>d - output from erosion/dilation</p>
@@ -47,19 +52,23 @@
 	get a final o* We select the components of o_c we wish to add by
 	masking their defining polygons to get a mask m_c</p>
 	<p>o* = o_d + m_c * o_c</p>
-	<p> Now, o_d or o* will still contain  areas with value 0 where we
-	subtracted off o_c.  We can fill in the values that we would
-	`expect’ to find in these areas by inpainting values from the
-	surrounding diffuse emission.  We can do this by either using
-	Navier-Stokes inpainting or Fast Marching Method inpainting. (See
-	e.g <a href="http://www.ifp.illinois.edu/~yuhuang/inpainting.html">http://www.ifp.illinois.edu/~yuhuang/inpainting.html</a>)
-	This will generate a an image o_inp which we can add to  o_d  or o*
-	to obtain a ‘filled in’ diffuse image, and subtract from o_c to
-	get the ‘actual’ point source signal.</p>
+	<p>Now, o_d or o* will still contain areas with value 0 where we
+	subtracted off o_c. We can fill in the values that we would `expect’
+	to find in these areas by inpainting values from the surrounding
+	diffuse emission. We can do this by either using Navier-Stokes
+	inpainting or Fast Marching Method inpainting. (See e.g
+	<a href="http://www.ifp.illinois.edu/~yuhuang/inpainting.html">http://www.ifp.illinois.edu/~yuhuang/inpainting.html</a>)
+	This will generate a an image o_inp which we can add to o_d or o* to
+	obtain a ‘filled in’ diffuse image, and subtract from o_c to get
+	the ‘actual’ point source signal.</p>
 	<p>Get_galaxy_parameters integrates the signal contained within
 	specified polygon areas of a radio astronomy image to derive
 	integrated flux densities and other parameters of a radio source.</p>
 	<p><br/>
+<br/>
+<br/>
+
+	</p>
 </div>
 </body>
 </html>
