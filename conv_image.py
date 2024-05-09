@@ -13,8 +13,7 @@ import matplotlib.pyplot as plt
 from datetime import date
 from astropy.wcs import WCS
 from astropy.io import fits
-from astropy.convolution import convolve, convolve_fft,Gaussian2DKernel, Tophat2DKernel
-from astropy.modeling.models import Gaussian2D
+from astropy.convolution import convolve, convolve_fft,Gaussian2DKernel
 import astropy.visualization as vis
 from check_array import check_array, update_dimensions
 from optparse import OptionParser
@@ -65,15 +64,17 @@ def convolve_image(fits_input_image, conv_factor, use_fft=False, do_downsize = F
 
 
 
-# need to adjust for new beam vs old beam size ratio
-  x_stddev = x_conv / (2.355 *pixel_size) 
-  y_stddev = y_conv / (2.355 *pixel_size) 
+# first convert from FWHM to sigma for use with Gaussian kernel
+# see https://en.wikipedia.org/wiki/Full_width_at_half_maximum
+  convert = 2.0 * math.sqrt(2.0 * np.log(2))
+  x_stddev = x_conv / (convert * pixel_size) 
+  y_stddev = y_conv / (convert * pixel_size) 
   theta = math.radians(bpa + 90.0) # theta from E-W line 
   kernel = Gaussian2DKernel(x_stddev, y_stddev, theta )
 
   original_array = hdu.data
   num_axes = len(hdu.data.shape)
-# now convolved the image
+# now convolve the image
   img_source = check_array(hdu.data)
 # set NaNs to zero
   img_source = np.nan_to_num(img_source)
@@ -83,7 +84,7 @@ def convolve_image(fits_input_image, conv_factor, use_fft=False, do_downsize = F
   else:
     print('**** using image plane convolution')
     astropy_conv = convolve(img_source, kernel)
-# apply gain factor
+# need to adjust for new beam vs old beam size ratio
   astropy_conv = astropy_conv * beam_size_gain
 # Now we plot te orginal and convolved image.  
 #plt.figure(1, figsize=(12, 12)).clf()
@@ -170,9 +171,9 @@ def main( argv ):
    parser.add_option('-f', '--file', dest = 'filename', help = 'input FITS file radio image  (default = None)', default = None)
    parser.add_option('-c', '--conv', dest = 'conv_factor', help = 'convolution factor (default = 2)', default = 2)
    parser.add_option('--ft', '--fft', dest = 'use_fft', help = 'do convolution with fft (default = False)', default = False)
-   parser.add_option('-d', '--downsize', dest = 'do_downsize', help = 'downsize image isampling interval (default = False)', default = False)
+   parser.add_option('-d', '--downsize', dest = 'do_downsize', help = 'downsize image sampling interval (default = False)', default = False)
    (options,args) = parser.parse_args()
-   print('options', options)
+   print('conv_image options', options)
    filename = options.filename
    conv_factor = float(options.conv_factor)
    use_fft = options.use_fft
@@ -184,10 +185,10 @@ def main( argv ):
      do_downsize = True
 
    print('conv_image incoming image', filename)
-   print('calling convolve with do_downsize', do_downsize)
+   print('conv_image calling convolve with do_downsize', do_downsize)
    convolve_image(filename, conv_factor, use_fft,do_downsize)
    elapsed = timeit.default_timer() - start_time
-   print("Run Time:",elapsed,"seconds")
+   print("conv_image Run Time:",elapsed,"seconds")
 
 
 if __name__ == '__main__':
