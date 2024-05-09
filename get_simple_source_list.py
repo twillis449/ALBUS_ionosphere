@@ -6,9 +6,9 @@
 import sys
 import numpy as np
 import math 
+import csv
 import timeit
 from coords import rad_to_hms, rad_to_dms
-from astropy.coordinates import Angle
 from astropy import units as u
 from astropy.io import fits
 from optparse import OptionParser
@@ -20,7 +20,6 @@ from beam_to_pixels import calculate_area
 from skimage import measure
 from skimage.draw import polygon as skimage_polygon
 from shapely.geometry import Polygon
-from shapely.geometry import  LineString
 from shapely.ops import polylabel
 from process_polygon_data import maxDist, simple_distance
 from operator import itemgetter, attrgetter
@@ -42,7 +41,6 @@ def Process_contour(x,y):
    data_result = orig_image[rr,cc]
 #  print('raw sum', data_result.sum())
    sum =  data_result.sum() / pixels_beam
-#  print('normalized  sum', sum)
    contained_points = len(rr) # needed if we want a flux density error
    point_source = False
    try:
@@ -60,6 +58,9 @@ def Process_contour(x,y):
          contour.append([x[i],y[i]])
       p = Polygon(contour)
       centroid = p.centroid     # gives position of object
+      bounds = p.bounds
+#     print(' ')
+#     print('bounds', bounds)
       use_max = 0
       if p.contains(centroid):
 # as usual, stupid x and y cordinate switching problem 
@@ -121,52 +122,42 @@ def Process_contour(x,y):
          s = s + '0'
       d_m_s = d + ':' + m + ':' + s
       source = h_m_s + ', ' + d_m_s  + ', ' +str(lon) + ', ' + str(lat)
+#     print('source', source)
 
 # get source size
       result = maxDist(contour,pixel_size)
       ang_size = result[0]
       pos_angle = result[1]
        
-#     print('raw angular size is ', ang_size)
-#     print('raw position angle is ', pos_angle)
-#     print('mean beam size is ', mean_beam)
-      sigma = mean_beam / 2.355 # 2.355 = 2 * sqrt(2 * ln 2)
-      ang_size = ang_size - 4 * sigma # 2 signa level ~ 10 % level of beam
-      if ang_size < 0.0:
-        ang_size = 0.0
-#     diff = ang_size*ang_size - mean_beam*mean_beam
-#     if diff > 0.0:
-#        ang_size = math.sqrt(ang_size*ang_size - mean_beam*mean_beam)
-#     else:
-#        ang_size = 0.0
-#     print('sum max_signal', sum, max_signal)
-      ratio = np.abs((sum - max_signal) / sum)
-#     print('ratio is ', ratio)
-#     print('corrected angular size is ', ang_size)
+      ratio = np.abs(sum / max_signal)
 # test for point source
-#     if (ratio <= 0.2) or (ang_size < 0.0):
-      if (ratio <= 0.2) or (ang_size < 0.5 * mean_beam):
-#     if ang_size <= 0.5 * mean_beam:
+      if (ratio <= extended_source_ratio) :
         point_source = True
+        ang_size = 0.0
+        if ratio < 0.8:
+          sum  = max_signal 
+      else:
+        mean_beam = 0.5 * (bmaj+bmin)
+        ang_size = ang_size - mean_beam
+        if ang_size < 0.0:
+          print('ang size < 0')
+          ang_size = 0.0
+          point_source = True
 # also test for point source
-      if (contained_points < pixels_beam):
-        point_source = True
-        sum = max_signal
+#       print('orignal sum,max_signal is', sum,max_signal)
       if point_source:
-#        output = source + ',  ' + str(round(sum*1000,3)) + ',   ' + str(round(flux_density_error*1000,4)) + ', ' +str(0.0) + ',   ' +str(0.0)
          output = source + ',' + str(sum) + ',' + str(flux_density_error) + ',' +str(0.0) + ',' +str(0.0)
       else:
          ang = round(ang_size,2)
          pa = round(pos_angle,2)
-#        output = source + ', ' + str(round(sum*1000,3)) + ', ' + str(round(flux_density_error*1000,4))  + ', ' + str(ang) + ', ' + str(pa)
          output = source + ',' + str(sum) + ',' + str(flux_density_error)  + ',' + str(ang) + ',' + str(pa)
       source_pos = (lon, output, use_max) # we will sort on the lon (ra)
    return source_pos
 
 # function that uses input parameters to set up things for distributed
 # and parallel data processing
-def generate_source_list(filename, threshold_value, noise):
-    global orig_image, pixels_beam , w, pixel_size, mean_beam, noise_out , limiting_flux
+def generate_source_list(filename, threshold_value, noise,source_ratio):
+    global orig_image, pixels_beam , w, pixel_size, bmaj, bmin, noise_out , limiting_flux, extended_source_ratio
     lowercase_fits = filename.lower()
     loc = lowercase_fits.find('.fits')
     outfile = filename[:loc] + '_source_list.txt' 
@@ -178,13 +169,12 @@ def generate_source_list(filename, threshold_value, noise):
     print('default noise (Jy)', noise)
     hdu_list = fits.open(filename)
     hdu = hdu_list[0]
-#   print('original fits header', hdu.header)
     w = WCS(hdu.header)
     w = w.celestial
     orig_image = check_array(hdu.data)
     nans = np.isnan(orig_image)
     orig_image[nans] = 0
-    print('original image max signal', orig_image.max())
+#   print('original image max signal', orig_image.max())
 
 # the 'orig_image' can be defined as a global variable as it is only
 # used in read-only mode. So it can be shared over separate cores / threads
@@ -194,11 +184,12 @@ def generate_source_list(filename, threshold_value, noise):
     print('pixel size arcsec = ', pixel_size)
     bmaj = hdu.header['BMAJ'] * 3600.0
     bmin = hdu.header['BMIN'] * 3600.0
-    mean_beam = 0.5 * (bmaj + bmin)
+    mean_beam = 0.5 * (bmaj+bmin)
     output ='# mean beam size (arcsec) ' + str(round(mean_beam,2)) + '\n' 
     f.write(output)
     pixels_beam = calculate_area(bmaj, bmin, pixel_size)
     output ='# calculated pixels per beam ' + str(round(pixels_beam,2)) + '\n'
+    print('pixels per beam', output)
     f.write(output)
     if noise == 0.0:
        print('determining noise in image - this may take some time ...')
@@ -209,9 +200,12 @@ def generate_source_list(filename, threshold_value, noise):
     output = '# noise out ' +  str(noise_out) + ' Jy\n'
     f.write(output)
     limiting_flux = noise_out * threshold_value
-
     print('limiting flux', limiting_flux)
-    output = '# limiting_flux ' + str(limiting_flux*1000) +' mJy\n'
+    output = '# limiting_flux ' + str(round(limiting_flux*1000,2)) +' mJy\n'
+    f.write(output)
+    extended_source_ratio = source_ratio
+    print('extended_source_ratio', extended_source_ratio)
+    output = '# extended_source_ratio test '+ str(extended_source_ratio) +'\n'
     f.write(output)
     mask = np.where(orig_image>limiting_flux,1.0,0.0)
     mask = mask.astype('float32')
@@ -297,15 +291,18 @@ def main( argv ):
    parser.add_option('-f', '--file', dest = 'filename', help = 'FITS file with radio image  (default = None)', default = None)
    parser.add_option('-t', '--threshold', dest = 'threshold', help = 'Threshold value for source detection in units of noise (default = 6)', default = 6)
    parser.add_option('-n', '--noise', dest = 'noise', help = 'noise specification in mJy, where noise cannot be found from image (default = 0)', default = 0.0)
+   parser.add_option('-e', '--extend', dest = 'extend', help = 'ratio to determine if a source is extended (default = 1.2)', default = 1.2)
    (options,args) = parser.parse_args()
    print('options', options)
    filename = options.filename
    noise = float(options.noise) 
    if noise > 0.0:
       noise = noise / 1000.0   # convert to Jy
+   extension_ratio = float(options.extend) 
+   print('extend ratio', extension_ratio) 
    signal_flux = float(options.threshold)
    start_time = timeit.default_timer()
-   generate_source_list(filename, signal_flux, noise)
+   generate_source_list(filename, signal_flux, noise,extension_ratio)
    print('get_source_list finished \n')
    elapsed = timeit.default_timer() - start_time
    print("Run Time:",elapsed,"seconds")
