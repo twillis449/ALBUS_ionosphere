@@ -33,9 +33,9 @@ def process_images(filename, filter_size, filter_type, offset_flux, use_conv, do
           out_ra_dec = ra_dec.replace(blank, underscore)
           print('output ra_dec ', out_ra_dec)
           if use_conv:
-            field_name = names[i] +'_conv'
+            field_name = names[i] +'_conv' + '.fits'
           else:
-            field_name = names[i] 
+            field_name = names[i] + '.fits'
           print('i, field_name_i ', i, field_name)
           parameter_list = []
           parameter_list.append(' ')
