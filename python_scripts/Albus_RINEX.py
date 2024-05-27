@@ -365,7 +365,7 @@ def get_RINEX_obs_file_from_web(RINEX_filename,
                                 FTP_site = 0,
                                 overwrite = 0
                                 ):
-    """use urllib3 to get a RINEX station observation file from the Internet
+    """ get a RINEX station observation file from the Internet
 
 RINEX_filename    I  The nameof the RINEX 2 file to get.  Should normally be
                      in the form ssssddd0.yyx, but you already know that.
@@ -732,7 +732,7 @@ def get_GPS_ephemeris_file_from_web(ephemeris_filename,
                                     FTP_site = 0,
                                     overwrite = 0
                                     ):
-    """use urllib3 to get an ephemeris file from the Internet
+    """ get an ephemeris file from the Internet
 
 ephemeris_filename I The nameof the ephemeris file to get.  Should normally be
                      in the form ggggddd0.yyi, but you already know that.
@@ -850,7 +850,7 @@ def get_IONEX_file_from_web(IONEX_filename,
                             FTP_site = 0,
                             overwrite = 0
                             ):
-    """use urllib3 to get an IONEX file from the Internet
+    """ get an IONEX file from the Internet
 
 IONEX_filename    I  The nameof the IONEX file to get.  Should normally be
                      in the form ggggddd0.yyi, but you already know that.
@@ -947,7 +947,7 @@ def get_CODE_P1P2_file_from_web(year, month, data_type = 'P2',
                                 output_directory = ".",
                                 overwrite = 0
                                 ):
-    """use urllib3 to get a P1P2 differential code bias file from CODE
+    """ get a P1P2 differential code bias file from CODE
 
 year              I  The 4 digit year of the observation
 month             I  the month of the observation
