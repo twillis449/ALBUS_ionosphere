@@ -61,7 +61,7 @@ def main():
            print('sftp host name', host_name)
            localFilePath = sys.argv[2]
            print('localFilePath',localFilePath)
-           with pysftp.Connection(host=host_name, username='anonymous', password='ALBUS_ionosphere') as sftp:
+           with pysftp.Connection(host=host_name, username='anonymous', password='ALBUS_ionosphere',cnopts=cnopts) as sftp:
               print("Connection successfully established ... ")
               remoteFilePath  = sys.argv[1][split_location+1:]
               print('*** sftp trying to get file', remoteFilePath )
