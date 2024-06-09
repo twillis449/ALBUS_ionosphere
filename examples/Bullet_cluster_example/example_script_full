@@ -1,0 +1,62 @@
+# run this script by entering on the command line 'source example_script_full'
+
+# first make 'soft' link to the original image
+# first delete any previous version
+
+/bin/rm -rf  *.fits
+ln -s bullet_cluster_centre.FITS  bullet_cluster.fits
+
+# generate morphology images
+# This will call generate_mask_polygons.py program
+
+get_morphology_images.py -f bullet.csv -t D --th 9 
+
+# inpainting will not work on large structures that are not surrounded 
+# by diffuse emission, so remove those objects from the mask
+
+/bin/rm -rf bullet_cluster.fits
+ln -s bullet_cluster-dilated_tophat.mask.fits  bullet_cluster.fits
+separate_masks.py -f bullet_cluster.fits
+
+# fil in the holes with inpainting
+inpainter.py  -f bullet.csv
+
+# get parameters for the un-convolved image
+
+/bin/rm -rf bullet_cluster.fits
+ln -s  bullet_cluster_CV_NS_inpaint_result.fits bullet_cluster.fits
+#ln -s bullet_cluster_pyheal_FMM_inpaint_result.fits bullet_cluster.fits
+get_galaxy_parameters.py -f bullet.csv --th 3.5 -s False
+/bin/rm -rf  bullet_cluster.source_parameters_diffuse_image
+mv bullet_cluster.source_parameters bullet_cluster.source_parameters_diffuse_image
+
+# get parameters for the un-convolved image useing manual mask (commented out for the moment)
+
+#/bin/rm -rf bullet_cluster.fits
+#ln -s  bullet_cluster_CV_NS_inpaint_result.fits bullet_cluster.fits
+#get_galaxy_parameters.py -f bullet.csv --th 3.5 -s False -m False
+#/bin/rm -rf bullet_cluster.source_parameters_diffuse_image_manual
+#mv bullet_cluster.manual_source_parameters bullet_cluster.source_parameters_diffuse_image_manual
+
+# convolve inpainted image by a default factor 2
+conv_image.py -f bullet_cluster.fits 
+
+# get parameters for the convolved image
+
+get_galaxy_parameters.py -f bullet.csv --th 4 --use_conv T -s False 
+/bin/rm -rf  bullet_cluster_conv.source_parameters_std
+mv bullet_cluster_conv.source_parameters bullet_cluster_conv.source_parameters_NS1
+
+# get flux density of point sources after subtracting off inpaint results
+
+image_math.py -f bullet_cluster_CV_NS_inpaint_result.fits -s  bullet_cluster-dilated_tophat.mask.fits  -m m
+image_math.py -f bullet_cluster.masked_compact_structure.fits -s  image_math_mult.fits  -m s
+/bin/rm -rf bullet_cluster.fits
+ln -s  image_math_subt.fits  bullet_cluster.fits  
+get_galaxy_parameters.py -f bullet.csv --th 3 -n 0.007 -s False
+/bin/rm -rf  bullet_cluster.source_parameters_compact_sources
+mv bullet_cluster.source_parameters bullet_cluster.source_parameters_compact_sources
+
+# finally run code based on Larry Rudlick approach
+
+larrys_script.py bullet_cluster_centre.FITS 5 5

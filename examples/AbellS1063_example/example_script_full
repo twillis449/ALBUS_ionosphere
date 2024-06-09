@@ -1,0 +1,52 @@
+# run this script by entering on the command line 'source example_script_full'
+
+# first make 'soft' link to the original image
+# first delete any previous version
+
+/bin/rm -rf  *.fits
+ln -s AbellS1063_inner.FITS AbellS1063.fits
+
+# generate morphology images
+#will call generate_mask_polygons.py program
+
+get_morphology_images.py -f abellsouth.csv -t D --th 6 
+
+# fil in the holes with inpainting
+
+/bin/rm -rf AbellS1063.fits
+ln -s  AbellS1063_final_image.fits  AbellS1063.fits
+inpainter.py  -f abellsouth.csv
+
+# get parameters for the un-convolved image
+
+/bin/rm -rf AbellS1063.fits
+ln -s  AbellS1063_CV_NS_inpaint_result.fits AbellS1063.fits
+get_galaxy_parameters.py -f abellsouth.csv --th 3.5 -s False
+/bin/rm -rf  AbellS1063.source_parameters_diffuse_image
+mv AbellS1063.source_parameters AbellS1063.source_parameters_diffuse_image
+
+# convolve image by a default factor of 2
+
+conv_image.py -f AbellS1063.fits 
+
+# get parameters for the convolved image
+
+get_galaxy_parameters.py -f abellsouth.csv --th 4 --use_conv T -s False
+/bin/rm -rf  AbellS1063_conv.source_parameters_std
+mv AbellS1063_conv.source_parameters AbellS1063_conv.source_parameters_std
+
+# do manual analysis
+
+get_galaxy_parameters.py -f abellsouth.csv --th 4 --use_conv T -s False -m False
+/bin/rm -rf AbellS1063.source_parameters_diffuse_image_manual
+mv AbellS1063.manual_source_parameters AbellS1063.source_parameters_diffuse_image_manual
+
+# get flux density of point sources after subtracting off inpaint results
+
+image_math.py -f AbellS1063_CV_NS_inpaint_result.fits -s  AbellS1063-dilated_tophat.mask.fits  -m m
+image_math.py -f AbellS1063.masked_compact_structure.fits -s  image_math_mult.fits  -m s
+/bin/rm -rf AbellS1063.fits
+ln -s  image_math_subt.fits  AbellS1063.fits  
+get_galaxy_parameters.py -f abellsouth.csv --th 3 -n 0.007 -s False
+/bin/rm -rf  AbellS1063.source_parameters_compact_sources
+mv AbellS1063.source_parameters AbellS1063.compact_source_parameters
