@@ -91,6 +91,7 @@ def convolve_image(fits_input_image, conv_factor, use_fft=False, do_downsize = F
   ax1 = plt.subplot(1,2,1, projection=WCS(hdu.header).celestial)
   interval = vis.PercentileInterval(99.9)
   vmin,vmax = interval.get_limits(img_source)
+  vmin = 0.0
   norm = vis.ImageNormalize(vmin=vmin, vmax=vmax, stretch=vis.LogStretch(1000))
   im = ax1.imshow(img_source, cmap =plt.cm.gray_r, norm = norm, origin = 'lower')
   ax1.coords['ra'].set_axislabel('Right Ascension')
@@ -101,6 +102,7 @@ def convolve_image(fits_input_image, conv_factor, use_fft=False, do_downsize = F
   ax4 = plt.subplot(1,2,2, projection=WCS(hdu.header).celestial)
   interval = vis.PercentileInterval(99.9)
   vmin,vmax = interval.get_limits(astropy_conv)
+  vmin = 0.0
   norm = vis.ImageNormalize(vmin=vmin, vmax=vmax, stretch=vis.LogStretch(1000))
   im=ax4.imshow(astropy_conv, cmap =plt.cm.gray_r, norm = norm, origin = 'lower')
   ax4.coords['ra'].set_axislabel('Right Ascension')
