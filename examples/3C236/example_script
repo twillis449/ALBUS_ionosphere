@@ -3,27 +3,28 @@
 # first make 'soft' link to the original image
 # first delete any previous version
 /bin/rm -rf 3C236.*fits 
-ln -s 3C236_original.FITS 3C236.fits
+ln -s 3C236_original_carta.FITS 3C236.fits
 
 # obtain initial flux density 
 # will call generate_mask_polygons.py program
-get_galaxy_parameters.py 3C236.csv F T F 6 
+get_galaxy_parameters.py -f 3C236.csv  --th 6  -s False
 
 # generate morphology images
 # NOTE: this script expects you to click on some of the background sources
 # and the central point source to remove them. If you don't do that
 # the script will not generate the output file needed for the next step
 # will call generate_mask_polygons.py program
-get_morphology_images.py 3C236.csv 3 D 6 F F 
+
+get_morphology_images.py -f 3C236.csv -t D --th 6 
 #
 # convolve the resulting image by a factor 2
 /bin/rm -rf 3C236.fits 
 ln -s 3C236_final_image.fits 3C236.fits
-conv_image.py 3C236.fits 2 F 
+conv_image.py -f 3C236.fits 
 
 # get parameters for the convolved image
 # will call generate_mask_polygons.py program
-get_galaxy_parameters.py 3C236.csv F T T 3  
+get_galaxy_parameters.py -f 3C236.csv --use_conv True --th 3  
 
 # that's all!
 
