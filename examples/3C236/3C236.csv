@@ -1,0 +1,5 @@
+freq  0.608500030000 
+#---+----1----+----2----+----3----+----4----+----5----+----6----+----7----+----8----+----9----+----0
+# name  RADEC   RA/deg        DEC/deg    LAS/' z_adopt  spectral_index
+3C236 1003+35 150.770710000 35.1468620000 40   0.1
+# ...... for as many objects as you wish to process
