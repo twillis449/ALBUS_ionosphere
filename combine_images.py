@@ -112,19 +112,20 @@ def combine_images(filename, json_polygons, original_noise=0.0):
 
 # update original masked diffuse file for later potential use
 # in filling in image holes
-      masked_dilated_fits_file = filename + '.masked_dilated_image.fits'
-      hdu_list = fits.open(masked_dilated_fits_file)
-      hdu = hdu_list[0]
-      incoming_dimensions = hdu.header['NAXIS']
-      hdu = hdu_list[0]
-      masked_dilated_data = check_array(hdu.data)
-      masked_dilated_data = masked_dilated_data * mask_update
-      masked_dilated_data = update_dimensions(masked_dilated_data,incoming_dimensions)
-      hdu.data = masked_dilated_data
-      hdu.header['DATAMIN'] = hdu.data.min()
-      hdu.header['DATAMAX'] = hdu.data.max()
-      print('sending final masked dilated data  to ', masked_dilated_fits_file)
-      hdu.writeto(masked_dilated_fits_file, overwrite=True)
+
+#     masked_dilated_fits_file = filename + '.masked_dilated_image.fits'
+#     hdu_list = fits.open(masked_dilated_fits_file)
+#     hdu = hdu_list[0]
+#     incoming_dimensions = hdu.header['NAXIS']
+#     hdu = hdu_list[0]
+#     masked_dilated_data = check_array(hdu.data)
+#     masked_dilated_data = masked_dilated_data * mask_update
+#     masked_dilated_data = update_dimensions(masked_dilated_data,incoming_dimensions)
+#     hdu.data = masked_dilated_data
+#     hdu.header['DATAMIN'] = hdu.data.min()
+#     hdu.header['DATAMAX'] = hdu.data.max()
+#     print('sending final masked dilated data  to ', masked_dilated_fits_file)
+#     hdu.writeto(masked_dilated_fits_file, overwrite=True)
 
 
     else:
