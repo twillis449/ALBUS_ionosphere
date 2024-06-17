@@ -114,6 +114,7 @@ def paint_image(filename, maskname):
 
      interval = vis.PercentileInterval(99.9)
      vmin,vmax = interval.get_limits(orig_image)
+     vmin = 0.0
      vmax = 0.25 * vmax
      norm = vis.ImageNormalize(vmin=vmin, vmax=vmax, stretch=vis.LogStretch(1000))
 
@@ -126,11 +127,13 @@ def paint_image(filename, maskname):
      ax[2].set_title('inpainted_diffuse_source')
      if use_cv2:
        vmin,vmax = interval.get_limits(inpainted)
+       vmin =0.0
        vmax = 0.25 * vmax
        norm = vis.ImageNormalize(vmin=vmin, vmax=vmax, stretch=vis.LogStretch(1000))
        ax[2].imshow(inpainted, cmap =plt.cm.gray_r, norm=norm,origin='lower')
      else:
        vmin,vmax = interval.get_limits(image)
+       vmin =0.0
        vmax = 0.25 * vmax
        norm = vis.ImageNormalize(vmin=vmin, vmax=vmax, stretch=vis.LogStretch(1000))
        ax[2].imshow(image, cmap=plt.cm.gray_r, norm=norm,origin='lower')
