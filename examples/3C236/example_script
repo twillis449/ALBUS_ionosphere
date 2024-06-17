@@ -27,6 +27,7 @@ get_morphology_images.py -f 3C236.csv -t D --th 22
 # note: this will overwrite the previous version of 3C236_final_image.fits
 
 # do inpainting of area where 200 mJy source was removed
+/bin/rm -rf 3C236.fits 
 ln -s 3C236_final_image.fits 3C236.fits
 inpainter.py  -f 3C236.csv
 
