@@ -129,7 +129,7 @@ def make_mask(argv):
     filename = filename[:loc]
     out_tophat = filename +'-dilated_tophat.fits'
 #   print('make_mask: tophat output to ', out_tophat )
-    hdu.writeto(out_tophat, overwrite=True)
+#   hdu.writeto(out_tophat, overwrite=True)
 
     
 #   m = mask derived from a comparison where  t > some signal
@@ -148,7 +148,7 @@ def make_mask(argv):
 # so we have filtered data which will be subtracted from original image
 #   m * t = m * (o - d)
     filtered_data = white_tophat * mask
-    filtered_morphology_image = morphology_image * mask
+#   filtered_morphology_image = morphology_image * mask
     nans = np.isnan(filtered_data)
     filtered_data[nans] = 0
 
@@ -156,14 +156,14 @@ def make_mask(argv):
 #   write out m * d
     masked_dilated_image = mask * morphology_image
     hdu.data = masked_dilated_image
-#   print('filtered data max and min', hdu.data.max(), hdu.data.min())
+    print('filtered data max and min', hdu.data.max(), hdu.data.min())
     hdu.header['DATAMAX'] =  masked_dilated_image.max()
     hdu.header['DATAMIN'] =  masked_dilated_image.min()
 
     outfile = filename +'.masked_dilated_image.fits'
-#   print('filtered_data image output to ', outfile )
+    print('filtered_data image output to ', outfile )
 #   write out m * d
-    hdu.writeto(outfile, overwrite=True)
+#   hdu.writeto(outfile, overwrite=True)
 
 #   o_d = output diffuse image
 #       = o - m * t  
