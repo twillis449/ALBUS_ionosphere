@@ -73,8 +73,9 @@ def make_morphology_image(filename, filter_size, filter_type, double_erode):
     hdu.header['DATAMAX'] =  filter_image.max()
     hdu.header['DATAMIN'] =  filter_image.min()
     loc = filename.find('.fits')
-    outfile = filename[:loc] + '-dilated.fits'
-    hdu.writeto(outfile, overwrite=True)
+#   don't bother to write this image out at the moment
+#   outfile = filename[:loc] + '-dilated.fits'
+#   hdu.writeto(outfile, overwrite=True)
     return filter_image
 
 def main( argv ):
