@@ -16,10 +16,12 @@ from calculate_source_parms import analyze_image
 from optparse import OptionParser
 
 
-def process_images(filename, use_b_mask, use_conv, do_subt, threshold_value,noise):
+def process_images(filename, use_b_mask, use_conv, use_multi, do_subt, threshold_value,noise):
         print('processing file ', filename)
         print('use_b_mask', use_b_mask)
         print('use_conv', use_conv)
+        print('use_conv', use_conv)
+        print('use_multi', use_multi)
         print('do_subt', do_subt)
         print('threshold value', threshold_value)
         print('default noise (Jy)', noise)
@@ -74,13 +76,14 @@ def process_images(filename, use_b_mask, use_conv, do_subt, threshold_value,nois
             print ("File does not exist")
             continue
           location = object_name.find('.fits')
-          analyze_image(field_name,freq,red_shift[i],spec_index[i],las_HA,use_b_mask,do_subt, threshold_value, noise)
+          analyze_image(field_name,freq,red_shift[i],spec_index[i],las_HA,use_b_mask,do_subt, threshold_value, noise, use_multi)
 
 
 def main( argv ):
    parser = OptionParser(usage = '%prog [options] ')
    parser.add_option('-f', '--file', dest = 'filename', help = 'Filename with radio source names, positions, redshift etc (default = None)', default = None)
    parser.add_option('-m', '--use_m', dest = 'use_mask', help = 'use mask (default = T)', default = True)
+   parser.add_option('-u', '--use_multi', dest = 'use_multi', help = 'use multi polygon (default = T)', default = True)
    parser.add_option('-c','--use_conv', dest = 'use_conv', help = 'use convolved image (default = F)', default = False)
    parser.add_option('-s','--subt', dest = 'do_subt', help = 'subtract central pixel flux density for equipartition (default = T)', default = True)
    parser.add_option('-t', '--threshold', dest = 'threshold', help = 'Threshold value forsoure detection in units of noise (default = 6)', default = 6)
@@ -92,12 +95,15 @@ def main( argv ):
    do_subt = options.do_subt
    print('do_subt', do_subt)
    use_mask = options.use_mask
+   use_multi = options.use_multi
    noise = float(options.noise) / 1000.0
    signal_flux = float(options.threshold)
    if use_conv != False:
      use_conv = True
    if use_mask != True:
      use_mask = False
+   if use_multi != True:
+     use_multi = False
    if do_subt != True:
      do_subt = False
 
@@ -109,7 +115,7 @@ def main( argv ):
   # argv[4] T = use a convolved radio image
   # argv[5] threshold value for signal derection ( = factor by which to 
   #         multiply breizorro noise)
-   process_images(filename, use_mask, use_conv, do_subt,signal_flux, noise)
+   process_images(filename, use_mask, use_conv, use_multi, do_subt,signal_flux, noise)
 
    print('get_galaxy_parameters: finished \n')
    elapsed = timeit.default_timer() - start_time
