@@ -47,7 +47,7 @@ def process_simple_polygon_file(points):
   return poly_coord
 
 
-def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,do_subt=False, threshold_value=3, noise=0):
+def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,do_subt=False, threshold_value=3, noise=0,use_multi=False):
     print('analyze_image parameters:', filename, freq, z_str, alpha_str, specified_las, use_mask_l, do_subt, threshold_value, noise)
 # note - no '.fits' extension expected ... but
     if filename.find('conv'):
@@ -255,8 +255,9 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,do
   # check on calculation
       else:
         try:
-#         print('\n calculating individual lobe parameters')
-#         print('i, lobe_las[i-1]', i, lobe_las[i-1])
+          print('\n calculating individual lobe parameters')
+          print('i, lobe_las[i-1]', i, lobe_las[i-1])
+          print('i, lobe_pa[i-1]', i, lobe_pa[i-1])
           hypotenuse = float(lobe_las[i-1]) / pixel_size 
           ellipse_half_size = p.area / (math.pi * 0.5 * hypotenuse )
 #         print('i hypotenuse , minor ellipse',i, hypotenuse, ellipse_half_size)
@@ -378,10 +379,26 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,do
         f.write(output)
         output = 'luminosity distance (Mpc) : ' + str(round(LUM_dist/1000.0,2)) + '\n'
         f.write(output)
+        if breizorro_noise:
+          if round(rms_noise*1000.0,3) <= 0.001:
+            output = 'breizorro median noise (microJy) : ' + str(round(rms_noise*1000000.0,3)) + ' \n'
+          else:
+            output = 'breizorro median noise (mJy) : ' + str(round(rms_noise*1000.0,3)) + ' \n'
+        else:
+          if round(rms_noise*1000.0,3) <= 0.001:
+            output = 'rms noise (microJy) : ' + str(round(rms_noise*1000000.0,3)) + ' \n'
+          else: 
+            output = 'rms noise (mJy) : ' + str(round(rms_noise*1000.0,3)) + ' \n'
+        f.write(output)
+        if not use_multi and num_polygons>1:
+          output = '\n \n'
+          f.write(output)
+          continue
+
         if not point_source:
           output = 'Computer generated source angular size (arcsec): ' + str(round(computer_las-mean_beam,2)) +'\n'
           f.write(output)
-          output = '  At position angle (degrees): ' + str(round(max_pa,0)) +'\n'
+          output = '  At position angle (degrees): ' + str(round(max_pa)) +'\n'
           f.write(output)
         specified_las = float(specified_las)
         output = 'Initial specified source angular size (arcsec): ' + str(round(specified_las,2)) + '\n'
@@ -409,22 +426,12 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,do
 
       output = 'source apparent projected size (kpc) : ' + str(round(source_size,2)) + '\n'
       f.write(output)
+      output = 'nominal position angle of lobe  (degrees) : ' + str(round(lobe_pa[i-1]))  + '\n'
+      f.write(output)
       output = 'model ellipse major and minor axis sizes (arcsec) : ' + str(round(theta_big,2)) + ' ' + str(round(theta_small,2)) + '\n'
       f.write(output)
       output = 'nominal path length through source (kpc) : ' + str(round(LAP,2)) + '\n'
       f.write(output)
-      if i == 0:
-        if breizorro_noise:
-          if round(rms_noise*1000.0,3) <= 0.001:
-            output = 'breizorro median noise (microJy) : ' + str(round(rms_noise*1000000.0,3)) + ' \n'
-          else:
-            output = 'breizorro median noise (mJy) : ' + str(round(rms_noise*1000.0,3)) + ' \n'
-        else:
-          if round(rms_noise*1000.0,3) <= 0.001:
-            output = 'rms noise (microJy) : ' + str(round(rms_noise*1000000.0,3)) + ' \n'
-          else: 
-            output = 'rms noise (mJy) : ' + str(round(rms_noise*1000.0,3)) + ' \n'
-        f.write(output)
       if i == 0:
         output = 'source flux density (mJy) : ' + str(round(flux*1000.0,2)) + ' \n'
       else:
