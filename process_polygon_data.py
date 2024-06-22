@@ -54,6 +54,8 @@ def maxDist(p,scale):
       tan = tan + 180.0
     if tan > 180.0:
       tan = tan - 180.0
+    result = (math.sqrt(maxm), tan)
+    print('maxDist result',result)
     return (math.sqrt(maxm), tan, p_0, p_1)
 
 def process_json_file(in_data, pixel_size=0.0):
@@ -127,7 +129,8 @@ def process_json_file(in_data, pixel_size=0.0):
       result = maxDist(p_max,pixel_size)
       max_las = result[0] 
       max_pa = result[1]
-#     print('Source has maximum angular size and position angle', max_las, max_pa)
+      print('Source has maximum angular size and position angle', max_las, max_pa)
+      print('las, las_pa', las,las_pa)
       return polygon_list, coords, max_las, las, max_pa, las_pa
     else:
       return polygon_list, coords
