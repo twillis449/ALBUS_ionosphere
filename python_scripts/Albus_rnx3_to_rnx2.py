@@ -7,8 +7,6 @@ import sys
 import os
 from os import path
 import time as systime
-import Albus_RINEX
-#import subprocess
 
 def convert_rnx3_to_rnx2_file(in_filename):
 # first convert incoming cnx file to rnx
