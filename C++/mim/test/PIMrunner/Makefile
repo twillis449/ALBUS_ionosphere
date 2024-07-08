@@ -168,7 +168,8 @@ LOFAR_OBS = \
 	test2.o \
 	vlba_obs.o
 
-all: $(PROG) $(LIBS)
+#all: $(PROG) $(LIBS)
+all: $(LIBS)
 .PHONY : all
 
 
