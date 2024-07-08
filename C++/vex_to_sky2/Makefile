@@ -43,8 +43,8 @@ SUBDIRS = \
 
 
 
-
-
+# As far as I can see we never make any use of ell_coord_converter. Coordinate conversions stuff
+# is handled by python code these days
 PROG = \
 	ell_coord_converter
 
@@ -94,7 +94,8 @@ install: subdirs libjmavex.so $(PROG)
 	$(CP) libjmavex.* $(INSTALLDIR)/lib
 	$(CP) $(HEADERS) $(INSTALLDIR)/include
 	$(MKDIR) $(INSTALLDIR)/bin
-	$(CP) $(PROG) $(INSTALLDIR)/bin
+#       $(CP) $(PROG) $(INSTALLDIR)/bin
+# we no longer install the compiled program
 
 
 test: $(OBJS) test.o
