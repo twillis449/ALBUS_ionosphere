@@ -20,6 +20,8 @@ import copy
 import socket
 if(socket.getdefaulttimeout == None):
     socket.setdefaulttimeout(120.0)
+#import urllib3.request, urllib3.parse, urllib3.error
+import urllib3.request
 import Albus_RINEX_2
 import Albus_RINEX
 import string
@@ -212,9 +214,7 @@ GPS         O  The filled dictionary
     print('input file is ', filename)
     # dunnon what encoding was used on this file but it is not UTF 8.
     # strip whatever is not ASCII further down
-    # this fails to read properly with Python3.6. It reads with Python3.8
     fp = open(filename, "rb") 
-    counter = 0
     try:
         site_id_found = 0
         for line in fp:
@@ -230,16 +230,20 @@ GPS         O  The filled dictionary
                     fp.close()
                     return GPS
                 else:
-                  name = line[1:5].lower()
-                  if name in GPS:  
-                    continue
-                  longitude = Albus_Coordinates.deg_str_to_rad(line[44:56])
-                  latitude  = Albus_Coordinates.deg_str_to_rad(line[57:69])
-                  height    = float(line[70:78])
-                x,y,z = cartesian_coord(longitude, latitude, height, WGS84)
-#               print('** name, long, lat, ht ', name,longitude, latitude, height)
-                GPS[name] = [x,y,z]
-                counter = counter +1
+                  search_key = line[1:5].lower()
+                  country = line[15:18]
+                  name = search_key + country
+                  add_data = True
+                  if add_data:
+                    for i in GPS.keys():
+                      if i[0:4] == search_key:
+                         add_data = False
+                  if add_data: 
+                    longitude = Albus_Coordinates.deg_str_to_rad(line[44:56])
+                    latitude  = Albus_Coordinates.deg_str_to_rad(line[57:69])
+                    height    = float(line[70:78])
+                    x,y,z = cartesian_coord(longitude, latitude, height, WGS84)
+                    GPS[name] = [x,y,z]
     except Exception as e:
       print('read failure at about line', counter)
       raise e
@@ -492,7 +496,11 @@ def fill_standard_stations():
             try:
                 try:
                     temp_file = tempfile.NamedTemporaryFile()
+                    webfile = "ftp://igs.org/pub/station/general/igs_with_former.snx"
                     try:
+                        print("Downloading %s"%webfile)
+                        urllib3.request.urlretrieve(webfile, temp_file.name)
+                        urllib3.request.urlcleanup()
                         print('%%% filling GPS_dict')
                         print('using GPS data file ', temp_file.name)
                         GPS_dict = fill_GPS_station_dict(GPS_dict, temp_file.name)
@@ -714,24 +722,17 @@ A        O  List of 3 element arrays [station_name, station_position, dist],
 """
     global GPS_stations
     if(stations == None): stations = GPS_stations
-    local_list = []
-    global_list = [] 
+    total_list = []
     for s in stations:
-#       print s, stations[s]
         pos = stations[s]
         for XYZ in coord_list:
             delta = [pos[0]-XYZ[0], pos[1]-XYZ[1], pos[2]-XYZ[2]]
             dist = math.sqrt(delta[0]*delta[0] +delta[1]*delta[1]
                              +delta[2]*delta[2])
             if(dist <= max_dist):
-              if s.lower() in GPS_global_station_list:
-                global_list.append([s, pos, dist])
-              else:
-                local_list.append([s, pos, dist])
-              print('get_stations_within_distance_2: potential station ',s.lower(),'at distance (km)', dist/1000.0)
+              print('potential GPS station',s,'at distance (km)', dist/1000.0)
+              total_list.append([s, pos, dist])
               break
-    # put global GNSS stations first - they tend to have high quality data
-    total_list = global_list + local_list
     return total_list
 
 

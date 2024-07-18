@@ -21,6 +21,7 @@ import warnings
 import math
 import time as systime
 import subprocess
+
 import requests
 
 ################################################################################
@@ -69,17 +70,9 @@ URL_GETTER = "Albus_RINEX_download.py"
 FTP_GETTER = "Albus_RINEX_userftp.py"
 FTP_GETTER_ALLOW = True
 
+_ISO_COUNTRY_CODES = ['AFG', 'ALA', 'ALB', 'DZA', 'ASM', 'AND', 'AGO', 'AIA', 'ATA', 'ATG', 'ARG', 'ARM', 'ABW', 'AUS', 'AUT', 'AZE', 'BHS', 'BHR', 'BGD', 'BRB', 'BLR', 'BEL', 'BLZ', 'BEN', 'BMU', 'BTN', 'BOL', 'BES', 'BIH', 'BWA', 'BVT', 'BRA', 'IOT', 'BRN', 'BGR', 'BFA', 'BDI', 'CPV', 'KHM', 'CMR', 'CAN', 'CYM', 'CAF', 'TCD', 'CHL', 'CHN', 'CXR', 'CCK', 'COL', 'COM', 'COG', 'COD', 'COK', 'CRI', 'CIV', 'HRV', 'CUB', 'CUW', 'CYP', 'CZE', 'DNK', 'DJI', 'DMA', 'DOM', 'ECU', 'EGY', 'SLV', 'GNQ', 'ERI', 'EST', 'SWZ', 'ETH', 'FLK', 'FRO', 'FJI', 'FIN', 'FRA', 'GUF', 'PYF', 'ATF', 'GAB', 'GMB', 'GEO', 'DEU', 'GHA', 'GIB', 'GRC', 'GRL', 'GRD', 'GLP', 'GUM', 'GTM', 'GGY', 'GIN', 'GNB', 'GUY', 'HTI', 'HMD', 'VAT', 'HND', 'HKG', 'HUN', 'ISL', 'IND', 'IDN', 'IRN', 'IRQ', 'IRL', 'IMN', 'ISR', 'ITA', 'JAM', 'JPN', 'JEY', 'JOR', 'KAZ', 'KEN', 'KIR', 'PRK', 'KOR', 'KWT', 'KGZ', 'LAO', 'LVA', 'LBN', 'LSO', 'LBR', 'LBY', 'LIE', 'LTU', 'LUX', 'MAC', 'MDG', 'MWI', 'MYS', 'MDV', 'MLI', 'MLT', 'MHL', 'MTQ', 'MRT', 'MUS', 'MYT', 'MEX', 'FSM', 'MDA', 'MCO', 'MNG', 'MNE', 'MSR', 'MAR', 'MOZ', 'MMR', 'NAM', 'NRU', 'NPL', 'NLD', 'NCL', 'NZL', 'NIC', 'NER', 'NGA', 'NIU', 'NFK', 'MKD', 'MNP', 'NOR', 'OMN', 'PAK', 'PLW', 'PSE', 'PAN', 'PNG', 'PRY', 'PER', 'PHL', 'PCN', 'POL', 'PRT', 'PRI', 'QAT', 'REU', 'ROU', 'RUS', 'RWA', 'BLM', 'SHN', 'KNA', 'LCA', 'MAF', 'SPM', 'VCT', 'WSM', 'SMR', 'STP', 'SAU', 'SEN', 'SRB', 'SYC', 'SLE', 'SGP', 'SXM', 'SVK', 'SVN', 'SLB', 'SOM', 'ZAF', 'SGS', 'SSD', 'ESP', 'LKA', 'SDN', 'SUR', 'SJM', 'SWE', 'CHE', 'SYR', 'TWN', 'TJK', 'TZA', 'THA', 'TLS', 'TGO', 'TKL', 'TON', 'TTO', 'TUN', 'TUR', 'TKM', 'TCA', 'TUV', 'UGA', 'UKR', 'ARE', 'GBR', 'USA', 'UMI', 'URY', 'UZB', 'VUT', 'VEN', 'VNM', 'VGB', 'VIR', 'WLF', 'ESH', 'YEM', 'ZMB', 'ZWE']
+
 _RINEX_SITE_LIST_EUROPE =  ['acor', 'adar', 'agrn', 'ajac', 'alac', 'alba', 'alme', 'ank2', 'aqui', 'ara2', 'argi', 'aris', 'arj6', 'asir', 'aubg', 'aut1', 'autn', 'axpv', 'baca', 'badh', 'baia', 'baut', 'bbys', 'bcln', 'bell', 'birg', 'bisk', 'bme1', 'boge', 'bogi', 'bogo', 'bolg', 'bor1', 'borj', 'borr', 'bpdl', 'brmf', 'brmg', 'brst', 'brts', 'brux', 'bscn', 'bsvz', 'bucu', 'budd', 'budp', 'bute', 'bydg', 'bzr2', 'cace', 'cag1', 'cako', 'cant', 'carg', 'casc', 'case', 'cebr', 'ceu1', 'cfrm', 'chio', 'chiz', 'clib', 'cniv', 'coba', 'como', 'cost', 'cpar', 'crak', 'creu', 'ctab', 'dare', 'delf', 'dent', 'deva', 'dgor', 'diep', 'dill', 'dlf1', 'dnmu', 'dour', 'drag', 'dub2', 'duth', 'dvcn', 'dyng', 'ebre', 'eglt', 'eijs', 'elba', 'enao', 'enis', 'entz', 'enza', 'esco', 'eusk', 'ffmj', 'fins', 'flrs', 'foyl', 'fra2', 'frne', 'func', 'gaia', 'galh', 'ganp', 'gari', 'gdrs', 'gell', 'geno', 'glsv', 'goet', 'goml', 'gop6', 'gope', 'gor2', 'grac', 'gras', 'graz', 'gsr1', 'guip', 'gwwl', 'has6', 'hel2', 'helg', 'hers', 'hert', 'hett', 'hobu', 'hofj', 'hofn', 'huel', 'ibiz', 'ieng', 'igeo', 'igm2', 'igmi', 'ignf', 'ijmu', 'ildx', 'invr', 'irbe', 'isrn', 'ista', 'izan', 'izmi', 'joe2', 'joen', 'jon6', 'joz2', 'joze', 'kad6', 'karl', 'kato', 'kda2', 'kev2', 'khar', 'kilp', 'kir0', 'kir8', 'kiru', 'kiv2', 'klnk', 'klop', 'knja', 'kos1', 'kra1', 'kraw', 'krrs', 'krs1', 'ktvl', 'kunz', 'kure', 'kuu2', 'lago', 'lama', 'lamp', 'larm', 'ldb2', 'leij', 'lek6', 'leon', 'leri', 'licc', 'lida', 'lign', 'lil2', 'linz', 'lliv', 'lodz', 'lov6', 'lpal', 'lroc', 'm0se', 'mad2', 'madr', 'mala', 'mall', 'man2', 'mar6', 'mar7', 'marp', 'mars', 'mas1', 'mat1', 'mate', 'matg', 'mdvj', 'medi', 'meli', 'mers', 'met3', 'metg', 'mets', 'mik3', 'mikl', 'mkrs', 'mlhd', 'mlvl', 'mnkw', 'mnsk', 'mogi', 'mop2', 'mopi', 'mops', 'morp', 'msel', 'muk2', 'nabg', 'newl', 'nico', 'noa1', 'nor7', 'not1', 'novp', 'npaz', 'nya1', 'nya2', 'nyal', 'obe4', 'olk2', 'ons1', 'onsa', 'orid', 'oriv', 'oros', 'osk6', 'osls', 'ost6', 'oul2', 'ove6', 'pado', 'pasa', 'pat0', 'pdel', 'penc', 'pfa3', 'pins', 'pmth', 'polv', 'pore', 'pots', 'pous', 'poze', 'ppsh', 'prat', 'pryl', 'psto', 'pstv', 'ptbb', 'pulk', 'puyv', 'pyha', 'pza2', 'qaq1', 'rabt', 'raeg', 'rah1', 'ramo', 'rant', 'redu', 'redz', 'reyk', 'riga', 'rio1', 'rivo', 'rom2', 'rove', 'rvne', 'saba', 'sala', 'sart', 'sas2', 'savu', 'sbg2', 'scil', 'scoa', 'scor', 'sfer', 'shoe', 'sjdv', 'ske0', 'ske8', 'smla', 'sneo', 'snik', 'sod3', 'soda', 'sofi', 'sons', 'sprn', 'spt0', 'spt7', 'srjv', 'stas', 'stnb', 'sul5', 'suld', 'sulp', 'sun6', 'sur4', 'sve6', 'svll', 'svtl', 'swas', 'swki', 'tar0', 'teos', 'ter2', 'terc', 'ters', 'teru', 'tit2', 'tll1', 'tlmf', 'tlse', 'tlsg', 'toil', 'tor1', 'tori', 'torn', 'trds', 'treu', 'trf2', 'trmi', 'tro1', 'tubi', 'tubo', 'tuc2', 'tuo2', 'uben', 'ucag', 'ume6', 'unpg', 'untr', 'usal', 'usdl', 'uzhl', 'vaa2', 'vaas', 'vaco', 'vae6', 'vala', 'vale', 'vars', 'ven1', 'vfch', 'vigo', 'vil0', 'vil6', 'vill', 'vir2', 'virg', 'vis0', 'vis6', 'vitr', 'vlis', 'vln1', 'vlns', 'vnrs', 'ware', 'warn', 'wrlg', 'wroc', 'wsrt', 'wtza', 'wtzr', 'wtzs', 'wtzz', 'wuth', 'yebe', 'zada', 'zara', 'zeck', 'zim2', 'zimm', 'zouf', 'zprs', 'zywi', 'zzon']
-
-_RINEX_SITE_LIST_VLA = ["mdo1", "nist", "pie1", "amc2", "blyt", "abq1", "azah", "azcn", "azco", "azgb", "azkr", "azmo", "azpe", "azsc", "cosa", "cot1", "cot2",  "dsrc",  "echo", "fern", "fred", "fst1", "gdac", "her2", "jtnt", "lvwd", "mexi", "myt1",  "nmgr",  "nmsf",  "nvbr", "nvlm",  "nvtr",  "okgm", "p003", "p009", "p011", "p015", "p026", "p028", "p031", "p034", "p035", "p036", "p037", "p038", "p039", "p040",  "p041",  "p105",  "p107",  "pltc",  "pub1",  "puc1", "sc01",  "srp1",  "sum1", "tcun",  "tmgo",  "txam", "txch", "txel", "txlu", "txod", "txpe", "txsa", "txsn", "wsmn", "zab1", "zab2",  "zdv1",  "apex",  "cdvv",  "glrs", "gmrc", "gnps", "hnps", "hurr",  "iid2",  "imps",  "ivco", "kayo", "mput", "ndap", "p012", "p104", "p106", "p108", "p110", "p112", "p123", "p498", "p499", "p500", "p501", "p502", "p506", "p507", "p508", "p509", "p511", "p611", "p621", "p622", "p623", "p626",  "pdbg",  "rg12",  "sa00", "sa24", "sa27", "sa31",  "sa46",  "sa48",  "sg24",  "sg33",  "spic",  "unr1",  "unr2",  "usmx",  "abq2",  "azbk",  "azcl",  "fst2",  "king", "myt2", "nmro", "nvcs", "nvlk", "pub2", "sum2", "gmpk", "aml5", "elp3", "lubb",  "ods5"]
-
-_RINEX_SITE_LIST_Aus = ["pert", "mro1", "mtma", "yar3", "exmt", "kalg", "keln", "bura", "cut0", "wlal", "espa", "nors", "alby", "nclf", "hil1", "karr", "ravn", "wagn", "medo", "lona", "hydn", "pthl", "yar2", "yarr", "nnor", "wilu", "bala", "lear", "tomp", "gasc", "yelo", "wara", "yula", "arub", "ucla", "bro1", "hill", "froy","tntr", "bdst", "armd", "warw", "wari", "turo", "gatt", "str2", "str1", "pbot", "quam", "wtcf", "cnda", "cndo", "ihoe", "rand", "rank", "hern", "hay1", "toow", "ulla", "mena", "clev", "newe", "crdx", "puty", "nowe", "bee2", "tidb", "yung", "loth", "tmra", "dbbo", "brba", "unsw", "tamw", "forb", "wlca", "fors", "wyng", "cool", "nbrk", "nbri", "toog", "ymba", "blck", "peri", "bigg", "ngan", "cwra", "str3", "cole", "tmba", "tmbo", "bath", "ndra", "pmac", "nwra", "cops", "dorr", "nsta", "cble", "cblt", "clbi", "wlwn", "bjct", "robi", "wool", "dksn", "coma", "burk", "nwcs", "prce", "weem", "gwab", "mgrv", "wwlg", "glbn", "sym1", "tott", "tlpa", "nyma", "ckwl", "cbar", "carg", "gong", "wlgt", "cnbn", "rgln", "gunn", "edsv", "tmut", "albu", "sngo", "ftdn", "ardl", "wrrn", "scon", "liri", "wgga", "invl", "hill", "dune", "obrn", "mrwa", "hlbk", "park", "bank", "coff", "gilg", "mchl", "mack", "gfth", "gftn", "mthr", "nml1", "lgow", "mree", "gfel", "anna", "tare", "spwd", "dalb", "jeri", "nrmn", "oval", "gngn", "brdw", "chip", "msvl", "gurl", "bndy", "bing", "sydn", "vlwd", "wfal", "yaro", "orng", "brwn", "tid1", "tid2", "lkht", "wdbg", "csno", "yass", "ctmd", "tull", "walw", "ips2", "nmbn", "baln", "ashf", "mudg", "cwn2", "glin", "ryls", "prks", "ptkl"]
-
-_RINEX_SITE_LIST_Ned_0 = ["apel","cabw","delf","eijs","ijmu","kosg","ters","vlie","vlis","wsra","wsrt"]
-
-_RINEX_SITE_LIST_ZA = ["anth","beni","beth","bftn","biso","brit","brnk","bwes","calv","cpnt","ctwn","dear","drba","elda","eras","gdal","geob","grey","grma","grnt","heid","hnus","ixop","kman","koks","kstd","lgbn","lsmh","malm","mfkg","mriv","nspt","nyls","pbwa","plbb","plet","pmbg","pret","pska","ptbg","qtwn","rbay","sbok","scot","secd","sosh","sprt","stbs","stng","tdou","upta","verg","welk","worc","bfta","mtut","rust","secd","sosh","sbas","sut1"]
-
-_RINEX_SITE_LIST_NZ = ["2406","ahti","akto","anau","arta","atia","auck","aukt","avln","bhst","birf","bluf","bm8a","bnet","bthl","cast","chat","chti","ckid","clim","clrr","cls3","cls4","cls5","cls6","clsg","clsk","cmbl","cncl","cnst","corm","dnvk","dund","dunt","durv","fale","fox1","frtn","gds1","gisb","gldb","glok","gnbk","grac","grng","gunr","haas","hamt","hana","hanm","hast","hikb","hoki","hold","horn","kahu","kaik","kapt","kara","kawk","kere","koko","koro","ktia","kuta","ldrz","levn","lexa","leyl","lkta","lok1","look","lrr1","lytt","maha","mahi","maho","mako","mang","mast","matw","mavl","mcnl","meth","ming","mkno","mnhr","mqzg","mrbl","mtbl","mtjo","mtpr","mtqn","mul1","nett","niuc","nium","nls1","nls2","nlsn","nmai","nply","nrrd","nrsw","ohin","okoh","optk","oroa","otak","ousd","paek","paki","pali","pari","parw","pawa","pgkh","pgne","pilk","pkno","pnui","pora","prtu","ptoi","puke","pygr","quar","rahi","rakw","raul","raum","rawi","rchd","rdlv","rgar","rgaw","rgcr","rghd","rghl","rghr","rgka","rgkw","rgli","rgmk","rgmt","rgon","rgop","rgre","rgrr","rgta","rgut","rgwc","rgwi","rgwv","ripa","sctb","sedd","snst","sutt","takl","takp","taup","tauw","tema","ten2","tenn","tgho","tghr","tgoh","tgra","tgri","tgtk","tgwh","thap","tint","tkar","tkhl","tory","trav","trng","trwh","turi","utk1","utk2","utk3","utk4","utku","v27b","v47b","vavs","vexa","vgdr","vget","vgfw","vgkr","vgmo","vgmt","vgng","vgnt","vgob","vgot","vgpk","vgt2","vgt8","vgtm","vgtr","vgts","vgwh","vgwn","vgwt","wahu","waim","waka","wang","wark","west","wgtn","wgtt","whkt","whng","whvr","with","wmat","wpaw","wpuk","wra1","wrau","wrpa","yald"]
 
 ################################################################################
 # Need some exception classes to help with downloding files
@@ -118,6 +111,31 @@ class RINEX_Data_Barf(IOError):
 #   fd.close()
 #   print('cddis file written out')
 #  return
+
+################################################################################
+def get_rinex3_filename(RINEX_filename, country):
+   print('incoming parameters', RINEX_filename, country)
+   RINEX3_filename = None
+   process = Popen(['/usr/local/bin/RX3name', RINEX_filename],stdout=PIPE)
+   (output, err) = process.communicate()
+   print('output', output)
+   if str(output).find('Station Name not found') > -1:
+      print('initial station not found \n')
+      if country in _ISO_COUNTRY_CODES:
+        command = '/usr/local/bin/RX3name ' + RINEX_filename +  ' 00' + country
+        print('command', command, '\n')
+        process =Popen(shlex.split(command), stdout=PIPE)
+        (output, err) = process.communicate()
+        print('second output', output, '\n')
+        print('err`', err, '\n')
+        if str(output).find('Station Name not found') < 0:
+           RINEX3_filename = output.decode('utf-8')[:-2]
+      else:
+        print('invalid country')
+   else:
+      RINEX3_filename = output.decode('utf-8')[:-2]
+   print('RINEX3_filename', RINEX3_filename)
+   return  RINEX3_filename
 
 ################################################################################
 def run_command_timeout(command, args, timeout):
@@ -359,16 +377,17 @@ def gunzip_some_file(compressed_file,
 
 
 ################################################################################
-def get_RINEX_obs_file_from_web(RINEX_filename,
+def get_RINEX_obs_file_from_web(RINEX_data,
                                 year, month, day, doy,
                                 output_directory = ".",
                                 FTP_site = 0,
                                 overwrite = 0
                                 ):
-    """ get a RINEX station observation file from the Internet
+    """use urllib3 to get a RINEX station observation file from the Internet
 
 RINEX_filename    I  The nameof the RINEX 2 file to get.  Should normally be
                      in the form ssssddd0.yyx, but you already know that.
+country           I  ISO country code
 year              I  The 4 digit year of the observation
 month             I  the month of the observation
 day               I  day of the month
@@ -383,11 +402,9 @@ overwrite         I  May files be overwritten?  0 No, else yes
 OUTPUTS:  None
 """
     assert(FTP_site >= 0)
-    print(f'Initiate get_RINEX_obs_file_from_web: '
-          f'{RINEX_filename}, year {year}, month {month}, day {day}, '
-          f'doy {doy}, outputdir {output_directory}, ftp site {FTP_site}, '
-          f'overwrite {overwrite}')
-    
+    RINEX_filename = RINEX_data[0]
+    country = RINEX_data[1]
+    print('*** get_RINEX_obs_file_from_web: original RINEX2 file and country requested', RINEX_filename, country)
     RX3_flag = False
     our_file = output_directory + '/' + RINEX_filename
     # First, if we have run out of FTP sites, bail
@@ -411,7 +428,8 @@ OUTPUTS:  None
                 pass
             else:
                 try:
-                    get_RINEX_obs_file_from_web(RINEX_filename[:-1]+'o',
+                    rinex_parms = (RINEX_filename[:-1]+'o',country)
+                    get_RINEX_obs_file_from_web(rinex_parms,
                                                 year, month, day, doy,
                                                 output_directory,
                                                 0,
@@ -446,20 +464,18 @@ OUTPUTS:  None
         raise No_RINEX_File_Error("Error: data %s is in the missing data list"%(RINEX_filename))
     # Fifth, check for known locations of some files
     if(FTP_site == 0):
-#    if(RINEX_filename[0:4].lower() in _RINEX_SITE_LIST_VLA):
+#    if country == 'USA:
 #        FTP_site = 0
-     if(RINEX_filename[0:4].lower() in _RINEX_SITE_LIST_Aus):
+     if country == 'AUS':
          FTP_site = 5
-     if(RINEX_filename[0:4].lower() in _RINEX_SITE_LIST_Ned_0):
+     if country == 'NLD':
          FTP_site = 6
-     if(RINEX_filename[0:4].lower() in _RINEX_SITE_LIST_ZA):
+     if country == 'ZAF':
          FTP_site = 8
-     if(RINEX_filename[0:4].lower() in _RINEX_SITE_LIST_NZ):
+     if country == 'NZL':
          FTP_site = 9
-     if(RINEX_filename[0:4].lower() in _RINEX_SITE_LIST_EUROPE):
+     if(RINEX_filename[0:4] in _RINEX_SITE_LIST_EUROPE):
          FTP_site = 4
-#    if(RINEX_filename[0:4].lower() in _RINEX_SITE_LIST_BIGF_0):
-#        FTP_site = 7
     assert(year > 1979)
     assert(year < 2080)
     yy = year - 1900
@@ -477,14 +493,14 @@ OUTPUTS:  None
         else:
           if year >= 2020:   # try RINEX3
             RX3_flag = True
-            print('converting to RINEX3 file name from RINEX2 name: ', RINEX_filename)
-            output = subprocess.Popen(['RX3name', RINEX_filename],
-                            stdout=subprocess.PIPE).communicate()[0]
-            RINEX3_filename = output.decode('utf-8')[:-2]
+            RINEX3_filename = get_rinex3_filename(RINEX_filename, country)
             print('SOPAC RINEX3_filename', RINEX3_filename)
-            our_file = output_directory + '/' + RINEX_filename 
-            our_Z_file = output_directory + '/' + RINEX3_filename + '.gz'
-            site_str = "ftp://garner.ucsd.edu/pub/rinex/%4.4d/%3.3d/%s.gz"%(year, doy, RINEX3_filename)
+            if RINEX3_filename is None:
+              pass
+            else:
+              our_file = output_directory + '/' + RINEX_filename 
+              our_Z_file = output_directory + '/' + RINEX3_filename + '.gz'
+              site_str = "ftp://garner.ucsd.edu/pub/rinex/%4.4d/%3.3d/%s.gz"%(year, doy, RINEX3_filename)
           else:
             if(RINEX_filename[-1] == 'd'):
               site_str = "ftp://garner.ucsd.edu/pub/rinex/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
@@ -520,12 +536,13 @@ OUTPUTS:  None
         if year >= 2020:   # need RINEX3
           RX3_flag = True
           print('converting to RINEX3 file name from RINEX2 name: ', RINEX_filename)
-          output = subprocess.Popen(['RX3name', RINEX_filename],
-                          stdout=subprocess.PIPE).communicate()[0]
-          RINEX3_filename = output.decode('utf-8')[:-2]
-          our_file = output_directory + '/' + RINEX_filename 
-          our_Z_file = output_directory + '/' + RINEX3_filename + '.gz'
-          site_str = "sftp.data.gnss.ga.gov.au/rinex/daily/%4.4d/%3.3d/%s.gz"%(year, doy, RINEX3_filename)
+          RINEX3_filename = get_rinex3_filename(RINEX_filename, country)
+          if RINEX3_filename is None:
+            pass
+          else:
+            our_file = output_directory + '/' + RINEX_filename 
+            our_Z_file = output_directory + '/' + RINEX3_filename + '.gz'
+            site_str = "sftp.data.gnss.ga.gov.au/rinex/daily/%4.4d/%3.3d/%s.gz"%(year, doy, RINEX3_filename)
         else:
           our_file = output_directory + '/' + RINEX_filename 
           our_Z_file = output_directory + '/' + RINEX_filename + '.gz'
@@ -536,49 +553,34 @@ OUTPUTS:  None
         print ( '*********** accessing Australian FTP site!')
         print('site string', site_str)
     elif(FTP_site == 6):
-        # Dutch National GPS Network (requires login)
-        if(RINEX_filename[0:4] in _RINEX_SITE_LIST_Ned_0):
             site_str = "ftp://gnss1.tudelft.nl/rinex/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
-        else:
-            pass # site_str = "" from above, which will generate an IOError
     elif(FTP_site == 7):
         pass
     elif(FTP_site == 8):
         # South Africa Trignet
         print ( '*********** accessing South African Trignet FTP site!')
-        if(RINEX_filename[0:4] in _RINEX_SITE_LIST_ZA):
-            ftp_file_name = RINEX_filename[0:7].upper()+'Z.zip'
-            site_str = "ftp://ftp.trignet.co.za/RefData.%2.2d/%3.3d/L1L2_30sec/%s"%(year-2000, doy, ftp_file_name)
-            our_Z_file = output_directory + '/' + ftp_file_name
-        else:
-            pass # site_str = "" from above, which will generate an IOError
+        ftp_file_name = RINEX_filename[0:7].upper()+'Z.zip'
+        site_str = "ftp://ftp.trignet.co.za/RefData.%2.2d/%3.3d/L1L2_30sec/%s"%(year-2000, doy, ftp_file_name)
+        our_Z_file = output_directory + '/' + ftp_file_name
     elif(FTP_site == 9):
         # New Zealand GeoNet and LINZ servers
         print ( '*********** accessing New Zealand FTP site!')
-        if(RINEX_filename[0:4] in _RINEX_SITE_LIST_NZ):
-            print('nz RINEX file name ', RINEX_filename)
-            if RINEX_filename[11] == 'o':
-              site_str = "https://data.geonet.org.nz/gnss/rinex/%4.4d/%3.3d/%s.gz"%(year, doy, RINEX_filename)
-        else:
-            pass # site_str = "" from above, which will generate an IOError
+        print('nz RINEX file name ', RINEX_filename)
+        if RINEX_filename[11] == 'o':
+           site_str = "https://data.geonet.org.nz/gnss/rinex/%4.4d/%3.3d/%s.gz"%(year, doy, RINEX_filename)
 
 # Getting big Rinex files from CDDIS is not yet working
-    elif(FTP_site == 10): # cddis
-       if use_cddis:
-          site_str = "https://cddis.nasa.gov/archive/gnss/data/daily/%4.4d/%3.3d/%2.2d%s/%s.Z"%(year, doy, yy, RINEX_filename[-1], RINEX_filename)
-       else:
-           pass # will raise IOerror
+    elif(FTP_site == 10 and use_cddis): # cddis
+       site_str = "https://cddis.nasa.gov/archive/gnss/data/daily/%4.4d/%3.3d/%2.2d%s/%s.Z"%(year, doy, yy, RINEX_filename[-1], RINEX_filename)
     else:
         print ( '************* unable to handle ftp site number ', FTP_site)
         raise KeyError("Unknown RINEX FTP site")
-    if not site_str:
-        raise No_RINEX_File_Error("Out of potential RINEX sites for this")
     try:
         print('+++++++++++++++ calling get_url with', site_str, our_Z_file)
         print('*********************************')
         get_url(site_str, our_Z_file)
     except IOError:
-        get_RINEX_obs_file_from_web(RINEX_filename,
+        get_RINEX_obs_file_from_web((RINEX_filename,country),
                                     year, month, day, doy,
                                     output_directory,
                                     FTP_site+1,
@@ -618,8 +620,9 @@ OUTPUT:  filename
 filename      O  filename of RINEX file, no directory path
 """
 #   print ( 'year doy ', year, doy)
-    assert(len(station_name) == 4)
-    station_name = station_name.lower()
+    station_name_short = station_name[0:4].lower()
+    country = station_name[4:7]
+    assert(len(station_name_short) == 4)
     assert(year > 1979)
     assert(year < 2080)
     yy = year - 1900
@@ -638,8 +641,8 @@ filename      O  filename of RINEX file, no directory path
         pass
     else:
         raise KeyError("Unsupported RINEX type '%s'"%RINEX_type)
-    filename = "%4.4s%3.3d0.%2.2d%1.1s"%(station_name,doy,yy,RINEX_type)
-    return filename
+    filename = "%4.4s%3.3d0.%2.2d%1.1s"%(station_name_short,doy,yy,RINEX_type)
+    return (filename, country)
 
 ################################################################################
 def make_RINEX_ephemeris_filename(group_name, gps_week, dow, year, doy):
@@ -732,7 +735,7 @@ def get_GPS_ephemeris_file_from_web(ephemeris_filename,
                                     FTP_site = 0,
                                     overwrite = 0
                                     ):
-    """ get an ephemeris file from the Internet
+    """use urllib3 to get an ephemeris file from the Internet
 
 ephemeris_filename I The nameof the ephemeris file to get.  Should normally be
                      in the form ggggddd0.yyi, but you already know that.
@@ -850,7 +853,7 @@ def get_IONEX_file_from_web(IONEX_filename,
                             FTP_site = 0,
                             overwrite = 0
                             ):
-    """ get an IONEX file from the Internet
+    """use urllib3 to get an IONEX file from the Internet
 
 IONEX_filename    I  The nameof the IONEX file to get.  Should normally be
                      in the form ggggddd0.yyi, but you already know that.
@@ -947,7 +950,7 @@ def get_CODE_P1P2_file_from_web(year, month, data_type = 'P2',
                                 output_directory = ".",
                                 overwrite = 0
                                 ):
-    """ get a P1P2 differential code bias file from CODE
+    """use urllib3 to get a P1P2 differential code bias file from CODE
 
 year              I  The 4 digit year of the observation
 month             I  the month of the observation
@@ -1932,11 +1935,11 @@ xyz      O  array of station's XYZ position, in m
                 if(os.path.isfile(RINEX_D_path)):
                     warnings.warn("File '%s' already exists.  Deleting."%RINEX_D_path)
                     os.remove(RINEX_D_path)
-                data_in = make_RINEX_filename(station_code,'d', y, doy)
+                rinex_parms = make_RINEX_filename(station_code,'d', y, doy)
                 nav_in = make_RINEX_filename('brdc','n', y, doy)
-                nav_gl = make_RINEX_filename('brdc','g', y, doy)
+                rinex_gl = make_RINEX_filename('brdc','g', y, doy)
                 try:
-                    get_RINEX_obs_file_from_web(data_in, y,m,d,doy,
+                    get_RINEX_obs_file_from_web(rinex_parms, y,m,d,doy,
                                                 data_directory,
                                                 overwrite = overwrite)
                     get_RINEX_obs_file_from_web(nav_in, y,m,d,doy,
@@ -1944,7 +1947,7 @@ xyz      O  array of station's XYZ position, in m
                                                 overwrite = overwrite)
                     # the GLONASS data is not so important
                     try:
-                        get_RINEX_obs_file_from_web(nav_gl, y,m,d,doy,
+                        get_RINEX_obs_file_from_web(rinex_gl, y,m,d,doy,
                                                     data_directory,
                                                     overwrite = overwrite)
                     except No_RINEX_File_Error:

@@ -5,8 +5,6 @@
 # 2023 Mar  4  AGW  --updates for igs long product file names
 
 
-from __future__ import (print_function)
-
 ################################################################################
 # some import commands  The User should not need to change this.
 ################################################################################
@@ -560,8 +558,8 @@ XYZ        O  Cartesian station position in Earth centered coodriantes, in m
             if((num_times < 0) or (time_index >= num_times)):
                 # skipping over data values
                 for i in range(num_sat*lines_per_sat):
-                    line = fp.readline()
-                    line = ''.join(map(chr, map(lambda x: x if x < 127 else ord(' '), line)))
+                   line = fp.readline()
+                   line = ''.join(map(chr, map(lambda x: x if x < 127 else ord(' '), line)))
             else:
                 for sat in range(num_sat):
                     line = fp.readline()
@@ -3289,9 +3287,10 @@ likely of the form Albus_RINEX.No_RINEX_File_Error
     year, month, day, frac = jma_tools.get_ymdf_from_JD(jma_tools.get_JD_from_MJD(MJD))
     doy = jma_tools.get_day_of_year(year, month, day)
     # Now try to get the compressed observation file for this day
-    data_comp = Albus_RINEX.make_RINEX_filename(station_code,'d', year, doy)
+    rinex_parameters = Albus_RINEX.make_RINEX_filename(station_code,'d', year, doy)
+    data_comp =  rinex_parameters[0]
     try:
-        Albus_RINEX.get_RINEX_obs_file_from_web(data_comp, year,month,day,
+        Albus_RINEX.get_RINEX_obs_file_from_web(rinex_parameters,year,month,day,
                                                 doy,
                                                 output_directory,
                                                 overwrite = overwrite)
@@ -3475,9 +3474,10 @@ sat_block_pos  O  An array of continguous block position ranges, as 3 element
         year, month, day, frac = jma_tools.get_ymdf_from_JD(jma_tools.get_JD_from_MJD(m))
         doy = jma_tools.get_day_of_year(year, month, day)
         # Now try to get the compressed observation file for this day
-        data_comp = Albus_RINEX.make_RINEX_filename(station_code,'d', year, doy)
+        rinex_parms = Albus_RINEX.make_RINEX_filename(station_code,'d', year, doy)
+        data_comp = rinex_parms[0]
         try:
-            Albus_RINEX.get_RINEX_obs_file_from_web(data_comp, year,month,day,
+            Albus_RINEX.get_RINEX_obs_file_from_web(rinex_parms, year,month,day,
                                                     doy,
                                                     output_directory,
                                                     overwrite = overwrite)
