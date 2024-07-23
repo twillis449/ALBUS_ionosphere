@@ -20,8 +20,6 @@ import copy
 import socket
 if(socket.getdefaulttimeout == None):
     socket.setdefaulttimeout(120.0)
-#import urllib3.request, urllib3.parse, urllib3.error
-import urllib3.request
 import Albus_RINEX_2
 import Albus_RINEX
 import string
@@ -499,8 +497,6 @@ def fill_standard_stations():
                     webfile = "ftp://igs.org/pub/station/general/igs_with_former.snx"
                     try:
                         print("Downloading %s"%webfile)
-                        urllib3.request.urlretrieve(webfile, temp_file.name)
-                        urllib3.request.urlcleanup()
                         print('%%% filling GPS_dict')
                         print('using GPS data file ', temp_file.name)
                         GPS_dict = fill_GPS_station_dict(GPS_dict, temp_file.name)
