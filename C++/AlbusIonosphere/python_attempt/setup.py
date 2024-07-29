@@ -5,25 +5,23 @@
 # 2016 April AGW - changed for numpy and got rid of all numarray-related stuff
 # 2019 July  AGW - script should now handle python 2 or python 3 
 
-from distutils.core import setup, Extension
+from setuptools import setup, Extension
 from platform import python_version
 import sys
 import numpy
 p_version = python_version()
-
 # python2
 if int(p_version[0])< 3:
-  user_inp = raw_input('Give me the ALBUS_PATH MAJ MIN:   ')
+  user_inp = raw_input('Sorry, Python2 is no longer supported')
+  exit
 else:
 # python3
-  user_inp = input('Give me the ALBUS_PATH MAJ MIN:   ')
+  user_inp = input(' ')
 user_inp = user_inp.split()
 ALBUS_PATH = user_inp[0]
-maj_ver = user_inp[1]
-min_ver = user_inp[2]
+
+
 module1 = Extension('AlbusIonosphere',
-                    define_macros = [('MAJOR_VERSION', maj_ver),
-                                     ('MINOR_VERSION', min_ver)],
                     libraries = ['mim',
                                  'jmavex',
                                  'iri',
@@ -41,10 +39,8 @@ module1 = Extension('AlbusIonosphere',
                     sources = ['AlbusIonosphere.cxx'])
 
 setup (name = 'AlbusIonosphere',
-       version = maj_ver+'.'+min_ver,
-       description = 'ALBUS Ionospheric Calibration package for AIPS',
+       version = '1.0.0',
        long_description = '''
-ALBUS Ionospheric Calibration package for AIPS
-Currently in a development stage.
+ALBUS Ionospheric Calibration C++ support package 
 ''',
        ext_modules = [module1])
