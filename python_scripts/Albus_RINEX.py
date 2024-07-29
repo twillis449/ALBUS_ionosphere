@@ -19,8 +19,10 @@ import numpy as np
 import inspect
 import warnings
 import math
+import shlex
 import time as systime
 import subprocess
+from subprocess import Popen, PIPE
 
 import requests
 
