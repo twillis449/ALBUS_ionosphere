@@ -576,7 +576,8 @@ OUTPUTS:  None
        site_str = "https://cddis.nasa.gov/archive/gnss/data/daily/%4.4d/%3.3d/%2.2d%s/%s.Z"%(year, doy, yy, RINEX_filename[-1], RINEX_filename)
     else:
         print ( '************* unable to handle ftp site number ', FTP_site)
-        raise KeyError("Unknown RINEX FTP site")
+        warnings.warn("To access the CDDIS site you need to open an account there")
+        warnings.warn("Go to https://cddis.nasa.gov/About/CDDIS_File_Download_Documentation.html")
     try:
         print('+++++++++++++++ calling get_url with', site_str, our_Z_file)
         print('*********************************')
