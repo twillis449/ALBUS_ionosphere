@@ -111,6 +111,15 @@ def make_mask(argv):
 
 #   o = original image
     morphology_image = make_morphology_image(filename, filter_size, filter_type, double_erode = double_erode)
+# write out complete morphology image in its entirety
+    hdu.data = morphology_image
+    hdu.header['DATAMIN'] = hdu.data.min()
+    hdu.header['DATAMAX'] = hdu.data.max()
+    loc = filename.find('.fits')
+    filename = filename[:loc]
+    out_morph = filename +'-morphology_image.fits'
+    hdu.writeto(out_morph, overwrite=True)
+
 
 #   d - output from erosion-> erosion-> dilation
 
@@ -125,11 +134,9 @@ def make_mask(argv):
     hdu.header['DATAMIN'] = hdu.data.min()
     hdu.header['DATAMAX'] = hdu.data.max()
 #   print('tophat image  data max and min', hdu.data.max(), hdu.data.min())
-    loc = filename.find('.fits')
-    filename = filename[:loc]
     out_tophat = filename +'-dilated_tophat.fits'
 #   print('make_mask: tophat output to ', out_tophat )
-#   hdu.writeto(out_tophat, overwrite=True)
+    hdu.writeto(out_tophat, overwrite=True)
 
     
 #   m = mask derived from a comparison where  t > some signal
@@ -148,7 +155,7 @@ def make_mask(argv):
 # so we have filtered data which will be subtracted from original image
 #   m * t = m * (o - d)
     filtered_data = white_tophat * mask
-#   filtered_morphology_image = morphology_image * mask
+    filtered_morphology_image = morphology_image * mask
     nans = np.isnan(filtered_data)
     filtered_data[nans] = 0
 
@@ -156,14 +163,14 @@ def make_mask(argv):
 #   write out m * d
     masked_dilated_image = mask * morphology_image
     hdu.data = masked_dilated_image
-    print('filtered data max and min', hdu.data.max(), hdu.data.min())
+#   print('filtered data max and min', hdu.data.max(), hdu.data.min())
     hdu.header['DATAMAX'] =  masked_dilated_image.max()
     hdu.header['DATAMIN'] =  masked_dilated_image.min()
 
     outfile = filename +'.masked_dilated_image.fits'
-    print('filtered_data image output to ', outfile )
+#   print('filtered_data image output to ', outfile )
 #   write out m * d
-#   hdu.writeto(outfile, overwrite=True)
+    hdu.writeto(outfile, overwrite=True)
 
 #   o_d = output diffuse image
 #       = o - m * t  
@@ -223,6 +230,7 @@ def make_mask(argv):
     if os.path.isfile(fits_file_out):
       os.remove(fits_file_out)
     os.symlink(diffuse_outfile , fits_file_out)
+
     return
 
 def main( argv ):
