@@ -52,9 +52,7 @@ distclean: clean
 
 
 install: $(LIBS) 
-	/bin/rm -rf build
-	mkdir build
-	echo $(INSTALLDIR)  | $(CURRENT_PYTHON) setup.py build install --prefix=$(INSTALLDIR) --install-platlib=$(INSTALLDIR)/lib --install-purelib=$(INSTALLDIR)/share/python
+	echo $(INSTALLDIR) $(VER_MAJOR) $(VER_MINOR) | $(CURRENT_PYTHON) setup.py build install --prefix=$(INSTALLDIR) --install-platlib=$(INSTALLDIR)/lib --install-purelib=$(INSTALLDIR)/share/python
 
 
 
