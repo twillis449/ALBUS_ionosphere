@@ -12,9 +12,15 @@ def getdata( filename, filename1 ):
         L = len(text)
         i = 0
         # skip over all stuff before actual data
-        while(text[i][0:13] != 'seq  rel_time'):
+        while(text[i][0:14] != 'reference time'):
            i = i+1
-
+        info = text[i].split()
+        sec = float(info[-1])
+        min = float(info[-2])
+        hour = float(info[-3])
+        ref_time = hour + min/60.0 + sec/3600.0
+        while(text[i][0:13] != 'seq  rel_time'):
+          i = i+1
         stec = []
         rel_time = []
         start = i+1
@@ -23,7 +29,8 @@ def getdata( filename, filename1 ):
           try:
             info = text[i].split()
             if int(info[2]) == 0:
-              rel_time.append(float(info[3])/3600.0)
+              latest = ref_time + float(info[3]) / 3600
+              rel_time.append(latest)
               stec.append(float(info[7]))
           except:
             pass
@@ -34,7 +41,6 @@ def getdata( filename, filename1 ):
         # skip over all stuff before actual data
         while(text[i][0:13] != 'seq  rel_time'):
            i = i+1
-
         stec1 = []
         rel_time1 = []
         start = i+1
@@ -43,25 +49,21 @@ def getdata( filename, filename1 ):
           try:
             info = text[i].split()
             if int(info[2]) == 0:
-              latest = float(info[3])/3600.0
               rel_time1.append(float(info[3])/3600.0)
               stec1.append(float(info[7]))
           except:
             pass
-        return rel_time, stec, rel_time1, stec1, latest
-
-
+        return rel_time, stec, stec1
 
 
 def main( argv ):
   print('processing ALBUS files ', argv[1], ' ', argv[2])
-  x_data, y_data, x_data1, y_data1, latest  = getdata(argv[1], argv[2])
+  x_data, y_data, y_data1  = getdata(argv[1], argv[2])
   for i in range(len(y_data)):
      try:
        y_data[i] = (y_data[i] - y_data1[i])
      except:
        pass
-  xlim(0, latest)
   plot(x_data, y_data,'ro')
   xlabel('UT Time (hours)')
   ylabel('STEC difference (rad/m^2)')
