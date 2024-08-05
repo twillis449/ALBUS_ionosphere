@@ -48,7 +48,7 @@ def combine_images(filename, json_polygons, original_noise=0.0):
     
     if num_polygons > 0:
       diffuse_fits_file = filename + '_diffuse_structure.fits'
-      compact_fits_file = filename + '.masked_compact_structure.fits'
+      compact_fits_file = filename + '.masked_original_image.fits'
 
       print('original compact image data  in file ', compact_fits_file)
       print('original diffuse image data  in file ', diffuse_fits_file)
@@ -99,7 +99,7 @@ def combine_images(filename, json_polygons, original_noise=0.0):
       
       # we need to update the mask file as some masked components have now been 
       # moved into the combined final output file
-      mask_file = filename + '-dilated_tophat.mask.fits'
+      mask_file = filename + '-white_tophat.mask.fits'
       print('mask file to be updated ', mask_file)
       hdu_list = fits.open(mask_file)
       hdu = hdu_list[0]

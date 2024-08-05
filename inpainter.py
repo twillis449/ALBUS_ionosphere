@@ -32,7 +32,7 @@ def paint_image(filename, maskname):
    for i in range(num_proc):
      if filename.find('csv') > -1:
         input_image = names[i]+'_final_image.fits'
-        mask_image =  names[i] + '-dilated_tophat.mask.fits'
+        mask_image =  names[i] + '-white_tophat.mask.fits'
      else:
         input_image = filename
         mask_image = maskname 

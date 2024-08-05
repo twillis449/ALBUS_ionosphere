@@ -134,7 +134,7 @@ def make_mask(argv):
     hdu.header['DATAMIN'] = hdu.data.min()
     hdu.header['DATAMAX'] = hdu.data.max()
 #   print('tophat image  data max and min', hdu.data.max(), hdu.data.min())
-    out_tophat = filename +'-dilated_tophat.fits'
+    out_tophat = filename +'-white_tophat.fits'
 #   print('make_mask: tophat output to ', out_tophat )
     hdu.writeto(out_tophat, overwrite=True)
 
@@ -147,7 +147,7 @@ def make_mask(argv):
     hdu.data = mask
     hdu.header['DATAMIN'] = 0.0
     hdu.header['DATAMAX'] = 1.0
-    outfile = filename +'-dilated_tophat.mask.fits'
+    outfile = filename +'-white_tophat.mask.fits'
     print('mask output to ', outfile )
     hdu.writeto(outfile, overwrite=True)
 
@@ -161,13 +161,13 @@ def make_mask(argv):
 
 #   print('filtered_data min and max', filtered_data.min(),  filtered_data.max())
 #   write out m * d
-    masked_dilated_image = mask * morphology_image
-    hdu.data = masked_dilated_image
+    masked_morphology_image = mask * morphology_image
+    hdu.data = masked_morphology_image
 #   print('filtered data max and min', hdu.data.max(), hdu.data.min())
-    hdu.header['DATAMAX'] =  masked_dilated_image.max()
-    hdu.header['DATAMIN'] =  masked_dilated_image.min()
+    hdu.header['DATAMAX'] =  masked_morphology_image.max()
+    hdu.header['DATAMIN'] =  masked_morphology_image.min()
 
-    outfile = filename +'.masked_dilated_image.fits'
+    outfile = filename +'.masked_morphology_image.fits'
 #   print('filtered_data image output to ', outfile )
 #   write out m * d
     hdu.writeto(outfile, overwrite=True)
@@ -191,7 +191,7 @@ def make_mask(argv):
     hdu.header['DATAMIN'] =  hdu.data.min()
 
 #   print('hdu.data max and main', hdu.data.max(), hdu.data.min())
-    compact_outfile = filename +'.masked_compact_structure.fits'
+    compact_outfile = filename +'.masked_original_image.fits'
 #   print('********** final compact file', outfile)
     hdu.writeto(compact_outfile, overwrite=True)
 #   print('wrote out', outfile)
