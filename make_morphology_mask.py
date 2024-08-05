@@ -206,7 +206,7 @@ def make_mask(argv):
     hdu.header['DATAMIN'] =  hdu.data.min()
 
 #   print('hdu.data max and main', hdu.data.max(), hdu.data.min())
-    diffuse_outfile = filename +'_diffuse_structure.fits'
+    diffuse_outfile = filename +'-diffuse_structure.fits'
 #   print('********** final diffuse', outfile)
     hdu.writeto(diffuse_outfile, overwrite=True)
 #   print('wrote out', outfile)

@@ -47,7 +47,7 @@ def combine_images(filename, json_polygons, original_noise=0.0):
 
     
     if num_polygons > 0:
-      diffuse_fits_file = filename + '_diffuse_structure.fits'
+      diffuse_fits_file = filename + '-diffuse_structure.fits'
       compact_fits_file = filename + '.masked_original_image.fits'
 
       print('original compact image data  in file ', compact_fits_file)
@@ -84,16 +84,12 @@ def combine_images(filename, json_polygons, original_noise=0.0):
       hdu.writeto(compact_fits_file, overwrite=True)
       print('sending final compact data output to ', compact_fits_file)
 
-#     fits_file_out = filename + '_final_image.fits'
-#     print('sending output to ', fits_file_out)
-#     hdu.writeto(fits_file_out, overwrite=True)
-
       diffuse_data = update_dimensions(diffuse_data,incoming_dimensions)
       hdu.data = diffuse_data
       hdu.header['DATAMIN'] = hdu.data.min()
       hdu.header['DATAMAX'] = hdu.data.max()
 
-      fits_file_out = filename + '_final_image.fits'
+      fits_file_out = filename + '-final_image.fits'
       print('sending final diffuse data output to ', fits_file_out)
       hdu.writeto(fits_file_out, overwrite=True)
       
@@ -130,8 +126,8 @@ def combine_images(filename, json_polygons, original_noise=0.0):
 
     else:
 # just link the diffuse file to final processed file
-      diffuse_fits_file = filename + '_diffuse_structure.fits'
-      fits_file_out = filename + '_final_image.fits'
+      diffuse_fits_file = filename + '-diffuse_structure.fits'
+      fits_file_out = filename + '-final_image.fits'
       if os.path.isfile(fits_file_out):
         os.remove(fits_file_out)
       print('no polygons selected so just making a symbolic link ',fits_file_out, ' to ', diffuse_fits_file)

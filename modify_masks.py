@@ -26,7 +26,6 @@ def modify_masks(filename, json_polygons):
     
     if num_polygons > 0:
       original_mask_file = filename +'-white_tophat.mask.fits'
-      residual_mask_file = filename + '.masked_residual_structure.fits'
 
       hdu_list = fits.open(original_mask_file)
       hdu = hdu_list[0]
@@ -53,8 +52,6 @@ def modify_masks(filename, json_polygons):
       hdu.data = compact_data
       hdu.header['DATAMIN'] = hdu.data.min()
       hdu.header['DATAMAX'] = hdu.data.max()
-#     hdu.writeto(residual_mask_file, overwrite=True)
-#     print('sending final compact data output to ', residual_mask_file)
 
       diffuse_data = update_dimensions(diffuse_data,incoming_dimensions)
       hdu.data = diffuse_data

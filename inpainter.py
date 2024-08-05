@@ -31,7 +31,7 @@ def paint_image(filename, maskname):
      names= []
    for i in range(num_proc):
      if filename.find('csv') > -1:
-        input_image = names[i]+'_final_image.fits'
+        input_image = names[i]+'-final_image.fits'
         mask_image =  names[i] + '-white_tophat.mask.fits'
      else:
         input_image = filename
@@ -85,10 +85,10 @@ def paint_image(filename, maskname):
        hdu.header['DATAMIN'] = hdu.data.min()
        hdu.header['DATAMAX'] = hdu.data.max()
        if len(names) > 0:
-         inpainted_result_file =  names[i] +'_CV_NS_inpaint_result.fits'
+         inpainted_result_file =  names[i] +'-CV_NS_inpaint_result.fits'
        else:
          loc = input_image.find('.fits')
-         inpainted_result_file =  input_image[:loc] + '_CV_NS_inpaint_result.fits'
+         inpainted_result_file =  input_image[:loc] + '-CV_NS_inpaint_result.fits'
        print('inpainted_result_file ',  inpainted_result_file)
        hdu.writeto(inpainted_result_file, overwrite=True)
      else:
@@ -100,10 +100,10 @@ def paint_image(filename, maskname):
        hdu.header['DATAMAX'] = hdu.data.max()
        print('inpainted image max and min', hdu.data.max(), hdu.data.min())
        if len(names) > 0:
-         inpainted_result_file =  names[i] +'_pyheal_FMM_inpaint_result.fits'
+         inpainted_result_file =  names[i] +'-pyheal_FMM_inpaint_result.fits'
        else:
          loc = input_image.find('.fits')
-         inpainted_result_file = input_image[:loc] + '_pyheal_FMM_inpaint_result.fits'
+         inpainted_result_file = input_image[:loc] + '-pyheal_FMM_inpaint_result.fits'
        hdu.writeto(inpainted_result_file, overwrite=True)
 
 # show the original input image, mask, and output image after
@@ -145,15 +145,15 @@ def paint_image(filename, maskname):
 
      if len(names) > 0:
        if use_cv2:
-           inpainted_png_file =  names[i] +'_CV_NS_inpaint_result.png'
+           inpainted_png_file =  names[i] +'-CV_NS_inpaint_result.png'
        else:
-           inpainted_png_file =  names[i] +'_pyheal_inpaint_result.png'
+           inpainted_png_file =  names[i] +'-pyheal_inpaint_result.png'
      else:
        loc = input_image.find('.fits')
        if use_cv2:
-           inpainted_png_file =  filename[:loc] +'_CV_NS_inpaint_result.png'
+           inpainted_png_file =  filename[:loc] +'-CV_NS_inpaint_result.png'
        else:
-           inpainted_png_file =  filename[:loc] +'_pyheal_inpaint_result.png'
+           inpainted_png_file =  filename[:loc] +'-pyheal_inpaint_result.png'
      plt.savefig(inpainted_png_file)
 #    plt.show()
  
