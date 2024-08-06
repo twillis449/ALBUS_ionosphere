@@ -225,7 +225,7 @@ def make_mask(argv):
         return
 
 # otherewise, just link the diffuse file to final processed file
-    fits_file_out = filename + '_final_image.fits'
+    fits_file_out = filename + '-final_image.fits'
     print('making a symbolic link')
     if os.path.isfile(fits_file_out):
       os.remove(fits_file_out)
