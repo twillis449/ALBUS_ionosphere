@@ -2,7 +2,7 @@
 
 # first make 'soft' link to the original image
 # first delete any previous version
-/bin/rm -rf 3C236*fits  
+/bin/rm -rf 3C236*fits 
 ln -s 3C236_original.FITS 3C236.fits
 
 # obtain initial flux density 
@@ -15,28 +15,14 @@ get_galaxy_parameters.py -f 3C236.csv  --th 6  -s False
 # the script will not generate the output file needed for the next step
 # will call generate_mask_polygons.py program
 
+# do 'deep' erosion
 get_morphology_images.py -f 3C236.csv -t D --th 6 
 
-# now get rid of 'buried' 200 mJy background source in SE lobe
-# we need a threshold of 22 x noise
-
-/bin/rm -rf 3C236.fits 
-ln -s 3C236_final_image.fits 3C236.fits 
-get_morphology_images.py -f 3C236.csv -t D --th 22    
-
-# note: this will overwrite the previous version of 3C236_final_image.fits
-
-# do inpainting of area where 200 mJy source was removed
-/bin/rm -rf 3C236.fits 
-ln -s 3C236_final_image.fits 3C236.fits
-inpainter.py  -f 3C236.csv
-
-# get parameters for the un-convolved image using the inpainted image
+# compare wih 'shallow' erosion
+get_morphology_images.py -f 3C236.csv -t D --th 6.5 -d False
 
 /bin/rm -rf 3C236.fits
-ln -s   3C236_CV_NS_inpaint_result.fits 3C236.fits
-get_galaxy_parameters.py -f 3C236.csv --th 3.5 -s False
-
+ln -s 3C236-final_image.fits 3C236.fits
 # convolve the resulting image by a factor 2
 conv_image.py -f 3C236.fits 
 
