@@ -15,7 +15,7 @@ get_morphology_images.py -f bullet.csv -t D --th 9
 # by diffuse emission, so remove those objects from the mask
 
 /bin/rm -rf bullet_cluster.fits
-ln -s bullet_cluster-dilated_tophat.mask.fits  bullet_cluster.fits
+ln -s bullet_cluster-white_tophat.mask.fits  bullet_cluster.fits
 separate_masks.py -f bullet_cluster.fits
 
 # fil in the holes with inpainting
@@ -24,7 +24,7 @@ inpainter.py  -f bullet.csv
 # get parameters for the un-convolved image
 
 /bin/rm -rf bullet_cluster.fits
-ln -s  bullet_cluster_CV_NS_inpaint_result.fits bullet_cluster.fits
+ln -s  bullet_cluster-CV_NS_inpaint_result.fits bullet_cluster.fits
 #ln -s bullet_cluster_pyheal_FMM_inpaint_result.fits bullet_cluster.fits
 get_galaxy_parameters.py -f bullet.csv --th 3.5 -s False
 /bin/rm -rf  bullet_cluster.source_parameters_diffuse_image
@@ -49,11 +49,11 @@ mv bullet_cluster_conv.source_parameters bullet_cluster_conv.source_parameters_N
 
 # get flux density of point sources after subtracting off inpaint results
 
-image_math.py -f bullet_cluster_CV_NS_inpaint_result.fits -s  bullet_cluster-dilated_tophat.mask.fits  -m m
-image_math.py -f bullet_cluster.masked_compact_structure.fits -s  image_math_mult.fits  -m s
+image_math.py -f bullet_cluster-CV_NS_inpaint_result.fits -s  bullet_cluster-white_tophat.mask.fits  -m m
+image_math.py -f bullet_cluster.masked_original_image.fits -s  image_math_mult.fits  -m s
 /bin/rm -rf bullet_cluster.fits
 ln -s  image_math_subt.fits  bullet_cluster.fits  
-get_galaxy_parameters.py -f bullet.csv --th 3 -n 0.007 -s False
+get_galaxy_parameters.py -f bullet.csv --th 3 -n 0.007 -s False -u False
 /bin/rm -rf  bullet_cluster.source_parameters_compact_sources
 mv bullet_cluster.source_parameters bullet_cluster.source_parameters_compact_sources
 
