@@ -48,7 +48,7 @@ def combine_images(filename, json_polygons, original_noise=0.0):
     
     if num_polygons > 0:
       diffuse_fits_file = filename + '-diffuse_structure.fits'
-      compact_fits_file = filename + '.masked_original_image.fits'
+      compact_fits_file = filename + '-masked_original_image.fits'
 
       print('original compact image data  in file ', compact_fits_file)
       print('original diffuse image data  in file ', diffuse_fits_file)
