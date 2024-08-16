@@ -4,7 +4,6 @@
 
 import sys
 import numpy as np
-import subprocess
 from astropy.io import fits
 from check_array import check_array, update_dimensions
 from astropy.io import fits

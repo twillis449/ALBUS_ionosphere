@@ -8,7 +8,6 @@ import sys
 import os
 import json
 import math
-import subprocess
 import numpy as np
 import weakref
 import matplotlib.pylab as plt

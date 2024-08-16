@@ -13,7 +13,6 @@ import sys
 import os
 #import json
 #import math
-#import subprocess
 import numpy as np
 import matplotlib.pylab as plt
 import matplotlib.cm as cm

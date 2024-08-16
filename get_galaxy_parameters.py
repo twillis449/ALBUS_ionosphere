@@ -8,7 +8,6 @@ import sys
 import numpy as np
 import math 
 import timeit
-import subprocess
 from astropy.io import fits
 from astropy.coordinates import SkyCoord
 from read_input_table import  process_input_file
