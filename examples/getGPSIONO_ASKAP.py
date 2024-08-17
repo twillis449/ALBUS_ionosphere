@@ -28,6 +28,17 @@ DEC="-45:16:57.10"
 
 # file containing pointing positions of ASKAP FPA beams
 positions_file = './NGC7232_beams'
+text = open(positions_file, 'r').readlines()
+start = 1
+positions_ascii = []
+for i in range( start,len(text)):
+    info = text[i].split(',')         # gets declination
+    ra = info[0]
+    dec = info[1]
+    comment = info [2]
+    positions_ascii.append([ra, dec, comment])
+print('positions ascii', positions_ascii)
+
 
 START_TIME="2021/12/12 04:14:35.0"
 END_TIME="2021/12/13  04:11:35.0"
@@ -43,9 +54,10 @@ num_processors = 8
 
 # the way to get and process the data if data has to be obtained from GPS servers
 do_serial = 0
+do_serial = 1
 NUM_PROCESSORS = 8  
 
-iono.process_ionosphere_multi_dir(Lat=LAT,Long=LONG,Height=HEIGHT,start_time=START_TIME,end_time=END_TIME,do_serial=do_serial,num_processors=NUM_PROCESSORS,gps_data_directory=gps_data_directory,object=OBJECT,positions_file =positions_file)
+iono.process_ionosphere_multi_dir(Lat=LAT,Long=LONG,Height=HEIGHT,start_time=START_TIME,end_time=END_TIME,do_serial=do_serial,num_processors=NUM_PROCESSORS,gps_data_directory=gps_data_directory,object=OBJECT,positions_file =positions_ascii)
 
 # if you have a CASA measurement set you can get the antenna postion(s), start 
 # and  end times directly from the meaurement set
