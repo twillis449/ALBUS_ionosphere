@@ -3228,12 +3228,20 @@ sat_pos     O  The output data array, as
         home_dir = os.path.expanduser('~')
         file = home_dir + '/.netrc'
         if os.path.isfile(file): # we can access CDDIS
-           group_name = 'jpl'
-        else:
            group_name = 'cod'
+        else:
+           group_name = 'jpl'
         group_name = 'cod'
-        filename = Albus_RINEX.make_RINEX_ephemeris_filename(group_name, gps_week, gps_dow, year, doy)
+        best_estimate = False
+        filename = Albus_RINEX.make_RINEX_ephemeris_filename(group_name, best_estimate, gps_week, gps_dow, year, doy)
         ret_code = Albus_RINEX.get_GPS_ephemeris_file_from_web(filename,year,
+                                                               gps_week,
+                                                               output_directory,
+                                                               overwrite)
+        if(ret_code < 0):
+            best_estimate = True
+            filename = Albus_RINEX.make_RINEX_ephemeris_filename(group_name, best_estimate, gps_week, gps_dow, year, doy)
+            ret_code = Albus_RINEX.get_GPS_ephemeris_file_from_web(filename,year,
                                                                gps_week,
                                                                output_directory,
                                                                overwrite)
@@ -3241,8 +3249,8 @@ sat_pos     O  The output data array, as
             print ( '*****' )
             print ( 'Unable to continue: could not download needed ephemeris data!!!!')
             print ( '*****' )
-            os._exit(2)
             raise Albus_RINEX.RINEX_Data_Barf("Unable to continue: could not download ephemeris data for MJD %d"%m)
+            os._exit(2)
         filename = output_directory + '/' + filename
         MJD, pos = read_RINEX_sp3_file(filename)
         sat_MJD_list.append(MJD)

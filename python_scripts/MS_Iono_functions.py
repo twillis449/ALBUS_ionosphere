@@ -942,6 +942,7 @@ def setup_AlbusIonosphere_for_ref_date(log, MSname="",MSdir=".",Lat=0, Long=0, H
       (year_ref,month_ref,day_ref,hr_ref,min_ref,sec_ref) = \
          obtain_observation_year_month_day_hms(st)
     print ('reference time for rel_time=0: year_ref,month_ref,day_ref,hr_ref,min_ref,sec_ref',year_ref,month_ref,day_ref,hr_ref,min_ref,sec_ref)
+    reference_start_MJD = jma_tools.get_MJD_hms(year_ref,month_ref,day_ref,hr_ref,min_ref,sec_ref)
         
     retval = Iono_agw.set_reference_time(year_ref,
                                                 month_ref,
@@ -1767,9 +1768,11 @@ def get_askap_beam_locations( filename ):
   positions_ascii = []
   for i in range( start,len(text)):
     info = text[i].split(',')         # gets declination
-    info1 = info[0].split(' ')        # gets right ascension
-    x = len(info1)-1
-    positions_ascii.append([info1[x],info[1]])
+    ra = info[0]
+    dec = info[1]
+    comment = info[2]
+    positions_ascii.append([ra, dec, comment])
+  print('positions ascii', positions_ascii)
 
   return positions_ascii
 
@@ -1910,11 +1913,13 @@ def process_ionosphere_multi_dir(MSname="",MSdir=".", Ra=0, Dec=0, Az=180.0, El=
 # read in positions from data file
     max_j = 1
     try:
-      positions_ascii  = get_askap_beam_locations(positions_file)
+      positions_ascii  = positions_file
+      print(' positions_ascii', positions_ascii)
       if len(positions_ascii) > 0:
         max_j = len(positions_ascii)
     except:
-        pass
+         print('file not found', positions_file)
+         pass
     # 
     for j in range(max_j):
       location_ra = []
@@ -1955,7 +1960,7 @@ def process_ionosphere_multi_dir(MSname="",MSdir=".", Ra=0, Dec=0, Az=180.0, El=
 
       print ('  ',file=log)
       print ('#######################################################',file=log)
-      print ('observation:', j,' direction ', positions_ascii[j][0],positions_ascii[j][1],file=log)
+      print ('observation:', j,' direction ', positions_ascii[j][0],positions_ascii[j][1], positions_ascii[j][2], file=log)
       print ('  ',file=log)
       print ('observation:', j,' direction ', positions_ascii[j][0],positions_ascii[j][1])
 

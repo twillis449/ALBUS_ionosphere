@@ -648,7 +648,7 @@ filename      O  filename of RINEX file, no directory path
     return (filename, country)
 
 ################################################################################
-def make_RINEX_ephemeris_filename(group_name, gps_week, dow, year, doy):
+def make_RINEX_ephemeris_filename(group_name, best_estimate, gps_week, dow, year, doy):
     """generate a RINEX ephemeris filename
 
 group_name    I  name of an ephemeris producing group.  Must be three characters.
@@ -677,7 +677,10 @@ filename      O  filename of RINEX ephemeris file, no directory path
       if gps_week < 2238: # week of 27 Nov 2022
         filename = "%3.3s%4.4d%1.1d.%3.3s"%(group_name, gps_week, dow, extension)
       else:
-         start_str = group_name.upper() + '0OPSFIN_'
+         if best_estimate:
+             start_str = group_name.upper() + '0OPSRAP_'
+         else:
+             start_str = group_name.upper() + '0OPSFIN_'
          end_str = '0000_01D_05M_ORB.SP3'
          filename =  "%s%4.4d%3.3d%s"%(start_str,year, doy, end_str)
     return filename
@@ -808,14 +811,14 @@ return_code       O  Status of getting file from web
            else:
               data_file = ephemeris_filename.upper()
               site_str = "https://cddis.nasa.gov/archive/gnss/products/%4.4d/%s.gz"%(gps_week, ephemeris_filename)
-       else:
-        # CODE, Switzerland
+         
+       else: # try SOPAC - currently does not seem to work
         data_file = ephemeris_filename.upper()
         if gps_week < 2238:
-          site_str = "ftp://ftp.aiub.unibe.ch/CODE/%4.4d/%s.Z"%(year, data_file)
+          site_str = " ftp://garner.ucsd.edu/pub/products/%4.4d/%s.Z"%(gps_week, ephemeris_filename)
         else:
-          site_str = "ftp://ftp.aiub.unibe.ch/CODE/%4.4d/%s.gz"%(year, data_file)
-        print('we should be using CODE site string:', site_str)
+          site_str = " ftp://garner.ucsd.edu/pub/products/%4.4d/%s.gz"%(gps_week, ephemeris_filename)
+        print('we should be using SOPAC site string:', site_str)
     elif(FTP_site == 1): 
         # CODE, Switzerland
         data_file = ephemeris_filename.upper()
@@ -825,6 +828,7 @@ return_code       O  Status of getting file from web
           site_str = "ftp://ftp.aiub.unibe.ch/CODE/%4.4d/%s.gz"%(year, data_file)
         print('we should be using CODE site string:', site_str)
     else:
+        return -1
         raise KeyError("Unknown ephemeris FTP site")
     try:
         get_url(site_str, our_Z_file)
