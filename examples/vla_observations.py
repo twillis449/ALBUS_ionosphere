@@ -37,17 +37,20 @@ if __name__ == "__main__":
   START_TIME="2017/08/06 02:28:00.00"
   END_TIME="2017/08/06 10:20:00.00"
 
-  START_TIME="2024/01/20 22:37:00.00"
-  END_TIME="2024/01/21 06:40:00.00"
-
   START_TIME="2023/11/04 09:50:00.00"
   END_TIME="2023/11/04 15:15:00.00"
 
   START_TIME="2017/05/10 03:07:00.00"
   END_TIME="2017/05/10 08:59:00.00"
 
+  START_TIME="2024/01/20 22:37:00.00"
+  END_TIME="2024/01/21 06:40:00.00"
+
+  START_TIME="2024/08/10 22:37:00.00"
+  END_TIME="2024/08/11 06:40:00.00"
+
   home_dir = os.path.expanduser('~')
-  data_dir = 'VLA_test_2017'
+  data_dir = 'VLA_test_2024'
   DATA_DIR = home_dir + '/' + data_dir
 
   RED_TYPE = 'RI_G01'
@@ -60,8 +63,8 @@ if __name__ == "__main__":
   RED_TYPE = 'RI_G09'
   RED_TYPE = 'RI_G03'
   TIME_STEP = 300
-  MAX_DIST = 400E3
   MAX_DIST = 200E3
+  MAX_DIST = 400E3
   NUM_PROCESSORS = 6
   DO_SER = 1
   DO_SER = 0
@@ -78,6 +81,9 @@ if __name__ == "__main__":
 
   else:
 # Source positions
+
+    RA = "13:31:08.28811" #  # J2000 coordinates of 3C286
+    DEC= "30:30:32.96"
 
     RA = "14:43:02.758"  # J2000 coordinates of 3C303
     DEC = "52:01:37.16"
@@ -98,7 +104,7 @@ if __name__ == "__main__":
     OBJECT="DA240_2017_tracking"
 
     if use_elev:
-      OBJECT="Zenith_Track_2017_with_200km_receiver_range"
+      OBJECT="Zenith_Track_2024_with_400km_receiver_range"
       print('tracking at zenith')
       iono.process_ionosphere(time_step=TIME_STEP,object=OBJECT,El=90.0,Lat=LAT,Long=LONG,Height=HEIGHT,start_time=START_TIME,end_time=END_TIME,max_dist=MAX_DIST,processing_option=RED_TYPE,do_serial=DO_SER,num_processors=NUM_PROCESSORS, gps_data_directory=DATA_DIR);
 #  use the following function if you want to track a  position
