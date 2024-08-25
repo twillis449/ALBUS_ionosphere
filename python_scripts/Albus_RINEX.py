@@ -403,6 +403,7 @@ overwrite         I  May files be overwritten?  0 No, else yes
 
 OUTPUTS:  None
 """
+    print ('in get_RINEX_obs_file_from_web with FTP_site =', FTP_site )
     assert(FTP_site >= 0)
     RINEX_filename = RINEX_data[0]
     country = RINEX_data[1]
@@ -416,7 +417,10 @@ OUTPUTS:  None
        use_cddis = True
     else:
        use_cddis = False
-    if(FTP_site > 10): 
+       print ( '************* unable to handle the CDDIS site')
+       warnings.warn("To access the CDDIS site you need to open an account there")
+       warnings.warn("Go to https://cddis.nasa.gov/About/CDDIS_File_Download_Documentation.html")
+    if(FTP_site > 11): 
         # Out of FTP sites.
         if(RINEX_filename[-1] != 'd'):
             GPS_stations.add_to_missing(RINEX_filename)
@@ -466,18 +470,16 @@ OUTPUTS:  None
         raise No_RINEX_File_Error("Error: data %s is in the missing data list"%(RINEX_filename))
     # Fifth, check for known locations of some files
     if(FTP_site == 0):
-#    if country == 'USA:
-#        FTP_site = 0
      if country == 'AUS':
-         FTP_site = 5
-     if country == 'NLD':
          FTP_site = 6
+     if country == 'NLD':
+         FTP_site = 7
      if country == 'ZAF':
-         FTP_site = 8
-     if country == 'NZL':
          FTP_site = 9
+     if country == 'NZL':
+         FTP_site = 10
      if(RINEX_filename[0:4] in _RINEX_SITE_LIST_EUROPE):
-         FTP_site = 4
+         FTP_site = 5
     assert(year > 1979)
     assert(year < 2080)
     yy = year - 1900
@@ -510,13 +512,17 @@ OUTPUTS:  None
               if(RINEX_filename[-1] == 'n'):
                  site_str = "ftp://garner.ucsd.edu/pub/nav/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
     elif(FTP_site == 2):
+       site_str = "https://geodesy.noaa.gov/corsdata/rinex/%4.4d/%3.3d/%s/%s.gz"%(year, doy, RINEX_filename[0:4], RINEX_filename)
+       our_file = output_directory + '/' + RINEX_filename 
+       our_Z_file = output_directory + '/' + RINEX_filename + '.gz'
+    elif(FTP_site == 3):
         # EUREF in Italy note: also has RINEX_V3 directory stuff for years >= 2010
         site_str = "ftp://geodaf.mt.asi.it/GEOD/GPSD/RINEX/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
-    elif(FTP_site == 3):
+    elif(FTP_site == 4):
         # IGN France - hum -doesn't seem to have data for 2023
         if year < 2023:
           site_str = "ftp://igs.ensg.ign.fr/pub/igs/data/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
-    elif(FTP_site == 4):
+    elif(FTP_site == 5):
         if year < 2020:
         # Belgium centre for EUREF data - now migrating to RINEX 3
           site_str = "ftp://epncb.oma.be/pub/obs/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename.upper())
@@ -531,7 +537,7 @@ OUTPUTS:  None
           our_Z_file = output_directory + '/' + RINEX3_filename + '.gz'
           site_str = "ftp://epncb.oma.be/pub/obs/%4.4d/%3.3d/%s.gz"%(year, doy, RINEX3_filename)
 
-    elif(FTP_site == 5):
+    elif(FTP_site == 6):
 # !@#$#%$%^^& f*ing Aussies - they stopped reporting rinex2 files 
 # and switched to rinex3 in2020
         # Australia site
@@ -554,17 +560,17 @@ OUTPUTS:  None
         print('trying to get ',  our_file )
         print ( '*********** accessing Australian FTP site!')
         print('site string', site_str)
-    elif(FTP_site == 6):
-            site_str = "ftp://gnss1.tudelft.nl/rinex/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
     elif(FTP_site == 7):
-        pass
+            site_str = "ftp://gnss1.tudelft.nl/rinex/%4.4d/%3.3d/%s.Z"%(year, doy, RINEX_filename)
     elif(FTP_site == 8):
+        pass
+    elif(FTP_site == 9):
         # South Africa Trignet
         print ( '*********** accessing South African Trignet FTP site!')
         ftp_file_name = RINEX_filename[0:7].upper()+'Z.zip'
         site_str = "ftp://ftp.trignet.co.za/RefData.%2.2d/%3.3d/L1L2_30sec/%s"%(year-2000, doy, ftp_file_name)
         our_Z_file = output_directory + '/' + ftp_file_name
-    elif(FTP_site == 9):
+    elif(FTP_site == 10):
         # New Zealand GeoNet and LINZ servers
         print ( '*********** accessing New Zealand FTP site!')
         print('nz RINEX file name ', RINEX_filename)
@@ -572,12 +578,10 @@ OUTPUTS:  None
            site_str = "https://data.geonet.org.nz/gnss/rinex/%4.4d/%3.3d/%s.gz"%(year, doy, RINEX_filename)
 
 # Getting big Rinex files from CDDIS is not yet working
-    elif(FTP_site == 10 and use_cddis): # cddis
+    elif(FTP_site == 11 and use_cddis): # cddis
        site_str = "https://cddis.nasa.gov/archive/gnss/data/daily/%4.4d/%3.3d/%2.2d%s/%s.Z"%(year, doy, yy, RINEX_filename[-1], RINEX_filename)
     else:
         print ( '************* unable to handle ftp site number ', FTP_site)
-        warnings.warn("To access the CDDIS site you need to open an account there")
-        warnings.warn("Go to https://cddis.nasa.gov/About/CDDIS_File_Download_Documentation.html")
     try:
         print('+++++++++++++++ calling get_url with', site_str, our_Z_file)
         print('*********************************')
@@ -589,12 +593,11 @@ OUTPUTS:  None
                                     FTP_site+1,
                                     overwrite)
         return
+
     # uncompress
     gunzip_some_file(our_Z_file,our_file,RX3_flag= RX3_flag)
     return
-    
-
-
+   
 
 ################################################################################
 def make_RINEX_filename(station_name,
