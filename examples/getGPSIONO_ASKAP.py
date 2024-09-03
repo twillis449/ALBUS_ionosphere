@@ -6,7 +6,7 @@
 # effects in each beam direction after the GPS receiver data has been 
 # collected and corrected for bias etc
 
-import numpy
+import numpy as np
 import os
 import time
 os.system('date')
@@ -28,15 +28,7 @@ DEC="-45:16:57.10"
 
 # file containing pointing positions of ASKAP FPA beams
 positions_file = './NGC7232_beams'
-text = open(positions_file, 'r').readlines()
-start = 1
-positions_ascii = []
-for i in range( start,len(text)):
-    info = text[i].split(',')         # gets declination
-    ra = info[0]
-    dec = info[1]
-    comment = info [2]
-    positions_ascii.append([ra, dec, comment])
+positions_ascii = np.loadtxt(positions_file, delimiter=',', dtype=str)
 print('positions ascii', positions_ascii)
 
 
