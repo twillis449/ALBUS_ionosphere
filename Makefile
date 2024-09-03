@@ -19,7 +19,7 @@ export INSTALLDIR = /home/twillis/albus
 export CURRENT_PYTHON = python
 
 # modify the following line to point to where Python include files are kept
-export PYTHONINCLUDEDIR = /usr/include/python3.8
+export PYTHONINCLUDEDIR = /usr/include/python3.10
 
 # Version numbering for the libiri library
 export VER_MAJOR = 1
