@@ -1753,29 +1753,6 @@ def process_ionosphere(MSname="",
     print ('process_ionosphere: total run time: %7.2f minutes' % duration)
     print ('process_ionosphere: total run time: %7.2f minutes' % duration, file=log)
 
-#
-
-#########################################################################
-def get_askap_beam_locations( filename ):
-# get ASKAP FPA phased up positions from ASCII file
-# decode ASKAP file having lines with form: 0  (-0.450  0.450)  22:10:35.412,-44:49:50.70
-# we want the last two coordinates
-
-  text = open(filename, 'r').readlines()
-# skip first line
-# get actual data
-  start = 1
-  positions_ascii = []
-  for i in range( start,len(text)):
-    info = text[i].split(',')         # gets declination
-    ra = info[0]
-    dec = info[1]
-    comment = info[2]
-    positions_ascii.append([ra, dec, comment])
-  print('positions ascii', positions_ascii)
-
-  return positions_ascii
-
 #########################################################################
 
 # The following function should be the only one which needs changes that depend
