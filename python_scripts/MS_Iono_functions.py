@@ -1401,7 +1401,6 @@ def process_ionosphere(MSname="",
                        tolerance=0.1,
                        overwrite=0,
                        do_serial=0,
-                       raise_bias_error=0,
                        num_processors=4,
                        use_pim=1,
                        use_global_data=0,
@@ -1443,15 +1442,14 @@ def process_ionosphere(MSname="",
 # measurement set
 # time_step - seconds to increment in each cycle of ionosphere prediction
 # object - name of what is being observed - can be left blank 
-# raise_bias_error - if set to 1, will ignore all GPS observations where bias 
-#   has not been corrected for
 
     
-    raise_bias_error = 0          # all RINEX files have uncorrected biases!
     os.system('date')
     process_start = time.time()
     startime = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
     print ("process_ionosphere Start at %s" % startime)
+
+    raise_bias_error = 0  # All RINEX files have uncorrected biases!
 
     if len(MSname) == 0:
         print ('*************')
