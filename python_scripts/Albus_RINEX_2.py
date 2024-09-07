@@ -2074,14 +2074,9 @@ raise_bias_error           I  reject data with no bias correction 0 No, else yes
     sta_bias_valid = np.zeros((MAX_POSSIBLE_SATELLITES//100),dtype='int32')+1
     if (bias_in_dicts(station_code, bias_IONEX[MJD_MID][1],bias_CODE_monthly[MJD_MID][1]) is None):
         sta_bias_valid[0] = 0
-        warnings.warn("Station '%s' has no bias correction"%station_code)
-        print ( 'raise_bias_error = ', raise_bias_error)
         if raise_bias_error:
           print ( '******************** rejecting data with no bias corection!!! ********')
           raise Albus_RINEX.RINEX_Data_Barf("Station '%s' has no bias correction"%station_code)
-        else:
-          print ( '******************** allowing data with no bias correction!!! ********')
-          warnings.warn("********* warning: Station '%s' has no bias correction"%station_code)
     if (bias_in_dicts(station_code + '_r', bias_IONEX[MJD_MID][1],bias_CODE_monthly[MJD_MID][1]) is None):
         sta_bias_valid[1] = 0
     if (bias_in_dicts(station_code + '_e', bias_IONEX[MJD_MID][1],bias_CODE_monthly[MJD_MID][1]) is None):

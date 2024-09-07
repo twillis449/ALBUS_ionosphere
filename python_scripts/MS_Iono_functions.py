@@ -74,7 +74,8 @@ PROCESSING_OPTION_RINEX_GROUPS = ["RI_G00",  # Single station, nearest sat
 
 ################################################################################
 def get_valid_stations(filename):
-  valid_stations = {}
+# valid_stations = {}
+  valid_stations_list = []
   try:
     text = open(filename, 'r').readlines()
     L = len(text)
@@ -82,12 +83,14 @@ def get_valid_stations(filename):
     for i in range(L):
       try:
         info = str.split(str.strip(text[i]))
-        valid_stations[info[0]] = i
+        valid_stations_list.append(info[0])
       except:
         pass
   except:
     pass
-  return valid_stations
+# print('valid_stations dict', valid_stations)
+# print('valid_stations list', valid_stations_list)
+  return valid_stations_list
 
 ################################################################################
 def get_observation_time_range(MS):
@@ -596,7 +599,6 @@ OUTPUTS: None
       station_log = open(station_file, 'a')
     else:
       valid_stations = get_valid_stations(station_file)
-      print ('valid stations are', valid_stations)
       if len(valid_stations) == 0:
         print ('no valid stations list found for data processing')
         print ('will try to collect new data')
@@ -746,25 +748,6 @@ OUTPUTS: None
         task_queue.put('STOP')
  
       print ('*********** finished collecting station data !!! ***************')
-# finally get current solar flux file
-# issue command here
-# ftp://ftp.geolab.nrcan.gc.ca/data/solar_flux/daily_flux_values/fluxtable.txt
-
-#     try:
-#       print ('*********** getting F10.7 cm solar flux data ***************')
-#       DEFAULT_TIMEOUT = 150
-# program name to get stuff
-#       URL_GETTER = "Albus_RINEX_download.py"
-#       infile = 'ftp://ftp.geolab.nrcan.gc.ca/data/solar_flux/daily_flux_values/fluxtable.txt'
-#       outfile = output_directory + '/' + 'fluxtable.txt'
-#     
-#       Albus_RINEX.run_command_timeout(URL_GETTER,
-#                               [URL_GETTER, infile, outfile,
-#                                "%d"%DEFAULT_TIMEOUT],
-#                               DEFAULT_TIMEOUT)
-#     except:
-#       print ('*********** failed to get F10.7 cm solar flux data ***************')
-#       pass
 
       # explicitly close list of usable GPS stations as soon as possible
       # otherwisr have to wait till entire script finishes
@@ -777,7 +760,7 @@ OUTPUTS: None
         raise RuntimeError("could not correct bias levels in Iono_agw")
 
 
-    return receiver_count, potential_number_GPS
+    return receiver_count, potential_number_GPS, station_file
 
 #############################################################################
 
@@ -909,7 +892,7 @@ def setup_AlbusIonosphere_for_ref_date(log, MSname="",MSdir=".",Lat=0, Long=0, H
       num_seconds = et - st
     
     ionosphere_GPS_set_criteria.Max_Rec_Dist_From_Tele = max_dist
-#   print ('maximum search radius for GPS stations from telescope (km) ', 0.001 * ionosphere_GPS_set_criteria.Max_Rec_Dist_From_Tele,file=log)
+    print ('maximum search radius for GPS stations from telescope (km) ', 0.001 * ionosphere_GPS_set_criteria.Max_Rec_Dist_From_Tele,file=log)
 #   print ('maximum search radius for GPS stations from telescope (km) ', 0.001 * ionosphere_GPS_set_criteria.Max_Rec_Dist_From_Tele)
 
     if(processing_option == 'MO_IRI'):
@@ -927,9 +910,17 @@ def setup_AlbusIonosphere_for_ref_date(log, MSname="",MSdir=".",Lat=0, Long=0, H
            ionosphere_GPS_set_criteria.Theo_Model_Type = 1
         print ('starting ionosphere_GPS_set_criteria.Bias_Fit_Type ', ionosphere_GPS_set_criteria.Bias_Fit_Type)
         print ('starting ionosphere_GPS_set_criteria.Theo_Model_Type ', ionosphere_GPS_set_criteria.Theo_Model_Type)
-        num_receivers, potential_num_receivers = ionosphere_GPS_setup_GPS(MS,MSlabel, processing_option,overwrite=overwrite,start_time=start_time, end_time=end_time,do_serial=do_serial,raise_bias_error=raise_bias_error,num_processors=num_processors, telescope_pos=station_pos, output_directory=gps_data_directory)
-        print ('Potential number of receivers for GPS fit ', potential_num_receivers,file=log)
+        num_receivers, potential_num_receivers,stations_file = ionosphere_GPS_setup_GPS(MS,MSlabel, processing_option,overwrite=overwrite,start_time=start_time, end_time=end_time,do_serial=do_serial,raise_bias_error=raise_bias_error,num_processors=num_processors, telescope_pos=station_pos, output_directory=gps_data_directory)
+        print ('Potential number of RINEX receivers for GPS fit ', potential_num_receivers,file=log)
         print ('Final number of receivers for GPS fit ', num_receivers,file=log)
+        actual_valid_stations = get_valid_stations(stations_file)
+        print ('Valid receivers used:',file=log)
+        list_size = len(actual_valid_stations)
+        step_size = 7
+        loc =   0
+        while (loc < list_size):
+           print(actual_valid_stations[loc:loc+step_size],file=log)
+           loc= loc+step_size
         retval = Iono_agw.set_ionosphere_GPS(tolerance,tolerance*100.0)
     print ('setup_AlbusIonosphere_for_ref_date time step is ', time_step)
     if time_step != 300.0:
@@ -1455,6 +1446,8 @@ def process_ionosphere(MSname="",
 # raise_bias_error - if set to 1, will ignore all GPS observations where bias 
 #   has not been corrected for
 
+    
+    raise_bias_error = 0          # all RINEX files have uncorrected biases!
     os.system('date')
     process_start = time.time()
     startime = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
@@ -1753,6 +1746,29 @@ def process_ionosphere(MSname="",
     print ('process_ionosphere: total run time: %7.2f minutes' % duration)
     print ('process_ionosphere: total run time: %7.2f minutes' % duration, file=log)
 
+#
+
+#########################################################################
+def get_askap_beam_locations( filename ):
+# get ASKAP FPA phased up positions from ASCII file
+# decode ASKAP file having lines with form: 0  (-0.450  0.450)  22:10:35.412,-44:49:50.70
+# we want the last two coordinates
+
+  text = open(filename, 'r').readlines()
+# skip first line
+# get actual data
+  start = 1
+  positions_ascii = []
+  for i in range( start,len(text)):
+    info = text[i].split(',')         # gets declination
+    ra = info[0]
+    dec = info[1]
+    comment = info[2]
+    positions_ascii.append([ra, dec, comment])
+  print('positions ascii', positions_ascii)
+
+  return positions_ascii
+
 #########################################################################
 
 # The following function should be the only one which needs changes that depend
@@ -1802,6 +1818,7 @@ def process_ionosphere_multi_dir(MSname="",MSdir=".", Ra=0, Dec=0, Az=180.0, El=
     startime = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
     print ("process_ionosphere Start at %s" % startime)
 
+    raise_bias_error = 0          # all RINEX files have uncorrected biases!
 
     if positions_file is None:
         print ('*************')
