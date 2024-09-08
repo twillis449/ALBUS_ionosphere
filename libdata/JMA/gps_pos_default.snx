@@ -3356,7 +3356,7 @@
  ccri  A XXXXXMXXX P                         16 46 32.2  +39 13 34.2    708.9  
  ccst  A XXXXXMXXX P                        240 59 11.5  +34 48 22.9   1578.1  
  cdmt  A XXXXXMXXX P                        243 39 50.6  +34 49 46.1    936.6  
- cdvv  A XXXXXMXXX P                        253  1 48.8  +34 15 14.9   1553.0  
+ cdvv  A XXXXXMUSA P                        253  1 48.8  +34 15 14.9   1553.0  
  ceda  A XXXXXMXXX P                        247  8 22.3  +40 40 50.5   1472.6  
  ceut  A XXXXXMXXX P                        354 41 19.2  +35 53 45.8     51.8  
  cgdm  A XXXXXMXXX P                        242  2  6.2  +34 14 38.4    704.7  
@@ -3663,7 +3663,7 @@
  p117  A XXXXXMXXX P                        248 14 54.9  +40 26  6.6   1629.0  
  p118  A XXXXXMXXX P                        248 39  0.5  +40 38  7.8   2082.6  
  p119  A XXXXXMXXX P                        248 44 32.2  +40 43 54.4   2045.4  
- p123  A XXXXXMXXX P                        254  5 21.0  +36 38  6.6   2411.2  
+ p123  A XXXXXMUSA P                        254  5 21.0  +36 38  6.6   2411.2  
  p128  A XXXXXMXXX P                        240 55 52.9  +39 29  9.9   1320.6  
  p130  A XXXXXMXXX P                        241  3 44.1  +39 16  4.9   1380.7  
  p132  A XXXXXMXXX P                        241 59 42.5  +38 43 43.8   1550.3  
@@ -3918,7 +3918,7 @@
  pavi  A XXXXXMXXX P                          9  8 10.1  +45 12 10.7    143.6  
  pbpp  A XXXXXMXXX P                        242  4 38.7  +34 30 29.6    902.0  
  pcol  A XXXXXMXXX P                        237 25 45.1  +47 10 19.4     79.1  
- pdbg  A XXXXXMXXX P                        253 10 23.5  +34 12 40.6   1504.9  
+ pdbg  A XXXXXMUSA P                        253 10 23.5  +34 12 40.6   1504.9  
  perl  A XXXXXMXXX P                        243 18 49.1  +36 54  6.5   1351.6  
  phan  A XXXXXMXXX P                        204 21 41.4  +19 26 49.2   3379.0  
  phin  A XXXXXMXXX P                        242 57 57.8  +36 58 49.4   1541.4  
@@ -3961,7 +3961,7 @@
  rep3  A XXXXXMXXX P                        243 31 54.7  +36 50 28.6   1479.2  
  rep4  A XXXXXMXXX P                        243 32  2.1  +36 50 56.9   1456.4  
  repo  A XXXXXMXXX P                        243 31 54.0  +36 50 25.3   1479.6  
- rg12  A XXXXXMXXX P                        255  1 53.9  +36 27 31.0   2136.0  
+ rg12  A XXXXXMUSA P                        255  1 53.9  +36 27 31.0   2136.0  
  rhcl  A XXXXXMXXX P                        241 58 25.8  +34  1  8.6    176.9  
  ried  A XXXXXMXXX P                         13 29 11.0  +48 12 12.3    505.3  
  rioj  A XXXXXMXXX P                        357 29 52.3  +42 27 28.6    506.2  
@@ -3992,7 +3992,7 @@
  sa20  A XXXXXMXXX P                        279 50 12.2  +25 43 54.1    -14.0  
  sa22  A XXXXXMXXX P                        285 45 56.2  +40 40 49.9     -4.7  
  sa23  A XXXXXMXXX P                        248 34 44.8  +41 56  1.6   1968.2  
- sa24  A XXXXXMXXX P                        250 18 42.4  +31 22  6.0   1231.8  
+ sa24  A XXXXXMUSA P                        250 18 42.4  +31 22  6.0   1231.8  
  sa25  A XXXXXMXXX P                        271 46 45.2  +40  6 42.3    194.3  
  sa26  A XXXXXMXXX P                        293 21 27.6  +45 57  0.5     24.1  
  sa27  A XXXXXMXXX P                        249  2 19.1  +29  4 55.5    184.1  
@@ -4002,7 +4002,7 @@
  sa34  A XXXXXMXXX P                        116 18 37.7  +39 59 30.6     56.7  
  sa37  A XXXXXMXXX P                        273 21 12.2  +34 43 26.8    180.3  
  sa43  A XXXXXMXXX P                        267 43 35.1  +38 54 17.1    222.1  
- sa46  A XXXXXMXXX P                        249  2 45.8  +32 13 47.4    729.8  
+ sa46  A XXXXXMUSA P                        249  2 45.8  +32 13 47.4    729.8  
  sa48  A XXXXXMXXX P                        248  8 20.5  +31 55  5.2    705.9  
  sabl  A XXXXXMXXX P                        358 11 39.1  +46 31 48.1     56.8  
  sala  A XXXXXMXXX P                        354 30 14.9  +40 56 42.3    855.4  
@@ -4038,7 +4038,7 @@
  sg26  A XXXXXMXXX P                        126 57 19.9  +37 27 45.1    200.4  
  sg27  A XXXXXMXXX P                        203 23 22.8  +71 19 22.4      9.4  
  sg32  A XXXXXMXXX P                        263 38 28.1  +30 36  8.9     80.6  
- sg33  A XXXXXMXXX P                        253 29 37.3  +31 46 22.2   1210.6  
+ sg33  A XXXXXMUSA P                        253 29 37.3  +31 46 22.2   1210.6  
  sg34  A XXXXXMXXX P                        263 15 35.2  +35 16  8.6    276.0  
  sg36  A XXXXXMXXX P                        145  7 57.9  -37 54 45.2    148.7  
  sg39  A XXXXXMXXX P                        287 45 36.1  +41 48 55.8    166.3  
@@ -4413,7 +4413,7 @@
  bea5  A XXXXXMXXX P                        265 49 13.1  +30  9 42.2    -10.4  
  coga  A XXXXXMXXX P                        277 51 57.7  +33 32 41.5    218.5  
  corc  A XXXXXMXXX P                        262 33 30.0  +27 44 26.9     -8.9  
- elp3  A XXXXXMXXX P                        253 43 42.4  +31 41 29.4   1121.9  
+ elp3  A XXXXXMUSA P                        253 43 42.4  +31 41 29.4   1121.9  
  gal1  A XXXXXMXXX P                        265 15 47.5  +29 19 47.6    -16.2  
  guax  A XXXXXMXXX P                        241 42 36.0  +28 52 48.0    100.0  
  hous  A XXXXXMXXX P                        264 34  1.3  +29 46 45.9     13.4  
