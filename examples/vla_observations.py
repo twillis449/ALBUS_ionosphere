@@ -63,9 +63,9 @@ if __name__ == "__main__":
   RED_TYPE = 'RI_G09'
   RED_TYPE = 'RI_G03'
   TIME_STEP = 300
-  MAX_DIST = 200E3
   MAX_DIST = 400E3
-  NUM_PROCESSORS = 6
+  MAX_DIST = 225E3
+  NUM_PROCESSORS = 1
   DO_SER = 1
   DO_SER = 0
 
@@ -104,8 +104,8 @@ if __name__ == "__main__":
     OBJECT="DA240_2017_tracking"
 
     if use_elev:
-      OBJECT="Zenith_Track_2024_with_400km_receiver_range"
       print('tracking at zenith')
+      OBJECT="VLA_Zenith_Track_2024_with_225km_receiver_range"
       iono.process_ionosphere(time_step=TIME_STEP,object=OBJECT,El=90.0,Lat=LAT,Long=LONG,Height=HEIGHT,start_time=START_TIME,end_time=END_TIME,max_dist=MAX_DIST,processing_option=RED_TYPE,do_serial=DO_SER,num_processors=NUM_PROCESSORS, gps_data_directory=DATA_DIR);
 #  use the following function if you want to track a  position
     else:
