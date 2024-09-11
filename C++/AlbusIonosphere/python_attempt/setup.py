@@ -5,8 +5,7 @@
 # 2016 April AGW - changed for numpy and got rid of all numarray-related stuff
 # 2019 July  AGW - script should now handle python 2 or python 3 
 
-from distutils.core import setup, Extension
-#from setuptools import setup, Extension
+from setuptools import setup, Extension
 from platform import python_version
 import sys
 import numpy
