@@ -467,9 +467,9 @@ Sint32 linfit(
     //_END
 
     {
-        fprintf(stderr, "in LINFIT\n");
-        printf("%s\t%s\n", "NUM_PARAM", "NUM_DATA");
-        printf("%d\t%d\n", NUM_PARAM, NUM_DATA);
+        //fprintf(stderr, "in LINFIT\n");
+        //printf("%s\t%s\n", "NUM_PARAM", "NUM_DATA");
+        //printf("%d\t%d\n", NUM_PARAM, NUM_DATA);
         // Now we need to fill out the coefficients for the SVD fitting process.
         // U holds the parameterized fit and B holds the actual data values
         {
@@ -953,7 +953,7 @@ void calculate_heights_and_scales(const Uint32 NUM_HEIGHTS,
                                   Real64* const height,
                                   Real64* const scale = NULL)
 {
-    printf("in linfit: calculate_heights_and_scales\n");
+    //printf("in linfit: calculate_heights_and_scales\n");
     // Given a number of heights to make, NUM_HEIGHTS > 0,
     // this function figures out what good heights are to
     // make ionosphere fitting heights.  This function uses
@@ -1074,7 +1074,7 @@ Real64 calculate_IRI_STEC(const MIM_PIM::Station_LatLon* const station,
                           const Real64 El)
 //                          const Space_Unit_Vector direction)
 {
-    printf("in linfit: calculate_IRI_STEC\n");
+    //printf("in linfit: calculate_IRI_STEC\n");
     station->get_pierce_ranges(El, NUM_IRI_DATAPOINTS,
                                IRI_data_work0,
                                MIM_PIM::radius_Earth,
@@ -1305,7 +1305,7 @@ void fit_simple_linear_model(
 //_END
 
     {
-        printf("in linfit:  fit_simple_linear_model\n");
+        //printf("in linfit:  fit_simple_linear_model\n");
         // Ok, how many good observations are there?
         Uint32 Num_Data = 0;
         for(Uint32 i=0; i < NUM_OBSERVATIONS; i++)
@@ -1499,7 +1499,7 @@ void calculate_simple_2D_polar_polynomials(
 //_END
 
     {
-        printf("in linfit:  calculate_simple_2D_polar_polynomials\n");
+        //printf("in linfit:  calculate_simple_2D_polar_polynomials\n");
         // if we aren't doing at least 1 poly, then why call this?
         if(NUM_PARAM <= 0) {
             fprintf(stderr, "Error: cannot do 0 polys here in %s:%d:%s\n",
@@ -1642,7 +1642,7 @@ void fit_simple_polar_model(
 //_END
 
     {
-        printf("in linfit:  fit_simple_polar_model\n");
+        //printf("in linfit:  fit_simple_polar_model\n");
         // Ok, how many good observations are there?
         Uint32 Num_Data = 0;
         for(Uint32 i=0; i < NUM_OBSERVATIONS; i++)
@@ -1841,7 +1841,7 @@ void calculate_multilayer_2D_linear_polynomials(
 //_END
 
     {
-        printf("in linfit:  calculate_multilayer_2D_linear_polynomials\n");
+        //printf("in linfit:  calculate_multilayer_2D_linear_polynomials\n");
         // if we aren't doing at least 1 poly, then why call this?
         if(NUM_PARAM <= 0) {
             fprintf(stderr, "Error: cannot do 0 polys here in %s:%d:%s\n",
@@ -1977,7 +1977,7 @@ void fit_multilayer_linear_model(
 //_END
 
     {
-        printf("in linfit:  fit_multilayer_linear_model\n");
+        //printf("in linfit:  fit_multilayer_linear_model\n");
         // Ok, how many good observations are there?
         Uint32 Num_Data = 0;
         for(Uint32 i=0; i < NUM_OBSERVATIONS; i++)
@@ -2412,7 +2412,7 @@ void calculate_manylayer_2D_linear_polynomials(
 //_END
 
     {
-        printf("in linfit:  calculate_manylayer_2D_linear_polynomials\n");
+        //printf("in linfit:  calculate_manylayer_2D_linear_polynomials\n");
         if(NUM_PARAM == 0) {
             // nothing to do
             return;
@@ -2540,7 +2540,7 @@ void fit_manylayer_linear_model(
 //_END
 
     {
-        printf("in linfit:  fit_manylayer_linear_model\n");
+        //printf("in linfit:  fit_manylayer_linear_model\n");
         // Ok, how many good observations are there?
         Uint32 Num_Data = 0;
         for(Uint32 i=0; i < NUM_OBSERVATIONS; i++)
@@ -3192,7 +3192,7 @@ Sint32 fit_simple_linear_model_2_grad(
 //_END
 
 {
-    printf("in linfit:  fit_simple_linear_model_2_grad\n");
+    //printf("in linfit:  fit_simple_linear_model_2_grad\n");
     // Ok, how many good observations are there?
     Uint32 Num_Data = 0;
     for(Uint32 i=0; i < NUM_OBSERVATIONS; i++)
@@ -3449,7 +3449,7 @@ void apply_simple_linear_model_2(
 //_END
 
 {
-    printf("in linfit:  apply_simple_linear_model_2\n");
+    //printf("in linfit:  apply_simple_linear_model_2\n");
     const Uint32 USE_BIAS_FLAG = NUM_STATIONS + NUM_OBJECTS;
     const Uint32 NUM_POLY = NUM_PARAM - USE_BIAS_FLAG;
     // loop over and create the model values
@@ -3582,7 +3582,7 @@ Sint32 fit_2D_time_linear_model_2(
 //_END
 
 {
-    printf("in linfit:  fit_2D_time_linear_model_2\n");
+    //printf("in linfit:  fit_2D_time_linear_model_2\n");
     // Ok, how many good observations are there?
     Uint32 Num_Data = 0;
     for(Uint32 i=0; i < NUM_OBSERVATIONS; i++)
@@ -3846,7 +3846,7 @@ Sint32 fit_2D_time_linear_model_2_grad(
 //_END
 
 {
-    printf("in linfit:  fit_2D_time_linear_model_2_grad\n");
+    //printf("in linfit:  fit_2D_time_linear_model_2_grad\n");
     // Ok, how many good observations are there?
     Uint32 Num_Data = 0;
     for(Uint32 i=0; i < NUM_OBSERVATIONS; i++)
@@ -4124,7 +4124,7 @@ void apply_2D_time_linear_model_2(
 //_END
 
 {
-    printf("in linfit:  apply_2D_time_linear_model_2\n");
+    //printf("in linfit:  apply_2D_time_linear_model_2\n");
     const Uint32 USE_BIAS_FLAG = NUM_STATIONS + NUM_OBJECTS;
     const Uint32 NUM_POLY = NUM_PARAM - USE_BIAS_FLAG;
 
@@ -4277,7 +4277,7 @@ Sint32 fit_multilayer_linear_model_2(
 //_END
 
 {
-    printf("in linfit:  fit_multilayer_linear_model_2\n");
+    //printf("in linfit:  fit_multilayer_linear_model_2\n");
     // Ok, how many good observations are there?
     Uint32 Num_Data = 0;
     for(Uint32 i=0; i < NUM_OBSERVATIONS; i++)
@@ -4604,7 +4604,7 @@ void apply_multilayer_linear_model_2(
 
 //_END
 {
-    printf("in linfit: apply_multilayer_linear_model_2\n");
+    //printf("in linfit: apply_multilayer_linear_model_2\n");
     const Uint32 USE_BIAS_FLAG = NUM_STATIONS + NUM_OBJECTS;
     const Uint32 NUM_POLY = NUM_PARAM - USE_BIAS_FLAG;
 
@@ -4825,7 +4825,7 @@ Sint32 fit_manylayer_linear_model_2(
 //_END
 
 {
-    printf("in linfit:  fit_manylayer_linear_model_2\n");
+    //printf("in linfit:  fit_manylayer_linear_model_2\n");
     // Ok, how many good observations are there?
     Uint32 Num_Data = 0;
     for(Uint32 i=0; i < NUM_OBSERVATIONS; i++)
@@ -5226,7 +5226,7 @@ void apply_manylayer_linear_model_2(
 //_END
 
 {
-    printf("in linfit:   apply_manylayer_linear_model_2\n");
+    //printf("in linfit:   apply_manylayer_linear_model_2\n");
     const Uint32 USE_BIAS_FLAG = NUM_STATIONS + NUM_OBJECTS;
     const Uint32 NUM_POLY = NUM_PARAM - USE_BIAS_FLAG;
 
@@ -5559,7 +5559,7 @@ void calculate_manylayer_2D_spherical_h_polynomials(
 //_END
 
 {
-    printf("in linfit:   calculate_manylayer_2D_spherical_h_polynomials\n");
+    //printf("in linfit:   calculate_manylayer_2D_spherical_h_polynomials\n");
     if(NUM_PARAM == 0) {
         // nothing to do
         return;
@@ -5693,7 +5693,7 @@ Sint32 fit_manylayer_spherical_h_model_2(
 //_END
 
 {
-    printf("in linfit:   fit_manylayer_spherical_h_model_2\n");
+    //printf("in linfit:   fit_manylayer_spherical_h_model_2\n");
     // Ok, how many good observations are there?
     Uint32 Num_Data = 0;
     for(Uint32 i=0; i < NUM_OBSERVATIONS; i++)
@@ -6106,7 +6106,7 @@ Sint32 fit_manylayer_spherical_h_model_2_grad(
 //_END
 
 {
-    printf("in linfit: fit_manylayer_spherical_h_model_2_grad\n");
+    //printf("in linfit: fit_manylayer_spherical_h_model_2_grad\n");
     // Ok, how many good observations are there?
     Uint32 Num_Data = 0;
     for(Uint32 i=0; i < NUM_OBSERVATIONS; i++)
@@ -6527,7 +6527,7 @@ void apply_manylayer_spherical_h_model_2(
 //_END
 
 {
-    printf("in linfit: apply_manylayer_spherical_h_model_2\n");
+    //printf("in linfit: apply_manylayer_spherical_h_model_2\n");
     const Uint32 USE_BIAS_FLAG = NUM_STATIONS + NUM_OBJECTS;
     const Uint32 NUM_POLY = NUM_PARAM - USE_BIAS_FLAG;
 

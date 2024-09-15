@@ -1428,7 +1428,7 @@ GPS_collection_return GPS_collection::get_multiple_receiver_2D_MIM_fit(
                     if(var < 0.0) var = 0.0;
                     Real64 std_dev = sqrt(var);
                     sum_array[i] = std_dev;
-                    printf("For station %4u got residual level %E\n", i, std_dev);
+                    //printf("For station %4u got residual level %E\n", i, std_dev);
                 }
             }
             else sum_array[i] = 0.0;
@@ -1975,7 +1975,7 @@ GPS_collection_return GPS_collection::get_multiple_receiver_3D_MIM_fit(
                     if(var < 0.0) var = 0.0;
                     Real64 std_dev = sqrt(var);
                     sum_array[i] = std_dev;
-                    printf("For station %4u got residual level %12.2E\n", i, std_dev);
+                    //printf("For station %4u got residual level %12.2E\n", i, std_dev);
                 }
                 else sum_array[i] = 0.0;
             }
@@ -3457,7 +3457,7 @@ Real64 GPS_collection::correct_receiver_biases_low(
         Uint32 NUM_RECEIVER = UINT32_MAX;
         for(Uint32 loop = 0; loop < 100; loop++) {
             get_nearby_receivers(station, Receiver_List, NUM_RECEIVER);
-            printf("Got %u receivers close to rec %u\n", NUM_RECEIVER, receiver);
+            //printf("Got %u receivers close to rec %u\n", NUM_RECEIVER, receiver);
             if(NUM_RECEIVER > NUM_RECEIVER_HIGH) {
                 selection_criteria.Max_Rec_Dist_From_Tele *= 0.95;
             }
@@ -3494,7 +3494,7 @@ Real64 GPS_collection::correct_receiver_biases_low(
         if(NUM_RECEIVER <= 1) {
             continue;
         }
-        printf("Got final %u receivers close to rec %u\n", NUM_RECEIVER, receiver);
+        //printf("Got final %u receivers close to rec %u\n", NUM_RECEIVER, receiver);
         // Find the position of the receiver in the temporary receiver list
         Uint32 receiver_bias_pos = 0;
         for(; receiver_bias_pos < NUM_RECEIVER; receiver_bias_pos++)
@@ -3534,7 +3534,7 @@ Real64 GPS_collection::correct_receiver_biases_low(
                                            + NUM_RECEIVER*type
                                            + receiver_bias_pos];
                 if((bias == 0.0) && (sta_err == 0.0)) continue;
-                printf("At MJD %10.4f got bias %.2E\n", MJD, bias);
+                //printf("At MJD %10.4f got bias %.2E\n", MJD, bias);
                 //fprintf(fp, "%u %u %.5f %.3E\n", receiver, type, MJD, bias);
                 station_sum[Num_Receivers*type+receiver] += bias;
                 station_sumsqr[Num_Receivers*type+receiver] += bias*bias;
@@ -3595,7 +3595,7 @@ Real64 GPS_collection::correct_receiver_biases_low(
             }
             for(Uint32 receiver = 0; receiver < Num_Receivers; receiver++) {
                 if(rec_list[receiver] == NULL) continue;
-                fprintf(stderr, "Receiver %d has err %E\n", receiver, station_error[Num_Receivers*type+receiver]);
+                //fprintf(stderr, "Receiver %d has err %E\n", receiver, station_error[Num_Receivers*type+receiver]);
                 bool bump_valid =
                     (station_error[Num_Receivers*type+receiver] < 0.0) ? true:false;
                 if((Apply_RMS_To_BIAS)) {
@@ -3610,7 +3610,7 @@ Real64 GPS_collection::correct_receiver_biases_low(
                     station_error[Num_Receivers*type+receiver]
                     +station_sumsqr[Num_Receivers*type+receiver]
                     :0.0;
-                fprintf(stderr, "For receiver %u, have %11.3E %9.1E %1u %1d\n",receiver, bias_level, err, type, int(bump_valid));
+                //fprintf(stderr, "For receiver %u, have %11.3E %9.1E %1u %1d\n",receiver, bias_level, err, type, int(bump_valid));
                 rec_list[receiver]->
                     station_obs.adjust_bias(bias_level,
                                             err,
@@ -3790,7 +3790,7 @@ Real64 GPS_collection::correct_receiver_biases_force(
         Uint32 NUM_RECEIVER = UINT32_MAX;
         for(Uint32 loop = 0; loop < 100; loop++) {
             get_nearby_receivers(station, Receiver_List, NUM_RECEIVER);
-            printf("Got %u receivers close to rec %u\n", NUM_RECEIVER, receiver);
+            //printf("Got %u receivers close to rec %u\n", NUM_RECEIVER, receiver);
             if(NUM_RECEIVER > NUM_RECEIVER_HIGH) {
                 selection_criteria.Max_Rec_Dist_From_Tele *= 0.95;
             }
@@ -3846,8 +3846,8 @@ Real64 GPS_collection::correct_receiver_biases_force(
                                                + NUM_RECEIVER*type
                                                + receiver_bias_pos];
                     if((bias == 0.0) && (sta_err == 0.0)) continue;
-                    printf("At MJD %10.4f got bias %.2E\n", MJD, bias);
-                    printf("%u %u %.5f %.3E\n", receiver, type, MJD, bias);
+                    //printf("At MJD %10.4f got bias %.2E\n", MJD, bias);
+                    //printf("%u %u %.5f %.3E\n", receiver, type, MJD, bias);
                     station_sum[Num_Receivers*type+rec_0] += bias;
                     station_sumsqr[Num_Receivers*type+rec_0] += bias*bias;
                     if(ionosphere.sigma_STEC > 0.0)
@@ -3939,7 +3939,7 @@ Real64 GPS_collection::correct_receiver_biases_force(
                     station_error[Num_Receivers*type+receiver]
                     +station_sumsqr[Num_Receivers*type+receiver]
                     :0.0;
-                fprintf(stderr, "For receiver %u, have %11.3E %9.1E %1u\n",receiver, bias_level, err, type);
+                //fprintf(stderr, "For receiver %u, have %11.3E %9.1E %1u\n",receiver, bias_level, err, type);
                 rec_list[receiver]->
                     station_obs.adjust_bias(bias_level,
                                             err,
@@ -4115,7 +4115,7 @@ Real64 GPS_collection::correct_receiver_biases_global_force(
                                            *GPS_MAX_POSSIBLE_RECEIVER_TYPE
                                            + NUM_RECEIVER*type
                                            + receiver_bias_pos];
-                printf("At MJD %10.4f got bias %10.2E for rec %4u type %1u with err %10.2E\n", MJD, bias, rec_0, type, sta_err);
+                //printf("At MJD %10.4f got bias %10.2E for rec %4u type %1u with err %10.2E\n", MJD, bias, rec_0, type, sta_err);
                 if((bias == 0.0) && (sta_err == 0.0)) continue;
                 station_sum[Num_Receivers*type+rec_0]    += bias;
                 station_sumsqr[Num_Receivers*type+rec_0] += bias*bias;
@@ -4348,7 +4348,7 @@ Real64 GPS_collection::correct_receiver_biases_track_force(
             Real64 sta_err = workspace[Max_Number_Workspace
                                        - 3*Satellite_Track_Max_Tracks
                                        + t];
-            printf("At MJD %10.4f got bias %10.2E for rec %4u sat %3d track %3d with err %10.2E\n", MJD, bias, rec_ID, sat_ID, track_ID, sta_err);
+            //printf("At MJD %10.4f got bias %10.2E for rec %4u sat %3d track %3d with err %10.2E\n", MJD, bias, rec_ID, sat_ID, track_ID, sta_err);
             if((bias == 0.0) && (sta_err == 0.0)) continue;
             track_sum[real_track_num]    += bias;
             track_sumsqr[real_track_num] += bias*bias;
