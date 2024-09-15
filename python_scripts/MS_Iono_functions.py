@@ -1,6 +1,7 @@
-# various fnctions for processing ionosphere data
+# various functions for processing ionosphere data
 
-from __future__ import (print_function)
+global DEBUG_SET
+DEBUG_SET = False
 
 import math
 import numpy
@@ -698,13 +699,15 @@ OUTPUTS: None
 
     if do_serial == 0:
       print ('*********** finished initialization!!! ***************')
-      print (' initial counter value ', counter)
+      if DEBUG_SET:
+         print (' initial counter value ', counter)
       # collect data in parallel
       NUMBER_OF_PROCESSES = num_processors
       TASKS = [(get_GPS_data, (i,GPS_receivers,Obs_Start, Obs_End, MJD_array, sat_XYZ, output_directory,overwrite,raise_bias_error)) for i in range(counter+1,len(GPS_receivers))]
 #     TASKS = [(get_GPS_data, (i,GPS_receivers,Obs_Start, Obs_End, MJD_array, sat_XYZ, output_directory,overwrite)) for i in range(counter+1,50)]
 
-      print ('number of tasks ', len(TASKS))
+      if DEBUG_SET:
+        print ('number of tasks ', len(TASKS))
 
    # Create queues
       task_queue = Queue()
@@ -728,14 +731,16 @@ OUTPUTS: None
           result = done_queue.get(timeout=300)
           result_sum = result_sum + 1
           if result[0] > -1:
-            print ('good result_sum  ', result_sum, 'station is ', result[1][0])
+            if DEBUG_SET:
+              print ('good result_sum  ', result_sum, 'station is ', result[1][0])
             print ('get_GPS data OK so calling process_GPS_data for sequence and station = ', result[0], result[1][0])
             print (result[1][0], file=station_log)
             result = process_GPS_data(result,SIG_pos,PL_pos)
             receiver_count += 1
           else:
-            print ('bad result_sum', result_sum, 'station is ', result[1][0])
-            print ('get_GPS_data failed for station ', result[1])
+            if DEBUG_SET:
+              print ('bad result_sum', result_sum, 'station is ', result[1])
+              print ('get_GPS_data failed for station ', result[1])
         except:
           print (' ')
           print ('****** TIMEOUT in Get_GPS_data queue !!!')

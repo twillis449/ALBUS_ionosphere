@@ -4,6 +4,8 @@
 # 2007 Apr 18  JMA  --updates for more satellite block position handling
 # 2023 Mar  4  AGW  --updates for igs long product file names
 
+global DEBUG_SET
+DEBUG_SET = False
 
 ################################################################################
 # some import commands  The User should not need to change this.
@@ -937,13 +939,15 @@ obs_data   O  The output data array, as
     MAX_POSSIBLE_SATELLITES = 300
     try:
         try:
-            print ( 'read_RINEX_sp3_file: trying to open ', filename)
+            if DEBUG_SET:
+               print ( 'read_RINEX_sp3_file: trying to open ', filename)
             fp = open(filename, "r")
         except IOError:
             raise Albus_RINEX.No_RINEX_File_Error("Error: sp3 file '%s' cannot be opened"%filename)
         line = fp.readline()    # Line 1
         version = line[1]
-        print('****rinex SP3 version', version)
+        if DEBUG_SET:
+          print('****rinex SP3 version', version)
         if((version == 'a') or (version == 'b') or (version == 'c') or (version == 'd')):
             # things are ok
             pass
@@ -1063,12 +1067,14 @@ obs_data   O  The output data array, as
 #               raise Albus_RINEX.RINEX_Data_Barf("Unsupported data type in line '%s'"%line)
     finally:
         fp.close()
-    print('Num_Data time_count', Num_Data, time_count)
+    if DEBUG_SET:
+       print('Num_Data time_count', Num_Data, time_count)
 #   assert(Num_Data == time_count+1)
     obs_data = _clean_up_phi_terms(obs_data)
-    print('obs_data shape', obs_data.shape)
-    print('MJD shape', MJD.shape)
-    print('time_offset', time_offset)
+    if DEBUG_SET:
+      print('obs_data shape', obs_data.shape)
+      print('MJD shape', MJD.shape)
+      print('time_offset', time_offset)
     return MJD, obs_data
 
 
@@ -1106,13 +1112,15 @@ obs_data   O  The output data array, as
 """
     try:
         try:
-            print ( 'read_RINEX_sp3_file: trying to open ', filename)
+            if DEBUG_SET:
+                print ( 'read_RINEX_sp3_file: trying to open ', filename)
             fp = open(filename, "r")
         except IOError:
             raise Albus_RINEX.No_RINEX_File_Error("Error: sp3 file '%s' cannot be opened"%filename)
         line = fp.readline()    # Line 1
         version = line[1]
-        print('****rinex SP3 version', version)
+        if DEBUG_SET:
+          print('****rinex SP3 version', version)
         if((version == 'a') or (version == 'b') or (version == 'c') or (version == 'd')):
             # things are ok
             pass
@@ -1128,7 +1136,8 @@ obs_data   O  The output data array, as
         second = float(line[20:31])
         MJD_start = jma_tools.get_MJD_hms(year, month, day, hour, minute, second)
         Num_Data = int(line[32:39])
-        print('Num_Data:', Num_Data)
+        if DEBUG_SET:
+          print('Num_Data:', Num_Data)
         if(Num_Data < 10):
             raise Albus_RINEX.RINEX_Data_Barf("Too few data times in file '%s' to get accurate interpolation"%filename)
         # skip to line 13
@@ -1224,8 +1233,9 @@ obs_data   O  The output data array, as
             else:
                 raise Albus_RINEX.RINEX_Data_Barf("Unsupported data type in line '%s'"%line)
     finally:
-        fp.close()
-    print('final time_count', time_count)
+      fp.close()
+    if DEBUG_SET:
+       print('final time_count', time_count)
     assert(Num_Data == time_count+1)
     obs_data = _clean_up_phi_terms(obs_data)
     return MJD, obs_data
@@ -1449,6 +1459,8 @@ XYZ         O  numpy array of the satellite positions
                x=0,y=1,z=2.  If x==y==z==0, the no data
                r=3,\phi=4,\theta=5
 """
+    #print('In interpolate_sat_positions -  calculating Satellite positions')
+    #Print('The calculations will take a minute or two')
     sh = sat_pos.shape
     NUM_OBS = sh[0]
     NUM_SAT = sh[1]
@@ -1460,7 +1472,8 @@ XYZ         O  numpy array of the satellite positions
     assert(NUM_TERMS_GLONASS <= NUM_TERMS_MAX)
     assert(NUM_OBS == MJD.shape[0])
     NUM_NEED = MJD_need.shape[0]
-    print('NUM_NEED', NUM_NEED)
+    if DEBUG_SET:
+      print('NUM_NEED', NUM_NEED)
     assert(NUM_NEED>0)
     XYZ = np.zeros((NUM_NEED,NUM_SAT,6), dtype='float64')
     work_c = np.zeros((NUM_TERMS_MAX), dtype='float64')
@@ -2074,7 +2087,7 @@ raise_bias_error           I  reject data with no bias correction 0 No, else yes
     sta_bias_valid = np.zeros((MAX_POSSIBLE_SATELLITES//100),dtype='int32')+1
     if (bias_in_dicts(station_code, bias_IONEX[MJD_MID][1],bias_CODE_monthly[MJD_MID][1]) is None):
         sta_bias_valid[0] = 0
-        if raise_bias_error:
+        if DEBUG_SET and raise_bias_error:
           print ( '******************** rejecting data with no bias corection!!! ********')
           raise Albus_RINEX.RINEX_Data_Barf("Station '%s' has no bias correction"%station_code)
     if (bias_in_dicts(station_code + '_r', bias_IONEX[MJD_MID][1],bias_CODE_monthly[MJD_MID][1]) is None):
@@ -4396,9 +4409,9 @@ sat_block_pos  O  An array of continguous block position ranges, as 3 element
 """
     assert(MJD_start <= MJD_end)
     sat_XYZ_set = True
-    print ( "getting in RINEX2",MJD_start,get_multiple_station_base_observations.MJD_start_last )  
-    print ( "AND:",MJD_end,get_multiple_station_base_observations.MJD_end_last)
-    
+    if DEBUG_SET:
+      print ( "getting in RINEX2",MJD_start,get_multiple_station_base_observations.MJD_start_last )  
+      print ( "AND:",MJD_end,get_multiple_station_base_observations.MJD_end_last)
     if((MJD_start != get_multiple_station_base_observations.MJD_start_last)
        or (MJD_end != get_multiple_station_base_observations.MJD_end_last)):
         # force a brand new calculation
@@ -4419,7 +4432,8 @@ sat_block_pos  O  An array of continguous block position ranges, as 3 element
     # compare the MJD arrays
     if(sta_MJD_in is not None):
         diff_val = 2.
-        print ( "SAME? sta_MJD_in vs sta_MJD ",sta_MJD_in, "\n", sta_MJD)
+        if DEBUG_SET:
+          print ( "SAME? sta_MJD_in vs sta_MJD ",sta_MJD_in, "\n", sta_MJD)
         retval = check_MJD_arrays_differ(sta_MJD, sta_MJD_in, diff_val)
         if(retval):
             print ( 'difference in MJD sec > ', diff_val, ' seconds at ', retval-1, sta_MJD[retval-1],sta_MJD_in[retval-1])
