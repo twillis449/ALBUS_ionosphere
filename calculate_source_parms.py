@@ -426,11 +426,12 @@ def analyze_image(filename, freq, z_str, alpha_str, specified_las, use_mask_l,do
 
       output = 'source apparent projected size (kpc) : ' + str(round(source_size,2)) + '\n'
       f.write(output)
-      output = 'nominal position angle of lobe  (degrees) : ' + str(round(lobe_pa[i-1]))  + '\n'
-      f.write(output)
+      if i-1 >= 0:
+        output = 'nominal position angle of lobe  (degrees) : ' + str(round(lobe_pa[i-1]))  + '\n'
+        f.write(output)
+        output = 'nominal path length through source (kpc) : ' + str(round(LAP,2)) + '\n'
+        f.write(output)
       output = 'model ellipse major and minor axis sizes (arcsec) : ' + str(round(theta_big,2)) + ' ' + str(round(theta_small,2)) + '\n'
-      f.write(output)
-      output = 'nominal path length through source (kpc) : ' + str(round(LAP,2)) + '\n'
       f.write(output)
       if i == 0:
         output = 'source flux density (mJy) : ' + str(round(flux*1000.0,2)) + ' \n'
