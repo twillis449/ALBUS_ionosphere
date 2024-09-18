@@ -1838,7 +1838,7 @@ standard_RINEX_bias_correction_wrapper.station_bias_CODE_monthly = None
 
 
 ################################################################################
-def rough_satellite_bias_correction(S, E, debug_level=0):
+def rough_satellite_bias_correction(S, E):
     """perform a rough correction for satellite timing biases
 
 Satellite transmitter timing biases can cause apparent negative STEC
@@ -1857,9 +1857,6 @@ station receiver biases as well.
 
 S            I  list of STEC np arrays
 E            I  corresponding list of Elevation np arrays
-debug_level  I  How much info to print out
-                0 nothing
-                1 some
 """
     elevation_limit = 20.0 * M_DEG2RAD
     # How many stations total?
@@ -2568,7 +2565,7 @@ A                 O  Output python list of STEC values.  Each element of the
                                                     overwrite
                                                     )
     # Perform a rough bias correction
-    rough_satellite_bias_correction([STEC],[El],0)
+    rough_satellite_bias_correction([STEC],[El])
     # Now to calculate the apparent Az,El using the AlbusIonosphere software
     retval = AlbusIonosphere.set_reference_time(year,month,day,0,0,0.0)
     if(retval < 0):
