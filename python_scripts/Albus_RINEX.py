@@ -117,6 +117,11 @@ class RINEX_Data_Barf(IOError):
 #   print('cddis file written out')
 #  return
 
+##################################
+def set_debug_option(debug_option):
+  DEBUG_SET = debug_option
+  print('Albus_RINEX setting debug_option to',debug_option)
+
 ################################################################################
 def get_rinex3_filename(RINEX_filename, country):
    print('incoming parameters', RINEX_filename, country)

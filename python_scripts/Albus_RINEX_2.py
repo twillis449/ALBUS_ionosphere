@@ -139,6 +139,12 @@ PRINT_DEBUG_LEVEL = 0
 
 
 
+##################################
+def set_debug_option(debug_option):
+  DEBUG_SET = debug_option
+  print('Albus_RINEX_2 setting debug_option to',debug_option)
+
+
 
 ################################################################################
 def fix_RINEX_obs_file_undersampling(step_max, Sat_array, obs_data):

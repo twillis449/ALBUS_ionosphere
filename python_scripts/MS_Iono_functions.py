@@ -72,6 +72,13 @@ PROCESSING_OPTION_RINEX_GROUPS = ["RI_G00",  # Single station, nearest sat
                                   "RI_G08",  # 2D with time, gradient
                                   "RI_G09",  # 3D spherical, gradient
                                   ]
+def set_debug_option(debug_option):
+# debug_option can be True or False
+
+  DEBUG_SET = debug_option
+  Albus_RINEX_2.set_debug_option(debug_option)
+  Albus_RINEX.set_debug_option(debug_option)
+  print('MS_Iono_functions setting debug option to ',debug_option)
 
 ################################################################################
 def get_valid_stations(filename):
@@ -1652,7 +1659,7 @@ def process_ionosphere(MSname="",
         for i in range(numi):
           ra,dec = observer.radec_of(az, el)
 #         dec = dec + math.radians(0.15)
-#         print 'i ephem ra, dec ', i, math.degrees(ra),math.degrees(dec)
+          print('i ephem ra, dec ', i, math.degrees(ra),math.degrees(dec))
           ra_float = float(ra)
           dec_float = float(dec)
           location_ra.append(ra_float)
