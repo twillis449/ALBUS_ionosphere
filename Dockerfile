@@ -68,17 +68,19 @@ RUN mkdir /src/ALBUS
 ENV ALBUSPATH /src/ALBUS
 
 ADD IMF24_request.png $ALBUSPATH
+ADD cbuild $ALBUSPATH/cbuild
 ADD build_rnx_crx $ALBUSPATH
 ADD dates $ALBUSPATH
 ADD definitions $ALBUSPATH
 ADD fast_orbital_data $ALBUSPATH
 ADD INSTALL $ALBUSPATH
-ADD Makefile $ALBUSPATH
+#ADD Makefile $ALBUSPATH
+ADD CMakeLists.txt $ALBUSPATH
 ADD iri.update $ALBUSPATH
 ADD kill_python $ALBUSPATH
 ADD LICENSE $ALBUSPATH
 ADD README.md $ALBUSPATH
-ADD remove_remainder $ALBUSPATH
+#ADD remove_remainder $ALBUSPATH
 ADD test_iri.f $ALBUSPATH
 ADD UPDATING_SPACE_WEATHER $ALBUSPATH
 ADD bin $ALBUSPATH/bin
@@ -97,19 +99,27 @@ RUN mkdir /optsoft/ALBUS
 ENV ALBUSINSTALL /optsoft/ALBUS
 
 ## Configure Make custom paths .. should really convert this to cmake or something....
-RUN sed -i '15s/.*/export INSTALLDIR = '$(echo ${ALBUSINSTALL} | sed 's/\//\\\//g')'/' $ALBUSPATH/Makefile
+
+RUN sed -i '8s/.*/set(INSTALLDIR = '$(echo ${ALBUSINSTALL}')' | sed 's/\//\\\//g')'/' $ALBUSPATH/CMakeLists.txt
+# RUN sed -i '15s/.*/export INSTALLDIR = '$(echo ${ALBUSINSTALL} | sed 's/\//\\\//g')'/' $ALBUSPATH/Makefile
 #### Ubuntu 18.04 ships Python 3.6 LTS not 3.8 as it is defined in the build system
-RUN sed -i '19s/.*/export CURRENT_PYTHON = python3.6/' $ALBUSPATH/Makefile
-RUN sed -i '22s/.*/export PYTHONINCLUDEDIR = \/usr\/include\/python3.6/' $ALBUSPATH/Makefile
-#### Build with specified GNU toolchain
-RUN sed -i '39s/.*/export CC = gcc-'"${GNUCOMPILER}"'/' $ALBUSPATH/Makefile
-RUN sed -i '40s/.*/export F77 = gfortran-'"${GNUCOMPILER}"' --std=legacy/' $ALBUSPATH/Makefile
-RUN sed -i '43s/.*/export F77_RECL_UNIT = bytes/' $ALBUSPATH/Makefile
-RUN sed -i '45s/.*/export C++ = g++-'"${GNUCOMPILER}"'/' $ALBUSPATH/Makefile
-RUN sed -i '47s/.*/export CPP = cpp-'"${GNUCOMPILER}"' -P/' $ALBUSPATH/Makefile
-## Patch up CFLAG passing... various missing includes and variable passing....
-RUN sed -i '10s/.*/CFLAGS += -I$(PYTHONINCLUDEDIR) -I$(INSTALLDIR)\/include -DINSTALLDIR=\\"$(INSTALLDIR)\\"/' $ALBUSPATH/C++/mim/test/PIMrunner/Makefile
-RUN sed -i '20s/.*/CFLAGS += -I$(PYTHONINCLUDEDIR) -I$(INSTALLDIR)\/include/' $ALBUSPATH/C++/AlbusIonosphere/python_attempt/Makefile
+
+RUN sed -i '11s/.*/set(CURRENT_PYTHON python3.6)/' $ALBUSPATH/CMakeLists.txt
+# RUN sed -i '19s/.*/export CURRENT_PYTHON = python3.6/' $ALBUSPATH/Makefile
+
+RUN sed -i '12s/.*/set(PYTHONINCLUDEDIR \/usr\/include\/python3.6)/' $ALBUSPATH/CMakeLists.txt
+# RUN sed -i '22s/.*/export PYTHONINCLUDEDIR = \/usr\/include\/python3.6/' $ALBUSPATH/Makefile
+
+
+# #### Build with specified GNU toolchain
+# RUN sed -i '39s/.*/export CC = gcc-'"${GNUCOMPILER}"'/' $ALBUSPATH/Makefile
+# RUN sed -i '40s/.*/export F77 = gfortran-'"${GNUCOMPILER}"' --std=legacy/' $ALBUSPATH/Makefile
+# RUN sed -i '43s/.*/export F77_RECL_UNIT = bytes/' $ALBUSPATH/Makefile
+# RUN sed -i '45s/.*/export C++ = g++-'"${GNUCOMPILER}"'/' $ALBUSPATH/Makefile
+# RUN sed -i '47s/.*/export CPP = cpp-'"${GNUCOMPILER}"' -P/' $ALBUSPATH/Makefile
+# ## Patch up CFLAG passing... various missing includes and variable passing....
+# RUN sed -i '10s/.*/CFLAGS += -I$(PYTHONINCLUDEDIR) -I$(INSTALLDIR)\/include -DINSTALLDIR=\\"$(INSTALLDIR)\\"/' $ALBUSPATH/C++/mim/test/PIMrunner/Makefile
+# RUN sed -i '20s/.*/CFLAGS += -I$(PYTHONINCLUDEDIR) -I$(INSTALLDIR)\/include/' $ALBUSPATH/C++/AlbusIonosphere/python_attempt/Makefile
 ## Dead symlinks????
 ##> $ ls -lah share/python                                                                                                   [±cleanup_dockerize ●●]
 ##total 8.0K
@@ -131,7 +141,15 @@ ENV PYTHONPATH "$ALBUSINSTALL/share/python:$ALBUSINSTALL/lib:$PYTHONPATH"
 
 # Step 4 Fingers crossed -- build
 WORKDIR $ALBUSPATH
-RUN make install
+#RUN make install
+RUN apt-get update && apt-get install -y cmake
+RUN apt-get update && apt-get install -y bison flex
+
+WORKDIR /src/ALBUS
+COPY . .
+RUN ls -l /src/ALBUS  # Debug: ensure CMakeLists.txt is present
+RUN rm -f /src/ALBUS/CMakeCache.txt && rm -rf /src/ALBUS/cbuild && mkdir /src/ALBUS/cbuild && cmake -S /src/ALBUS -B /src/ALBUS/cbuild
+
 RUN python -c "import AlbusIonosphere" && echo "Crack the bubbly - this hog is airborne!!!"
 
 # can run any script mounted inside the container py calling (assuming you run Bash or equiv.)
