@@ -34,8 +34,12 @@ set(HAVE_G2C_H_FILE 0 CACHE BOOL "Set if g2c.h is available")
 #----------------------------------------------------------------------------
 # Set include directories and preprocessor definitions
 #----------------------------------------------------------------------------
+
+
+
 include_directories(${CMAKE_SOURCE_DIR} ${INSTALLDIR}/include)
-add_definitions(-DINSTALLDIR="\"${INSTALLDIR}\"")
+
+add_definitions(-DINSTALLDIR="${INSTALLDIR}")
 if(HAVE_G2C_H_FILE)
   add_definitions(-DHAVE_G2C_H_FILE=${HAVE_G2C_H_FILE})
 endif()
@@ -63,14 +67,10 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "SunOS")
 endif()
 
 #----------------------------------------------------------------------------
-# Add PIC flag if building shared libraries; set file extension accordingly
+# For shared libraries, ensure position independent code
 #----------------------------------------------------------------------------
 if(SHARED)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
-  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fPIC")
-  set(EXT "so")
-else()
-  set(EXT "a")
+  set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 endif()
 
 #----------------------------------------------------------------------------
@@ -86,10 +86,11 @@ endif()
 # Subdirectories (similar to your SUBDIRS list in the Makefile)
 #----------------------------------------------------------------------------
 # Each of these subdirectories should contain its own CMakeLists.txt.
-add_subdirectory("C++")
-add_subdirectory("FORTRAN")
-add_subdirectory("Python")
-add_subdirectory("include")
+#add_subdirectory(include)
+add_subdirectory(C++)
+add_subdirectory(FORTRAN)
+#add_subdirectory(Python)
+
 
 #----------------------------------------------------------------------------
 # Installation rules (install targets)
@@ -151,7 +152,7 @@ install(DIRECTORY ${INSTALLDIR}/share
 #----------------------------------------------------------------------------
 # CMake already provides a "clean" target via the generated build system.
 # The following custom target emulates "distclean" from the Makefile.
-add_custom_target(distclean
+add_custom_target(main_distclean
   COMMAND ${CMAKE_COMMAND} --build . --target clean
   COMMAND ${CMAKE_COMMAND} -E remove_directory ${INSTALLDIR}
   COMMENT "Performing a distclean (cleaning build files and installation directory)"

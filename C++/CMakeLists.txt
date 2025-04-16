@@ -26,15 +26,20 @@ add_subdirectory(AlbusIonosphere/python_attempt)
 #   - "python_attempt_target" in AlbusIonosphere/python_attempt
 #
 # Adjust these target names to match what is defined in the subdirectories.
+add_custom_target(PIMrunner_target  /mim/test/PIMrunner/mim)
+add_custom_target(vex_to_sky2_target /vex_to_sky2/vex2005/vex.so)
 add_dependencies(PIMrunner_target vex_to_sky2_target)
-add_dependencies(python_attempt_target vex_to_sky2_target PIMrunner_target)
+
+#add_dependencies(python_attempt_target vex_to_sky2_target PIMrunner_target)
+
 
 #----------------------------------------------------------------------------
 # Optionally, define a custom target to build all subdirectories
 # (this is analogous to the "all" and "subdirs" targets in the Makefile).
-add_custom_target(subdirs ALL
-  DEPENDS vex_to_sky2_target PIMrunner_target python_attempt_target
-)
+#add_custom_target(subdirs ALL
+#  DEPENDS vex_to_sky2_target PIMrunner_target python_attempt_target
+#)
+
 
 #----------------------------------------------------------------------------
 # Installation:

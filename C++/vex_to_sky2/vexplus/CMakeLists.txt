@@ -52,6 +52,7 @@ set_target_properties(vexplus_static PROPERTIES
   OUTPUT_NAME "vexplus"
 )
 
+target_link_libraries(vexplus PRIVATE vex)
 #----------------------------------------------------------------------------
 # Installation rules
 #----------------------------------------------------------------------------

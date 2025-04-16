@@ -1,15 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(jmavex_project LANGUAGES CXX Fortran)
 
-#----------------------------------------------------------------------------
-# Configuration Variables
-#----------------------------------------------------------------------------
-# Set installation directory (adjust as needed) – note that CMAKE_INSTALL_PREFIX
-# is typically used for installation, but we mimic the Makefile variable here.
-set(INSTALLDIR "/path/to/install" CACHE PATH "Installation directory")
-
-# For linking with Fortran libraries (e.g. gfortran runtime); adjust if needed.
-set(F77_COMPILER_LIB "gfortran" CACHE STRING "Fortran compiler library name")
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 #----------------------------------------------------------------------------
 # Include Directories & Link Directories
@@ -20,6 +12,7 @@ include_directories(
   vexplus
   ../mim/test/PIMrunner
   ${INSTALLDIR}/include
+  ${INSTALLDIR}/lib
 )
 
 # If the external libraries are not in standard locations, add their directories.
@@ -49,25 +42,27 @@ set(SRCS
 #----------------------------------------------------------------------------
 # These subdirectories should contain their own CMakeLists.txt.
 add_subdirectory(vex2005)
+
+
 add_subdirectory(vexplus)
+
 
 #----------------------------------------------------------------------------
 # Create Library Targets Using an Object Library
 #----------------------------------------------------------------------------
 # Create an OBJECT library from the common sources so that both a shared and
 # static library can be built without compiling the sources twice.
-add_library(jmavex_obj OBJECT ${SRCS})
 
 # Build shared library (libjmavex.so)
-add_library(jmavex_shared SHARED $<TARGET_OBJECTS:jmavex_obj>)
-set_target_properties(jmavex_shared PROPERTIES
+add_library(jmavex SHARED  ${SRCS})
+set_target_properties(jmavex PROPERTIES
   OUTPUT_NAME "jmavex"
   VERSION "1.0.0"
   SOVERSION "1"
 )
 
 # Build static library (libjmavex.a)
-add_library(jmavex_static STATIC $<TARGET_OBJECTS:jmavex_obj>)
+add_library(jmavex_static STATIC ${SRCS})
 set_target_properties(jmavex_static PROPERTIES
   OUTPUT_NAME "jmavex"
 )
@@ -75,9 +70,10 @@ set_target_properties(jmavex_static PROPERTIES
 # Link the external libraries to the shared library target.
 # This mirrors the Makefile’s EXTERN_LIBS:
 #   -lvexplus -lvex -lfl -lsofa -l$(F77_COMPILER_LIB)
-target_link_libraries(jmavex_shared PRIVATE
-  vexplus
+target_link_libraries(jmavex PRIVATE
   vex
+  mim
+  vexplus
   fl
   sofa
   ${F77_COMPILER_LIB}
@@ -103,22 +99,22 @@ add_executable(ell_coord_converter ell_coord_converter.cxx ellipsoidal_coord.cxx
 target_link_libraries(ell_coord_converter PRIVATE m)
 
 # test executable (assumes a source file "test.cxx" exists)
-add_executable(test test.cxx)
-target_link_libraries(test PRIVATE
-  jmavex_shared
-  vexplus
-  vex
-  fl
-  sofa
-  ${F77_COMPILER_LIB}
-  m
-)
+#add_executable(test_vex test.cxx)
+#target_link_libraries(test_vex PRIVATE
+#  jmavex_shared
+#  vexplus
+#  vex
+#  fl
+#  sofa
+#  ${F77_COMPILER_LIB}
+#  m
+#)
 
 #----------------------------------------------------------------------------
 # Installation Rules
 #----------------------------------------------------------------------------
 # Install the shared (and optionally static) library, headers, and executables.
-install(TARGETS jmavex_shared
+install(TARGETS jmavex
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
 )
@@ -129,9 +125,9 @@ install(TARGETS jmavex_static
 
 install(FILES ${HEADERS} DESTINATION include)
 
-install(TARGETS ell_coord_converter test
-  RUNTIME DESTINATION bin
-)
+#install(TARGETS ell_coord_converter test_vex
+#  RUNTIME DESTINATION bin
+#)
 
 #----------------------------------------------------------------------------
 # (Optional) Additional Custom Targets

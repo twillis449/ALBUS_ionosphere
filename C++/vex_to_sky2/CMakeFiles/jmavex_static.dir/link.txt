@@ -1,0 +1,2 @@
+/usr/bin/ar qc libjmavex.a CMakeFiles/jmavex_obj.dir/ellipsoidal_coord.cxx.o CMakeFiles/jmavex_obj.dir/ut1_interp.f.o CMakeFiles/jmavex_obj.dir/vex_iono_processor.cxx.o CMakeFiles/jmavex_obj.dir/vex_time.cxx.o CMakeFiles/jmavex_obj.dir/vex_ut1_interp.cxx.o
+/usr/bin/ranlib libjmavex.a

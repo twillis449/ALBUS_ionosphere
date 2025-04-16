@@ -1,12 +1,8 @@
 cmake_minimum_required(VERSION 3.10)
 project(JMA_Code C CXX)
 
-#----------------------------------------------------------------------------
-# Configure paths and variables (analogous to Makefile environment variables)
-#----------------------------------------------------------------------------
-# You might want to adjust these paths as appropriate.
-set(PYTHONINCLUDEDIR "/usr/include/python3.10" CACHE PATH "Python include directory")
-set(INSTALLDIR "/home/twillis/albus" CACHE PATH "Installation directory")
+
+
 
 # Library name
 set(LIBRARY_NAME "mim")
@@ -15,7 +11,15 @@ set(LIBRARY_NAME "mim")
 # Include directories (similar to -I options in the Makefile)
 #----------------------------------------------------------------------------
 include_directories(${PYTHONINCLUDEDIR})
-include_directories(${INSTALLDIR}/C++/vex_to_sky2)
+
+include_directories(../../../../C++/vex_to_sky2)
+include_directories(../../../../C++/vex_to_sky2/vexplus)
+include_directories(../../../../FORTRAN/IRI)
+include_directories(../../../../FORTRAN/PIM/PIM_1.7/pim/source/vlb4)
+
+
+
+
 
 #----------------------------------------------------------------------------
 # Add compile options if desired (e.g. adding -I${PYTHONINCLUDEDIR} to CFLAGS)
@@ -112,6 +116,7 @@ set(HEADERS
 #----------------------------------------------------------------------------
 add_library(${LIBRARY_NAME} ${SRCS} ${HEADERS})
 
+
 # Set version information for the shared library (if BUILD_SHARED_LIBS is ON)
 set_target_properties(${LIBRARY_NAME} PROPERTIES
     VERSION "1.0.0"
@@ -121,14 +126,10 @@ set_target_properties(${LIBRARY_NAME} PROPERTIES
 #----------------------------------------------------------------------------
 # Specify additional include directories for the library target
 #----------------------------------------------------------------------------
-target_include_directories(${LIBRARY_NAME} PRIVATE
-    ${PYTHONINCLUDEDIR}
-    ${INSTALLDIR}/C++/vex_to_sky2
-)
-
 #----------------------------------------------------------------------------
 # Specify additional link directories (analogous to -L options)
 #----------------------------------------------------------------------------
+
 link_directories(${INSTALLDIR}/lib /usr/lib)
 
 #----------------------------------------------------------------------------
@@ -143,7 +144,7 @@ link_directories(${INSTALLDIR}/lib /usr/lib)
 target_link_libraries(${LIBRARY_NAME} PRIVATE
     pim
     iri
-    jmavex
+    #jmavex
     vexplus
     vex
     sofa
@@ -151,6 +152,10 @@ target_link_libraries(${LIBRARY_NAME} PRIVATE
     m
 )
 
+
+
+add_dependencies(jmavex vex)
+add_dependencies(vexplus vex)
 #----------------------------------------------------------------------------
 # Define executable targets
 #
@@ -170,8 +175,8 @@ set(EXECUTABLES
     lofar8
     lofar9
     lofar10
-    test
-    test2
+    test_pim
+    test2_pim
     vlba_obs
 )
 

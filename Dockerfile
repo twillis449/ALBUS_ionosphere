@@ -95,12 +95,23 @@ ADD python_scripts $ALBUSPATH/python_scripts
 ADD share $ALBUSPATH/share
 
 # Step 2 configure install path and apply necessary patches to build system
-RUN mkdir /optsoft/ALBUS
+WORKDIR /src/ALBUS/include
+RUN mkdir -p /optsoft/ALBUS/include
+RUN cp  *.h /optsoft/ALBUS/include/
+# RUN cp  JMA_math.h /optsoft/ALBUS/include/JMA_math.h
+# RUN cp  f2c.h /optsoft/ALBUS/include/f2c.h
+# RUN cp  sofa.h /optsoft/ALBUS/include/sofa.h
+
 ENV ALBUSINSTALL /optsoft/ALBUS
 
 ## Configure Make custom paths .. should really convert this to cmake or something....
 
-RUN sed -i '8s/.*/set(INSTALLDIR = '$(echo ${ALBUSINSTALL}')' | sed 's/\//\\\//g')'/' $ALBUSPATH/CMakeLists.txt
+# RUN sed -i '8s/.*/set(INSTALLDIR '$(echo ${ALBUSINSTALL}')' | sed 's/\//\\\//g')'/' $ALBUSPATH/CMakeLists.txt
+
+RUN sed -i "8s|.*|set(INSTALLDIR \"${ALBUSINSTALL}\")|" $ALBUSPATH/CMakeLists.txt
+
+#RUN cat $ALBUSPATH/CMakeLists.txt
+
 # RUN sed -i '15s/.*/export INSTALLDIR = '$(echo ${ALBUSINSTALL} | sed 's/\//\\\//g')'/' $ALBUSPATH/Makefile
 #### Ubuntu 18.04 ships Python 3.6 LTS not 3.8 as it is defined in the build system
 
@@ -119,6 +130,9 @@ RUN sed -i '12s/.*/set(PYTHONINCLUDEDIR \/usr\/include\/python3.6)/' $ALBUSPATH/
 # RUN sed -i '47s/.*/export CPP = cpp-'"${GNUCOMPILER}"' -P/' $ALBUSPATH/Makefile
 # ## Patch up CFLAG passing... various missing includes and variable passing....
 # RUN sed -i '10s/.*/CFLAGS += -I$(PYTHONINCLUDEDIR) -I$(INSTALLDIR)\/include -DINSTALLDIR=\\"$(INSTALLDIR)\\"/' $ALBUSPATH/C++/mim/test/PIMrunner/Makefile
+
+RUN sed -i '10s/.*/CFLAGS += -I$(PYTHONINCLUDEDIR) -I$(INSTALLDIR)\/include -DINSTALLDIR=\\"$(INSTALLDIR)\\"/' $ALBUSPATH/C++/mim/test/PIMrunner/Makefile
+
 # RUN sed -i '20s/.*/CFLAGS += -I$(PYTHONINCLUDEDIR) -I$(INSTALLDIR)\/include/' $ALBUSPATH/C++/AlbusIonosphere/python_attempt/Makefile
 ## Dead symlinks????
 ##> $ ls -lah share/python                                                                                                   [±cleanup_dockerize ●●]
@@ -139,6 +153,7 @@ ENV PATH "$ALBUSINSTALL/bin:$PATH"
 ENV LD_LIBRARY_PATH "$ALBUSINSTALL/lib:$LD_LIBRARY_PATH"
 ENV PYTHONPATH "$ALBUSINSTALL/share/python:$ALBUSINSTALL/lib:$PYTHONPATH"
 
+RUN ls -la $ALBUSINSTALL/bin
 # Step 4 Fingers crossed -- build
 WORKDIR $ALBUSPATH
 #RUN make install
@@ -146,11 +161,18 @@ RUN apt-get update && apt-get install -y cmake
 RUN apt-get update && apt-get install -y bison flex
 
 WORKDIR /src/ALBUS
-COPY . .
-RUN ls -l /src/ALBUS  # Debug: ensure CMakeLists.txt is present
-RUN rm -f /src/ALBUS/CMakeCache.txt && rm -rf /src/ALBUS/cbuild && mkdir /src/ALBUS/cbuild && cmake -S /src/ALBUS -B /src/ALBUS/cbuild
+#RUN rm -f /src/ALBUS/CMakeCache.txt && rm -rf /src/ALBUS/cbuild && mkdir /src/ALBUS/cbuild && cmake -S /src/ALBUS -B /src/ALBUS/cbuild
+# RUN mkdir /src/build
 
-RUN python -c "import AlbusIonosphere" && echo "Crack the bubbly - this hog is airborne!!!"
+
+RUN cmake .
+RUN make 
+
+
+# RUN cmake --build /src/ALBUS/cbuild
+#RUN find /src/ALBUS -name "CMakeCache.txt" -delete
+#RUN cmake --source /src/ALBUS --build /src/ALBUS/cbuild
+#RUN python -c "import AlbusIonosphere" && echo "Crack the bubbly - this hog is airborne!!!"
 
 # can run any script mounted inside the container py calling (assuming you run Bash or equiv.)
 # docker run -v <absolute path to gfzrnx>:/optsoft/bin/gfzrnx \
