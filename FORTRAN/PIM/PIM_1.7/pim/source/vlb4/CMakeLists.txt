@@ -74,7 +74,9 @@ add_library(pim SHARED ${LIB_SRCS})
 set_target_properties(pim PROPERTIES OUTPUT_NAME "pim")
 
 add_library(pim_static STATIC ${LIB_SRCS})
-set_target_properties(pim_static PROPERTIES OUTPUT_NAME "pim")
+set_target_properties(pim PROPERTIES OUTPUT_NAME "pim" 
+ VERSION "${VER_MAJOR}.${VER_MINOR}.${VER_SUBSUB}"
+  SOVERSION "${VER_MAJOR}")
 
 # --------------------------------------------------------------------
 # Build Executable Targets
@@ -96,10 +98,10 @@ target_link_libraries(pim_asub PRIVATE pim ${SOFA_LIB} ${F77_COMPILER_LIB} m)
 # in the "include" directory of the install prefix.
 # --------------------------------------------------------------------
 install(TARGETS pim pim_static
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
-        RUNTIME DESTINATION bin)
-install(FILES ${HEADERS} DESTINATION include)
+        LIBRARY DESTINATION ${INSTALLDIR}/lib 
+        ARCHIVE DESTINATION ${INSTALLDIR}/lib
+        RUNTIME DESTINATION ${INSTALLDIR}/bin)
+install(FILES ${HEADERS} DESTINATION ${INSTALLDIR}/include)
 
 # --------------------------------------------------------------------
 # Custom Targets for Dependency Generation and Cleaning

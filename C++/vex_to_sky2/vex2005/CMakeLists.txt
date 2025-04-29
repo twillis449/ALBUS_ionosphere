@@ -1,8 +1,13 @@
 cmake_minimum_required(VERSION 3.10)
 project(vex LANGUAGES C)
 
-# Enable position independent code globally (-fPIC)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+# Define headers. Note that y.tab.h is generated.
+set(HEADERS
+    ${CMAKE_CURRENT_SOURCE_DIR}/vex++.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/vex.h
+    ${CMAKE_CURRENT_BINARY_DIR}/y.tab.h
+)
+
 
 # Find Bison and Flex for generating parser files
 find_package(BISON REQUIRED)
@@ -42,26 +47,19 @@ add_library(vex_static STATIC ${SOURCES})
 set_target_properties(vex_static PROPERTIES OUTPUT_NAME "vex")
 
 # Option 2: Build a shared library with versioning
-add_library(vex SHARED ${SOURCES})
-set_target_properties(vex PROPERTIES OUTPUT_NAME "vex")
-# Set the shared library version and the "soname" property (adjust these numbers as needed)
-set_target_properties(vex PROPERTIES VERSION 1.0.0 SOVERSION 1)
+add_library(vex SHARED ${SOURCES} )
+set_target_properties(vex PROPERTIES OUTPUT_NAME "vex" 
+ VERSION "${VER_MAJOR}.${VER_MINOR}.${VER_SUBSUB}"
+  SOVERSION "${VER_MAJOR}"
+)
+
 target_link_libraries(vex PUBLIC fl)
 # Installation rules: install both the libraries and headers
-install(TARGETS vex vex_static
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-)
+install(TARGETS vex 
+    LIBRARY DESTINATION ${INSTALLDIR}/lib )
 
-# Define headers. Note that y.tab.h is generated.
-set(HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/vex++.h
-    ${CMAKE_CURRENT_SOURCE_DIR}/vex.h
-    ${CMAKE_CURRENT_BINARY_DIR}/y.tab.h
-)
 
 install(FILES ${HEADERS}
-    DESTINATION include
+    DESTINATION ${INSTALLDIR}/include
 )
 
-# Optional: add custom targets for cleaning generated files (CMake cleans automatically)

@@ -4,8 +4,7 @@ project(JMA_Code C CXX)
 
 
 
-# Library name
-set(LIBRARY_NAME "mim")
+
 
 #----------------------------------------------------------------------------
 # Include directories (similar to -I options in the Makefile)
@@ -13,9 +12,9 @@ set(LIBRARY_NAME "mim")
 include_directories(${PYTHONINCLUDEDIR})
 
 include_directories(../../../../C++/vex_to_sky2)
-include_directories(../../../../C++/vex_to_sky2/vexplus)
-include_directories(../../../../FORTRAN/IRI)
-include_directories(../../../../FORTRAN/PIM/PIM_1.7/pim/source/vlb4)
+#include_directories(../../../../C++/vex_to_sky2/vexplus)
+#include_directories(../../../../FORTRAN/IRI)
+#include_directories(../../../../FORTRAN/PIM/PIM_1.7/pim/source/vlb4)
 
 
 
@@ -114,13 +113,15 @@ set(HEADERS
 #----------------------------------------------------------------------------
 # Create the library target (shared or static based on BUILD_SHARED_LIBS)
 #----------------------------------------------------------------------------
-add_library(${LIBRARY_NAME} ${SRCS} ${HEADERS})
+add_library(mim SHARED ${SRCS})
 
 
 # Set version information for the shared library (if BUILD_SHARED_LIBS is ON)
-set_target_properties(${LIBRARY_NAME} PROPERTIES
-    VERSION "1.0.0"
-    SOVERSION "1"
+set_target_properties(mim 
+   PROPERTIES OUTPUT_NAME "mim"
+ VERSION "${VER_MAJOR}.${VER_MINOR}.${VER_SUBSUB}"
+  SOVERSION "${VER_MAJOR}"
+
 )
 
 #----------------------------------------------------------------------------
@@ -130,7 +131,7 @@ set_target_properties(${LIBRARY_NAME} PROPERTIES
 # Specify additional link directories (analogous to -L options)
 #----------------------------------------------------------------------------
 
-link_directories(${INSTALLDIR}/lib /usr/lib)
+
 
 #----------------------------------------------------------------------------
 # Link external libraries (analogous to the LIBRARIES variable in the Makefile)
@@ -141,10 +142,9 @@ link_directories(${INSTALLDIR}/lib /usr/lib)
 # Here we assume that libraries named pim, iri, jmavex, vexplus, vex, sofa, fl and m
 # are available. You might need to adjust these or use find_library() if necessary.
 #----------------------------------------------------------------------------
-target_link_libraries(${LIBRARY_NAME} PRIVATE
+target_link_libraries(mim PRIVATE
     pim
     iri
-    #jmavex
     vexplus
     vex
     sofa
@@ -153,9 +153,6 @@ target_link_libraries(${LIBRARY_NAME} PRIVATE
 )
 
 
-
-add_dependencies(jmavex vex)
-add_dependencies(vexplus vex)
 #----------------------------------------------------------------------------
 # Define executable targets
 #
@@ -183,7 +180,7 @@ set(EXECUTABLES
 foreach(exec ${EXECUTABLES})
   # Assume the main file for each executable is named "<exec>.cxx"
   add_executable(${exec} ${exec}.cxx)
-  target_link_libraries(${exec} PRIVATE ${LIBRARY_NAME}
+  target_link_libraries(${exec} PRIVATE mim
     pim
     iri
     jmavex
@@ -205,14 +202,14 @@ endforeach()
 # Install the library (shared or static) and the header files.
 # Also install the executables if desired.
 #----------------------------------------------------------------------------
-install(TARGETS ${LIBRARY_NAME}
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib)
+install(TARGETS mim
+        LIBRARY DESTINATION ${INSTALLDIR}/lib
+      )
 
-install(FILES ${HEADERS} DESTINATION include)
+install(FILES ${HEADERS} DESTINATION ${INSTALLDIR}/include)
 
 install(TARGETS ${EXECUTABLES}
-        RUNTIME DESTINATION bin)
+        RUNTIME DESTINATION ${INSTALLDIR}/bin)
 
 #----------------------------------------------------------------------------
 # (Optional) Custom targets for cleaning, dependency generation, etc.

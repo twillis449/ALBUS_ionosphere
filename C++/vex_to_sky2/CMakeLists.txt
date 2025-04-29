@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 project(jmavex_project LANGUAGES CXX Fortran)
 
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 #----------------------------------------------------------------------------
 # Include Directories & Link Directories
@@ -12,11 +11,8 @@ include_directories(
   vexplus
   ../mim/test/PIMrunner
   ${INSTALLDIR}/include
-  ${INSTALLDIR}/lib
 )
 
-# If the external libraries are not in standard locations, add their directories.
-link_directories(${INSTALLDIR}/lib ../mim/test/PIMrunner)
 
 #----------------------------------------------------------------------------
 # Define Sources and Headers
@@ -57,8 +53,8 @@ add_subdirectory(vexplus)
 add_library(jmavex SHARED  ${SRCS})
 set_target_properties(jmavex PROPERTIES
   OUTPUT_NAME "jmavex"
-  VERSION "1.0.0"
-  SOVERSION "1"
+ VERSION "${VER_MAJOR}.${VER_MINOR}.${VER_SUBSUB}"
+  SOVERSION "${VER_MAJOR}"
 )
 
 # Build static library (libjmavex.a)
@@ -72,7 +68,7 @@ set_target_properties(jmavex_static PROPERTIES
 #   -lvexplus -lvex -lfl -lsofa -l$(F77_COMPILER_LIB)
 target_link_libraries(jmavex PRIVATE
   vex
-  mim
+  mim  ### included in the original make file as lib
   vexplus
   fl
   sofa
@@ -99,35 +95,25 @@ add_executable(ell_coord_converter ell_coord_converter.cxx ellipsoidal_coord.cxx
 target_link_libraries(ell_coord_converter PRIVATE m)
 
 # test executable (assumes a source file "test.cxx" exists)
-#add_executable(test_vex test.cxx)
-#target_link_libraries(test_vex PRIVATE
-#  jmavex_shared
-#  vexplus
-#  vex
-#  fl
-#  sofa
-#  ${F77_COMPILER_LIB}
-#  m
-#)
+add_executable(test_vex test.cxx)
+target_link_libraries(test_vex PRIVATE
+  jmavex
+  vexplus
+  vex
+  fl
+  sofa
+  ${F77_COMPILER_LIB}
+  m
+)
 
 #----------------------------------------------------------------------------
 # Installation Rules
 #----------------------------------------------------------------------------
 # Install the shared (and optionally static) library, headers, and executables.
 install(TARGETS jmavex
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-)
+  LIBRARY DESTINATION ${INSTALLDIR}/lib )
 
-install(TARGETS jmavex_static
-  ARCHIVE DESTINATION lib
-)
-
-install(FILES ${HEADERS} DESTINATION include)
-
-#install(TARGETS ell_coord_converter test_vex
-#  RUNTIME DESTINATION bin
-#)
+install(FILES ${HEADERS} DESTINATION ${INSTALLDIR}/include)
 
 #----------------------------------------------------------------------------
 # (Optional) Additional Custom Targets

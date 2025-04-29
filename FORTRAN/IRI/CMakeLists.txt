@@ -51,7 +51,7 @@ set_target_properties(iri PROPERTIES VERSION ${VER_MAJOR}.${VER_MINOR}.${VER_SUB
 
 
 # Build static library
-#add_library(iri_static STATIC ${OBJS} ${NOBJS})
+add_library(iri_static STATIC ${OBJS} ${NOBJS})
 
 # make_ap executable
 
@@ -60,9 +60,9 @@ add_executable(make_ap make_ap.cxx)
 target_link_libraries(make_ap ${LIBRARIES})
 
 # Installation rules
-#install(TARGETS iri iri_static LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
-install(FILES ${HEADERS} DESTINATION include)
-install(DIRECTORY libdata/IRI DESTINATION libdata)
+install(TARGETS iri iri_static LIBRARY DESTINATION ${INSTALLDIR}/lib ARCHIVE DESTINATION ${INSTALLDIR}/lib)
+install(FILES ${HEADERS} DESTINATION ${INSTALLDIR}/include)
+install(DIRECTORY DESTINATION ${INSTALLDIR}/libdata/IRI)
 
 # Cleanup rules
 #if(NOT TARGET clean)

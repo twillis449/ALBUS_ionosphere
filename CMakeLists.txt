@@ -5,11 +5,11 @@ project(JMA_Code VERSION 1.0.0 LANGUAGES C CXX Fortran)
 # Configuration variables (equivalent to exported Makefile variables)
 #----------------------------------------------------------------------------
 # Installation directory (adjust as needed)
-set(INSTALLDIR "/home/ntsikelelo/Projects/ALBUS/ALBUS_ionosphere" CACHE PATH "Installation directory")
+set(INSTALLDIR "/home/ntsikelelo/Projects/ALBUS/ALBUS_ionosphere" CACHE PATH "Installation directory")   ## set by docker file
 
 # Python configuration
-set(CURRENT_PYTHON "python" CACHE STRING "Python interpreter")
-set(PYTHONINCLUDEDIR "/usr/include/python3.10" CACHE PATH "Python include directory")
+set(CURRENT_PYTHON "python" CACHE STRING "Python interpreter")   ## set by docker file
+set(PYTHONINCLUDEDIR "/usr/include/python3.10" CACHE PATH "Python include directory")  ## set by docker file
 
 # Version numbers for the library (if used in targets)
 set(VER_MAJOR 1)
@@ -23,17 +23,6 @@ option(SHARED "Build shared library" ON)
 # Option for HAVE_G2C_H_FILE (defaulting to off)
 set(HAVE_G2C_H_FILE 0 CACHE BOOL "Set if g2c.h is available")
 
-#----------------------------------------------------------------------------
-# Set compilers explicitly (if desired; these are normally auto-detected)
-#----------------------------------------------------------------------------
-# set(CMAKE_C_COMPILER gcc)
-# set(CMAKE_CXX_COMPILER g++)
-# For Fortran: note the Makefile uses some extra flags (e.g. -std=legacy)
-# set(CMAKE_Fortran_COMPILER gfortran)
-
-#----------------------------------------------------------------------------
-# Set include directories and preprocessor definitions
-#----------------------------------------------------------------------------
 
 
 
@@ -86,75 +75,12 @@ endif()
 # Subdirectories (similar to your SUBDIRS list in the Makefile)
 #----------------------------------------------------------------------------
 # Each of these subdirectories should contain its own CMakeLists.txt.
-#add_subdirectory(include)
-add_subdirectory(C++)
+
+# Build all libaries then link with ALBUS_ionosphere last in C++ folder 
+
 add_subdirectory(FORTRAN)
-#add_subdirectory(Python)
+add_subdirectory(Python)
+add_subdirectory(C++)
 
 
-#----------------------------------------------------------------------------
-# Installation rules (install targets)
-#----------------------------------------------------------------------------
-# Here we assume that each subdirectory properly installs its targets.
-# The following install commands mimic the manual chmod/mkdir in the Makefile.
-install(DIRECTORY ${INSTALLDIR}/bin
-        DESTINATION bin
-        FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                         GROUP_READ GROUP_EXECUTE
-                         WORLD_READ WORLD_EXECUTE
-        DIRECTORY_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                              GROUP_READ GROUP_EXECUTE
-                              WORLD_READ WORLD_EXECUTE)
-install(DIRECTORY ${INSTALLDIR}/include
-        DESTINATION include
-        FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                         GROUP_READ GROUP_EXECUTE
-                         WORLD_READ WORLD_EXECUTE
-        DIRECTORY_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                              GROUP_READ GROUP_EXECUTE
-                              WORLD_READ WORLD_EXECUTE)
-install(DIRECTORY ${INSTALLDIR}/lib
-        DESTINATION lib
-        FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                         GROUP_READ GROUP_EXECUTE
-                         WORLD_READ WORLD_EXECUTE
-        DIRECTORY_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                              GROUP_READ GROUP_EXECUTE
-                              WORLD_READ WORLD_EXECUTE)
-install(DIRECTORY ${INSTALLDIR}/libdata
-        DESTINATION libdata
-        FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                         GROUP_READ GROUP_EXECUTE
-                         WORLD_READ WORLD_EXECUTE
-        DIRECTORY_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                              GROUP_READ GROUP_EXECUTE
-                              WORLD_READ WORLD_EXECUTE)
-# Create and install man and share directories
-install(DIRECTORY ${INSTALLDIR}/man
-        DESTINATION man
-        FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                         GROUP_READ GROUP_EXECUTE
-                         WORLD_READ WORLD_EXECUTE
-        DIRECTORY_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                              GROUP_READ GROUP_EXECUTE
-                              WORLD_READ WORLD_EXECUTE)
-install(DIRECTORY ${INSTALLDIR}/share
-        DESTINATION share
-        FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                         GROUP_READ GROUP_EXECUTE
-                         WORLD_READ WORLD_EXECUTE
-        DIRECTORY_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-                              GROUP_READ GROUP_EXECUTE
-                              WORLD_READ WORLD_EXECUTE)
-
-#----------------------------------------------------------------------------
-# Custom targets for cleaning up (optional)
-#----------------------------------------------------------------------------
-# CMake already provides a "clean" target via the generated build system.
-# The following custom target emulates "distclean" from the Makefile.
-add_custom_target(main_distclean
-  COMMAND ${CMAKE_COMMAND} --build . --target clean
-  COMMAND ${CMAKE_COMMAND} -E remove_directory ${INSTALLDIR}
-  COMMENT "Performing a distclean (cleaning build files and installation directory)"
-)
 

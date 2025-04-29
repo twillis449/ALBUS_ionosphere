@@ -31,10 +31,7 @@ set(MODULES
 set(PROG Albus_RINEX_download.py)
 set(DATA gps_pos_default.snx)
 
-# Use INSTALLDIR if defined, otherwise default to CMAKE_INSTALL_PREFIX.
-if(NOT DEFINED INSTALLDIR)
-  set(INSTALLDIR "${CMAKE_INSTALL_PREFIX}")
-endif()
+
 
 #-----------------------------------------------------------------------------
 # Installation of files
@@ -46,17 +43,17 @@ endif()
 
 install(
   FILES ${SRCS}
-  DESTINATION share/python
+  DESTINATION ${INSTALLDIR}/share/python
 )
 
 install(
   FILES ${DATA}
-  DESTINATION libdata/JMA
+  DESTINATION ${INSTALLDIR}/libdata/JMA
 )
 
 install(
   FILES ${PROG}
-  DESTINATION bin
+  DESTINATION ${INSTALLDIR}/bin
 )
 
 #-----------------------------------------------------------------------------
@@ -77,12 +74,6 @@ install(
 # Join MODULES into a space‐separated string for the shell loop.
 string(REPLACE ";" " " MODULES_STR "${MODULES}")
 
-add_custom_target(install_precompile
-  COMMAND ${CMAKE_COMMAND} -E echo "Precompiling installed Python modules in ${INSTALLDIR}/share/python"
-  COMMAND ${CMAKE_COMMAND} -E chdir "${INSTALLDIR}/share/python" sh -c "for module in ${MODULES_STR}; do echo \"import \$module\" | ${Python3_EXECUTABLE}; done"
-  COMMENT "Precompiling Python modules (importing them)"
-)
-
 # Optionally, you might want the precompile step to run as part of installation.
 # Uncomment the following line to add a dependency so that 'install' depends on precompilation.
 # add_dependencies(install install_precompile)
@@ -92,18 +83,6 @@ add_custom_target(install_precompile
 #
 # These mimic the 'clean' and 'distclean' targets of the Makefile.
 #-----------------------------------------------------------------------------
-add_custom_target(pyclean
-  COMMAND ${CMAKE_COMMAND} -E remove -f *.pyc
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  COMMENT "Removing Python bytecode files (*.pyc)"
-)
-
-add_custom_target(py_distclean
-  COMMAND ${CMAKE_COMMAND} -E remove -f *~
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-  COMMENT "Removing backup files (*~)"
-)
-
 #-----------------------------------------------------------------------------
 # Note:
 #

@@ -9,10 +9,6 @@ if(NOT DEFINED INSTALLDIR)
   set(INSTALLDIR ${CMAKE_INSTALL_PREFIX} CACHE PATH "Installation directory")
 endif()
 
-# Version information for the shared library (customize as needed)
-set(VER_MAJOR 1)
-set(VER_MINOR 0)
-set(VER_SUBSUB 0)
 
 #----------------------------------------------------------------------------
 # Include directories
@@ -58,9 +54,8 @@ target_link_libraries(vexplus PRIVATE vex)
 #----------------------------------------------------------------------------
 # Install the shared library and header file(s) to the specified directories.
 install(TARGETS vexplus
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION ${INSTALLDIR}/lib 
 )
 
-install(FILES ${HEADERS} DESTINATION include)
+install(FILES ${HEADERS} DESTINATION ${INSTALLDIR}/include )
 

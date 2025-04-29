@@ -8,16 +8,7 @@ set(VER_MAJOR 1)
 set(VER_MINOR 0)
 set(VER_SUBSUB 0)
 
-#---------------------------------------------------------------------------
-# Installation Directory
-#
-# By default, CMAKE_INSTALL_PREFIX is used. You can override it by setting
-# INSTALLDIR when configuring, e.g.:
-#   cmake -DINSTALLDIR=/path/to/install ..
-#---------------------------------------------------------------------------
-if(NOT DEFINED INSTALLDIR)
-  set(INSTALLDIR ${CMAKE_INSTALL_PREFIX} CACHE PATH "Installation directory")
-endif()
+
 
 #---------------------------------------------------------------------------
 # Build Type and Compiler Flags
@@ -43,8 +34,6 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "SunOS")
   endif()
 endif()
 
-# Always add Position Independent Code (equivalent to adding -fPIC)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 #---------------------------------------------------------------------------
 # Include Directories
@@ -52,17 +41,14 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 # In the Makefile these were:
 #    -I. -I$(INSTALLDIR)/include
 #---------------------------------------------------------------------------
-include_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  ${INSTALLDIR}/include
-)
 
+1
 #---------------------------------------------------------------------------
 # Define the Executable Target
 #
 # The Makefile builds "AlbusIonosphere" from AlbusIonosphere.cxx.
 #---------------------------------------------------------------------------
-add_executable(AlbusIonosphere AlbusIonosphere.cxx)
+add_library(AlbusIonosphere SHARED AlbusIonosphere.cxx)
 
 #---------------------------------------------------------------------------
 # External Libraries
@@ -91,7 +77,7 @@ target_link_libraries(AlbusIonosphere
 # Install the executable into the "bin" subdirectory of the installation directory.
 #---------------------------------------------------------------------------
 install(TARGETS AlbusIonosphere
-        RUNTIME DESTINATION bin
+         DESTINATION ${INSTALLDIR}/bin
 )
 
 #---------------------------------------------------------------------------

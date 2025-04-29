@@ -9,26 +9,5 @@ project(JMA_code)
 #---------------------------------------------------------------------------
 add_subdirectory(sofa)
 
-#---------------------------------------------------------------------------
-# Custom target for installing headers from the sofa subdirectory
-#
-# This replicates the "sofa_headers" rule in the Makefile.
-# It assumes that the sofa CMakeLists.txt defines a target named "install_headers".
-# If not, adjust the command as needed.
-#---------------------------------------------------------------------------
-add_custom_target(sofa_headers
-    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR}/sofa --target install_headers
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/sofa
-    COMMENT "Running install_headers in the sofa subdirectory"
-)
 
-#---------------------------------------------------------------------------
-# Note on Other Targets
-#
-# - The "all" target is automatically provided by CMake (it builds all added targets).
-# - CMake automatically provides a "clean" target.
-# - Additional targets like "depend" or "distclean" are typically not needed
-#   with CMake’s out-of-source builds.
-# - To perform installation, invoke "cmake --build . --target install" after configuration.
-#---------------------------------------------------------------------------
 

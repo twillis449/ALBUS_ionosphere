@@ -166,9 +166,7 @@ target_link_libraries(sofa PRIVATE m)
 # Install the shared library into the lib directory and the header into include.
 #---------------------------------------------------------------------------
 install(TARGETS sofa
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
-)
-install(FILES ${HEADERS} DESTINATION include)
+    LIBRARY DESTINATION ${INSTALLDIR}/lib )
+install(FILES ${HEADERS} DESTINATION ${INSTALLDIR}/include)
 
 
