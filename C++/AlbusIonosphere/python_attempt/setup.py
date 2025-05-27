@@ -37,7 +37,7 @@ module1 = Extension('AlbusIonosphere',
                                  'm'],
                     library_dirs = [ALBUS_PATH+'/lib'],
                     runtime_library_dirs = [ALBUS_PATH+'/lib'],
-                    include_dirs = [numpy.get_include()],
+                    include_dirs = [numpy.get_include(), ALBUS_PATH+'/include'],   ## added include dir
                     sources = ['AlbusIonosphere.cxx'])
 
 setup (name = 'AlbusIonosphere',

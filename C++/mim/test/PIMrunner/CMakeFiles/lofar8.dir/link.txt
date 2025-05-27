@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/lofar8.dir/lofar8.cxx.o -o lofar8   -L/home/ntsikelelo/Projects/ALBUS/ALBUS_ionosphere/lib  -Wl,-rpath,/home/ntsikelelo/Projects/ALBUS/ALBUS_ionosphere/lib:/home/user/Projects/ALBUS/ALBUS_ionosphere/C++/vex_to_sky2/vexplus: libmim.a -lpim -liri -ljmavex ../../../vex_to_sky2/vexplus/libvexplus.so.1.0.0 -lvex -lsofa -lfl -lm 

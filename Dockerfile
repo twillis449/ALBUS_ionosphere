@@ -29,7 +29,9 @@ RUN docker-apt-install build-essential\
                        python3-urllib3 \
                        unzip \
                        python3-nose \
-                       python3-requests
+                       python3-requests \
+                       python3-pip \
+                       cmake
 
 RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-$GNUCOMPILER 100 && \
     update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-$GNUCOMPILER 100 && \
@@ -68,17 +70,19 @@ RUN mkdir /src/ALBUS
 ENV ALBUSPATH /src/ALBUS
 
 ADD IMF24_request.png $ALBUSPATH
+ADD cbuild $ALBUSPATH/cbuild
 ADD build_rnx_crx $ALBUSPATH
 ADD dates $ALBUSPATH
 ADD definitions $ALBUSPATH
 ADD fast_orbital_data $ALBUSPATH
 ADD INSTALL $ALBUSPATH
-ADD Makefile $ALBUSPATH
+#ADD Makefile $ALBUSPATH
+ADD CMakeLists.txt $ALBUSPATH
 ADD iri.update $ALBUSPATH
 ADD kill_python $ALBUSPATH
 ADD LICENSE $ALBUSPATH
 ADD README.md $ALBUSPATH
-ADD remove_remainder $ALBUSPATH
+#ADD remove_remainder $ALBUSPATH
 ADD test_iri.f $ALBUSPATH
 ADD UPDATING_SPACE_WEATHER $ALBUSPATH
 ADD bin $ALBUSPATH/bin
@@ -93,34 +97,35 @@ ADD python_scripts $ALBUSPATH/python_scripts
 ADD share $ALBUSPATH/share
 
 # Step 2 configure install path and apply necessary patches to build system
-RUN mkdir /optsoft/ALBUS
+# set up include dir
+WORKDIR /src/ALBUS/include
+RUN mkdir -p /optsoft/ALBUS/include
+RUN cp  *.h /optsoft/ALBUS/include/
+
+
+
+RUN mkdir -p /optsoft/ALBUS/bin
+RUN mkdir -p /optsoft/ALBUS/lib
+RUN mkdir -p /optsoft/ALBUS/libdata
+RUN mkdir -p /optsoft/ALBUS/man
+RUN mkdir -p /optsoft/ALBUS/share
+
+## copy all data for libary
+WORKDIR /src/ALBUS
+RUN cp -r libdata /optsoft/ALBUS/libdata
 ENV ALBUSINSTALL /optsoft/ALBUS
 
-## Configure Make custom paths .. should really convert this to cmake or something....
-RUN sed -i '15s/.*/export INSTALLDIR = '$(echo ${ALBUSINSTALL} | sed 's/\//\\\//g')'/' $ALBUSPATH/Makefile
+## Configure Make custom paths ..
+
+
+RUN sed -i "8s|.*|set(INSTALLDIR \"${ALBUSINSTALL}\")|" $ALBUSPATH/CMakeLists.txt
+
+
 #### Ubuntu 18.04 ships Python 3.6 LTS not 3.8 as it is defined in the build system
-RUN sed -i '19s/.*/export CURRENT_PYTHON = python3.6/' $ALBUSPATH/Makefile
-RUN sed -i '22s/.*/export PYTHONINCLUDEDIR = \/usr\/include\/python3.6/' $ALBUSPATH/Makefile
-#### Build with specified GNU toolchain
-RUN sed -i '39s/.*/export CC = gcc-'"${GNUCOMPILER}"'/' $ALBUSPATH/Makefile
-RUN sed -i '40s/.*/export F77 = gfortran-'"${GNUCOMPILER}"' --std=legacy/' $ALBUSPATH/Makefile
-RUN sed -i '43s/.*/export F77_RECL_UNIT = bytes/' $ALBUSPATH/Makefile
-RUN sed -i '45s/.*/export C++ = g++-'"${GNUCOMPILER}"'/' $ALBUSPATH/Makefile
-RUN sed -i '47s/.*/export CPP = cpp-'"${GNUCOMPILER}"' -P/' $ALBUSPATH/Makefile
-## Patch up CFLAG passing... various missing includes and variable passing....
+
+RUN sed -i '11s/.*/set(CURRENT_PYTHON python3.6)/' $ALBUSPATH/CMakeLists.txt
+RUN sed -i '12s/.*/set(PYTHONINCLUDEDIR \/usr\/include\/python3.6)/' $ALBUSPATH/CMakeLists.txt
 RUN sed -i '10s/.*/CFLAGS += -I$(PYTHONINCLUDEDIR) -I$(INSTALLDIR)\/include -DINSTALLDIR=\\"$(INSTALLDIR)\\"/' $ALBUSPATH/C++/mim/test/PIMrunner/Makefile
-RUN sed -i '20s/.*/CFLAGS += -I$(PYTHONINCLUDEDIR) -I$(INSTALLDIR)\/include/' $ALBUSPATH/C++/AlbusIonosphere/python_attempt/Makefile
-## Dead symlinks????
-##> $ ls -lah share/python                                                                                                   [±cleanup_dockerize ●●]
-##total 8.0K
-##drwxrwxr-x 2 hugo hugo 4.0K Sep 26 11:44 .
-##drwxrwxr-x 3 hugo hugo 4.0K Sep 26 11:44 ..
-##lrwxrwxrwx 1 hugo hugo   42 Sep 26 11:44 Albus_Coordinates.py -> ../../maaijke_scripts/Albus_Coordinates.py
-##lrwxrwxrwx 1 hugo hugo   38 Sep 26 11:44 Albus_RINEX_2.py -> ../../maaijke_scripts/Albus_RINEX_2.py
-##lrwxrwxrwx 1 hugo hugo   36 Sep 26 11:44 Albus_RINEX.py -> ../../maaijke_scripts/Albus_RINEX.py
-##lrwxrwxrwx 1 hugo hugo   37 Sep 26 11:44 GPS_stations.py -> ../../maaijke_scripts/GPS_stations.py
-##lrwxrwxrwx 1 hugo hugo   34 Sep 26 11:44 jma_tools.py -> ../../maaijke_scripts/jma_tools.py
-##lrwxrwxrwx 1 hugo hugo   36 Sep 26 11:44 MS_Iono_agw.py -> ../../maaijke_scripts/MS_Iono_agw.py
 
 RUN rm $ALBUSPATH/share/python/*
 
@@ -129,8 +134,10 @@ ENV PATH "$ALBUSINSTALL/bin:$PATH"
 ENV LD_LIBRARY_PATH "$ALBUSINSTALL/lib:$LD_LIBRARY_PATH"
 ENV PYTHONPATH "$ALBUSINSTALL/share/python:$ALBUSINSTALL/lib:$PYTHONPATH"
 
+
 # Step 4 Fingers crossed -- build
-WORKDIR $ALBUSPATH
+WORKDIR /src/ALBUS
+RUN cmake .
 RUN make install
 RUN python -c "import AlbusIonosphere" && echo "Crack the bubbly - this hog is airborne!!!"
 
