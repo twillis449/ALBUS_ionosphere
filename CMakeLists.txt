@@ -78,9 +78,18 @@ endif()
 
 # Build all libaries then link with ALBUS_ionosphere last in C++ folder 
 
+
+
+
 add_subdirectory(FORTRAN)
 add_subdirectory(Python)
 add_subdirectory(C++)
 
-
-
+##set file permissions after installation 
+install(CODE "execute_process(COMMAND chmod -R ugo+rX ${INSTALLDIR}/bin)")
+install(CODE "execute_process(COMMAND chmod -R ugo+rX ${INSTALLDIR}/include)")
+install(CODE "execute_process(COMMAND chmod -R ugo+rX ${INSTALLDIR}/lib)")
+install(CODE "execute_process(COMMAND chmod -R ugo+rX ${INSTALLDIR}/libdata)")
+install(CODE "execute_process(COMMAND chmod -R ugo+rX ${INSTALLDIR}/share)")
+install(CODE "execute_process(COMMAND mkdir -p ${INSTALLDIR}/man)")
+install(CODE "execute_process(COMMAND chmod -R ugo+rX ${INSTALLDIR}/man)")

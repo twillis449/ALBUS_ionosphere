@@ -70,7 +70,7 @@ RUN mkdir /src/ALBUS
 ENV ALBUSPATH /src/ALBUS
 
 ADD IMF24_request.png $ALBUSPATH
-ADD cbuild $ALBUSPATH/cbuild
+#ADD cbuild $ALBUSPATH/cbuild
 ADD build_rnx_crx $ALBUSPATH
 ADD dates $ALBUSPATH
 ADD definitions $ALBUSPATH
