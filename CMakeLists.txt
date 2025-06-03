@@ -93,3 +93,5 @@ install(CODE "execute_process(COMMAND chmod -R ugo+rX ${INSTALLDIR}/libdata)")
 install(CODE "execute_process(COMMAND chmod -R ugo+rX ${INSTALLDIR}/share)")
 install(CODE "execute_process(COMMAND mkdir -p ${INSTALLDIR}/man)")
 install(CODE "execute_process(COMMAND chmod -R ugo+rX ${INSTALLDIR}/man)")
+
+

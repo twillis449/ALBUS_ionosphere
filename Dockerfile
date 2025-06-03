@@ -112,7 +112,7 @@ RUN mkdir -p /optsoft/ALBUS/share
 
 ## copy all data for libary
 WORKDIR /src/ALBUS
-RUN cp -r libdata /optsoft/ALBUS/libdata
+RUN cp -r libdata/* /optsoft/ALBUS/libdata
 ENV ALBUSINSTALL /optsoft/ALBUS
 
 ## Configure Make custom paths ..

@@ -36,10 +36,6 @@ set(NEOBJS
     iritecne.f
 )
 
-# Build executable targets
-#add_executable(iritest iritest.f ${OBJS} ${NOBJS})
-#target_link_libraries(iritest ${LIBRARIES})
-
 add_executable(iritestne iritestne.f ${OBJS} ${NEOBJS})
 target_link_libraries(iritestne ${LIBRARIES})
 
@@ -49,26 +45,17 @@ add_library(iri SHARED ${OBJS} ${NOBJS})
 set_target_properties(iri PROPERTIES VERSION ${VER_MAJOR}.${VER_MINOR}.${VER_SUBSUB})
 
 
-
-# Build static library
-add_library(iri_static STATIC ${OBJS} ${NOBJS})
-
 # make_ap executable
-
 
 add_executable(make_ap make_ap.cxx)
 target_link_libraries(make_ap ${LIBRARIES})
 
 # Installation rules
-install(TARGETS iri iri_static LIBRARY DESTINATION ${INSTALLDIR}/lib ARCHIVE DESTINATION ${INSTALLDIR}/lib)
+install(TARGETS iri LIBRARY DESTINATION ${INSTALLDIR}/lib )
 install(FILES ${HEADERS} DESTINATION ${INSTALLDIR}/include)
-install(DIRECTORY DESTINATION ${INSTALLDIR}/libdata/IRI)
 
-# Cleanup rules
-#if(NOT TARGET clean)
-#   add_custom_target(clean COMMAND ${CMAKE_COMMAND} -E remove ${OBJS} ${NOBJS} ${NEOBJS} make_ap.o iritest.o iritestne.o libiri.so*)
-#endif()
 
-#if(NOT TARGET distclean)
-#    add_custom_target(distclean COMMAND ${CMAKE_COMMAND} -E remove ${OBJS} ${PROG})
-#endif()
+
+
+
+
