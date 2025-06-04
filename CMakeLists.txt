@@ -39,7 +39,9 @@ endif()
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
   if(NOT DEBUG)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2 -Wall")
-    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -O2 -Wall")
+    # Add legacy standard flag
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --std=legacy")
+
   else()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -Wall")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -g -Wall")
@@ -71,10 +73,6 @@ else()
   set(POSTFIX "${CMAKE_SYSTEM_NAME}_debug")
 endif()
 
-#----------------------------------------------------------------------------
-# Subdirectories (similar to your SUBDIRS list in the Makefile)
-#----------------------------------------------------------------------------
-# Each of these subdirectories should contain its own CMakeLists.txt.
 
 # Build all libaries then link with ALBUS_ionosphere last in C++ folder 
 
