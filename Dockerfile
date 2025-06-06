@@ -123,8 +123,7 @@ RUN sed -i "8s|.*|set(INSTALLDIR \"${ALBUSINSTALL}\")|" $ALBUSPATH/CMakeLists.tx
 
 #### Ubuntu 18.04 ships Python 3.6 LTS not 3.8 as it is defined in the build system
 
-RUN sed -i '11s/.*/set(CURRENT_PYTHON python3.6)/' $ALBUSPATH/CMakeLists.txt
-RUN sed -i '12s/.*/set(PYTHONINCLUDEDIR \/usr\/include\/python3.6)/' $ALBUSPATH/CMakeLists.txt
+
 RUN sed -i '10s/.*/CFLAGS += -I$(PYTHONINCLUDEDIR) -I$(INSTALLDIR)\/include -DINSTALLDIR=\\"$(INSTALLDIR)\\"/' $ALBUSPATH/C++/mim/test/PIMrunner/Makefile
 
 RUN rm $ALBUSPATH/share/python/*
