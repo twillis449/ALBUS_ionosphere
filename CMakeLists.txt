@@ -1,11 +1,13 @@
 cmake_minimum_required(VERSION 3.10)
+
 project(JMA_Code VERSION 1.0.0 LANGUAGES C CXX Fortran)
 
 #----------------------------------------------------------------------------
 # Configuration variables (equivalent to exported Makefile variables)
 #----------------------------------------------------------------------------
 # Installation directory (adjust as needed)
-set(INSTALLDIR "/home/ntsikelelo/Projects/ALBUS/ALBUS_ionosphere" CACHE PATH "Installation directory")   ## set by docker file
+
+#set(INSTALLDIR "/home/ntsikelelo/Projects/ALBUS/ALBUS_ionosphere" CACHE PATH "Installation director")   ## set by docker file
 
 find_package(PythonInterp REQUIRED)
 find_package(PythonLibs REQUIRED)
@@ -17,6 +19,7 @@ find_package(PythonLibs REQUIRED)
 # Extract just "python3.6" from the version
 string(REGEX MATCH "^[0-9]+\\.[0-9]+" PYTHON_MAJOR_MINOR "${PYTHON_VERSION_STRING}")
 set(CURRENT_PYTHON "python${PYTHON_MAJOR_MINOR}")
+
 
 
 

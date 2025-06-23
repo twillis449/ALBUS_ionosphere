@@ -35,6 +35,7 @@ set(NEOBJS
     irisubne.f
     iritecne.f
 )
+add_compile_options(--std=legacy)
 
 add_executable(iritestne iritestne.f ${OBJS} ${NEOBJS})
 target_link_libraries(iritestne ${LIBRARIES})

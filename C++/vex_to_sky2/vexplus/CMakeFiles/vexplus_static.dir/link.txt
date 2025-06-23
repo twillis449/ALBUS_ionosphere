@@ -1,2 +1,0 @@
-/usr/bin/ar qc libvexplus.a CMakeFiles/vexplus_static.dir/vexplus.cxx.o
-/usr/bin/ranlib libvexplus.a
