@@ -47,6 +47,14 @@ ENV C_INCLUDE_PATH $C_INCLUDE_PATH:/optsoft/include
 ENV CPLUS_INCLUDE_PATH $C_INCLUDE_PATH:/optsoft/include
 
 
+# ---------- Build RNXCMP from source into /optsoft ---------- 
+RUN mkdir /src
+ADD RNXCMP_4.1.0_src.tar.gz /src/
+WORKDIR /src/RNXCMP_4.1.0_src/source
+RUN gcc -ansi -O2 -static rnx2crx.c -o /optsoft/bin/RNX2CRX && \
+    gcc -ansi -O2 -static crx2rnx.c -o /optsoft/bin/CRX2RNX && \
+    ln -s /optsoft/bin/CRX2RNX /optsoft/bin/crx2rnx && \
+    ln -s /optsoft/bin/RNX2CRX /optsoft/bin/rnx2crx
 
 
 # ---------- COMPILE ALBUS ----------
@@ -121,10 +129,11 @@ ENV LD_LIBRARY_PATH "$ALBUSINSTALL/lib:$LD_LIBRARY_PATH"
 ENV PYTHONPATH "$ALBUSINSTALL/share/python:$ALBUSINSTALL/lib:$PYTHONPATH"
 
 #Step 4 Fingers crossed -- build
+RUN apt-get update && apt-get install -y python-is-python3
 WORKDIR /src/ALBUS
 RUN cmake .
 RUN make install
-RUN python3 -c "import AlbusIonosphere" && echo "Crack the bubbly - this hog is airborne!!!"
+RUN python -c "import AlbusIonosphere" && echo "Crack the bubbly - this hog is airborne!!!"
 
 
 # Then build/install:
