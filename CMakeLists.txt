@@ -1,15 +1,32 @@
 cmake_minimum_required(VERSION 3.10)
+
 project(JMA_Code VERSION 1.0.0 LANGUAGES C CXX Fortran)
 
 #----------------------------------------------------------------------------
 # Configuration variables (equivalent to exported Makefile variables)
 #----------------------------------------------------------------------------
 # Installation directory (adjust as needed)
-set(INSTALLDIR "/home/ntsikelelo/Projects/ALBUS/ALBUS_ionosphere" CACHE PATH "Installation directory")   ## set by docker file
 
-# Python configuration
-set(CURRENT_PYTHON "python" CACHE STRING "Python interpreter")   ## set by docker file
-set(PYTHONINCLUDEDIR "/usr/include/python3.10" CACHE PATH "Python include directory")  ## set by docker file
+#set(INSTALLDIR "/home/ntsikelelo/Projects/ALBUS/ALBUS_ionosphere" CACHE PATH "Installation director")   ## set by docker file
+
+find_package(PythonInterp REQUIRED)
+find_package(PythonLibs REQUIRED)
+
+
+# Python_VERSION_STRING is defined by FindPythonInterp
+# It will be something like "3.6.9" → extract the major.minor part
+
+# Extract just "python3.6" from the version
+string(REGEX MATCH "^[0-9]+\\.[0-9]+" PYTHON_MAJOR_MINOR "${PYTHON_VERSION_STRING}")
+set(CURRENT_PYTHON "python${PYTHON_MAJOR_MINOR}")
+
+
+
+
+set(PYTHONINCLUDEDIR ${PYTHON_INCLUDE_DIR}) 
+
+
+include_directories(${PYTHON_INCLUDE_DIRS})
 
 # Version numbers for the library (if used in targets)
 set(VER_MAJOR 1)
@@ -39,7 +56,9 @@ endif()
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
   if(NOT DEBUG)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O2 -Wall")
-    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -O2 -Wall")
+    # Add legacy standard flag
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} --std=legacy")
+
   else()
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -Wall")
     set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -g -Wall")
@@ -71,16 +90,23 @@ else()
   set(POSTFIX "${CMAKE_SYSTEM_NAME}_debug")
 endif()
 
-#----------------------------------------------------------------------------
-# Subdirectories (similar to your SUBDIRS list in the Makefile)
-#----------------------------------------------------------------------------
-# Each of these subdirectories should contain its own CMakeLists.txt.
 
 # Build all libaries then link with ALBUS_ionosphere last in C++ folder 
+
+
+
 
 add_subdirectory(FORTRAN)
 add_subdirectory(Python)
 add_subdirectory(C++)
 
+##set file permissions after installation 
+install(CODE "execute_process(COMMAND chmod -R ugo+rX ${INSTALLDIR}/bin)")
+install(CODE "execute_process(COMMAND chmod -R ugo+rX ${INSTALLDIR}/include)")
+install(CODE "execute_process(COMMAND chmod -R ugo+rX ${INSTALLDIR}/lib)")
+install(CODE "execute_process(COMMAND chmod -R ugo+rX ${INSTALLDIR}/libdata)")
+install(CODE "execute_process(COMMAND chmod -R ugo+rX ${INSTALLDIR}/share)")
+install(CODE "execute_process(COMMAND mkdir -p ${INSTALLDIR}/man)")
+install(CODE "execute_process(COMMAND chmod -R ugo+rX ${INSTALLDIR}/man)")
 
 

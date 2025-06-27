@@ -46,17 +46,15 @@ install(
   DESTINATION ${INSTALLDIR}/share/python
 )
 
-install(
-  FILES ${DATA}
-  DESTINATION ${INSTALLDIR}/libdata/JMA
-)
+
 
 install(
   FILES ${PROG}
   DESTINATION ${INSTALLDIR}/bin
 )
+#need to this file executable
+install(CODE "execute_process(COMMAND chmod +x ${INSTALLDIR}/bin/Albus_RINEX_download.py)")
 
-#-----------------------------------------------------------------------------
 # Precompile Python modules
 #
 # For each module listed in MODULES, the original Makefile does:

@@ -1,0 +1,21 @@
+[build-system]
+requires = ["scikit-build-core[pyproject]", "numpy"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "AlbusIonosphere"
+version = "1.0.0"
+description = "ALBUS Ionospheric Calibration package for AIPS"
+authors = [{ name = "James M Anderson" }]
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = ["numpy"]
+
+[tool.scikit-build]
+# This uses your existing CMakeLists.txt
+cmake.minimum-version = "3.10"
+sdist.include = ["CMakeLists.txt"]
+wheel.packages = ["Python"]
+
+

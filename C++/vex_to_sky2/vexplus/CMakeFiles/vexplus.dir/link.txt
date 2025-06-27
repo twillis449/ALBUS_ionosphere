@@ -1,1 +1,0 @@
-/usr/bin/c++ -fPIC -shared -Wl,-soname,libvexplus.so.1 -o libvexplus.so.1.0.0 CMakeFiles/vexplus.dir/vexplus.cxx.o   -L/home/ntsikelelo/Projects/ALBUS/ALBUS_ionosphere/lib  -L/home/user/Projects/ALBUS/ALBUS_ionosphere/C++/vex_to_sky2/../mim/test/PIMrunner 

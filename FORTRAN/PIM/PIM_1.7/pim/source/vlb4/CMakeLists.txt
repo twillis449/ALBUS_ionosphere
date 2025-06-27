@@ -70,10 +70,8 @@ endif()
 # (which will produce libpim.a). We use the output name "pim" so that on UNIX
 # the actual files become libpim.so and libpim.a.
 # --------------------------------------------------------------------
-add_library(pim SHARED ${LIB_SRCS})
-set_target_properties(pim PROPERTIES OUTPUT_NAME "pim")
 
-add_library(pim_static STATIC ${LIB_SRCS})
+add_library(pim SHARED ${LIB_SRCS})
 set_target_properties(pim PROPERTIES OUTPUT_NAME "pim" 
  VERSION "${VER_MAJOR}.${VER_MINOR}.${VER_SUBSUB}"
   SOVERSION "${VER_MAJOR}")
@@ -97,37 +95,6 @@ target_link_libraries(pim_asub PRIVATE pim ${SOFA_LIB} ${F77_COMPILER_LIB} m)
 # The libraries will be placed in the "lib" directory and the headers
 # in the "include" directory of the install prefix.
 # --------------------------------------------------------------------
-install(TARGETS pim pim_static
-        LIBRARY DESTINATION ${INSTALLDIR}/lib 
-        ARCHIVE DESTINATION ${INSTALLDIR}/lib
-        RUNTIME DESTINATION ${INSTALLDIR}/bin)
+install(TARGETS pim LIBRARY DESTINATION ${INSTALLDIR}/lib)
 install(FILES ${HEADERS} DESTINATION ${INSTALLDIR}/include)
 
-# --------------------------------------------------------------------
-# Custom Targets for Dependency Generation and Cleaning
-#
-# CMake generators already provide a "clean" target. You can add custom
-# targets for dependency generation if needed. The following is a placeholder.
-# --------------------------------------------------------------------
-add_custom_target(vlb4_depend
-  COMMAND ${CMAKE_COMMAND} -E echo "Dependency generation not implemented."
-  COMMENT "Generating dependencies"
-)
-
-# --------------------------------------------------------------------
-# Notes:
-#
-# - The original Makefile built executables by directly linking object files.
-#   In CMake, we instead build a library from the common sources and link that library.
-#
-# - If your test program source files have extensions other than ".f" (or if
-#   they need special compile options), you can set source file properties or add
-#   separate targets accordingly.
-#
-# - The linking of external libraries (e.g. SOFA and the Fortran runtime) is
-#   done via target_link_libraries. Adjust these as needed.
-#
-# - CMake’s built-in "clean" target (e.g. using "cmake --build . --target clean")
-#   will remove build artifacts. The "distclean" functionality (removing backup
-#   files) can be added as an additional custom target if desired.
-# --------------------------------------------------------------------

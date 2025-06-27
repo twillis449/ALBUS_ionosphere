@@ -162,17 +162,17 @@ target_link_libraries(mim PRIVATE
 # In CMake we define one executable per main file and link it against the library.
 #----------------------------------------------------------------------------
 set(EXECUTABLES
-    lofar
-    lofar2
-    lofar3
-    lofar4
-    lofar5
+    #lofar
+    #lofar2
+    # lofar3
+    #lofar4
+    #lofar5
     lofar6
     lofar7
     lofar8
     lofar9
     lofar10
-    test_pim
+    #test_pim
     test2_pim
     vlba_obs
 )

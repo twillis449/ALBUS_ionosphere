@@ -1,0 +1,16 @@
+[distutils.commands]
+build_cmake = scikit_build_core.setuptools.build_cmake:BuildCMake
+
+[distutils.setup_keywords]
+cmake_args = scikit_build_core.setuptools.build_cmake:cmake_args
+cmake_install_target = scikit_build_core.setuptools.build_cmake:cmake_install_target
+cmake_source_dir = scikit_build_core.setuptools.build_cmake:cmake_source_dir
+
+[hatch]
+scikit-build = scikit_build_core.hatch.hooks
+
+[setuptools.finalize_distribution_options]
+scikit_build_entry = scikit_build_core.setuptools.build_cmake:finalize_distribution_options
+
+[validate_pyproject.tool_schema]
+scikit-build = scikit_build_core.settings.skbuild_schema:get_skbuild_schema
